@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AEFABCBD-847B-4FEB-85AA-BD06F35E4E6B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{16EDA0BA-4E8B-4357-BD93-5F7235786F24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tixxp.WebApp", "TixxpWebApp\Tixxp.WebApp.csproj", "{4AB38EDF-80DC-4589-AC10-AE05B5CF672F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tixxp.Entities", "TixxpEntities\Tixxp.Entities.csproj", "{A948DD7B-2FFE-480F-AE23-ACB8D1739302}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tixxp.Infrastructure", "Tixxp.DataAccess\Tixxp.Infrastructure.csproj", "{C26A25D0-07CD-4CF9-A9F9-35ED2C44E969}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tixxp.Business", "Tixxp.Business\Tixxp.Business.csproj", "{6385FA0C-B5C2-4F8F-A813-8B1228AFBD69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tixxp.Core", "Tixxp.Core\Tixxp.Core.csproj", "{642EBDE0-2114-47A7-B906-B6C37F5FD61C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AB38EDF-80DC-4589-AC10-AE05B5CF672F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AB38EDF-80DC-4589-AC10-AE05B5CF672F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AB38EDF-80DC-4589-AC10-AE05B5CF672F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AB38EDF-80DC-4589-AC10-AE05B5CF672F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A948DD7B-2FFE-480F-AE23-ACB8D1739302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A948DD7B-2FFE-480F-AE23-ACB8D1739302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A948DD7B-2FFE-480F-AE23-ACB8D1739302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A948DD7B-2FFE-480F-AE23-ACB8D1739302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C26A25D0-07CD-4CF9-A9F9-35ED2C44E969}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C26A25D0-07CD-4CF9-A9F9-35ED2C44E969}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C26A25D0-07CD-4CF9-A9F9-35ED2C44E969}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C26A25D0-07CD-4CF9-A9F9-35ED2C44E969}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6385FA0C-B5C2-4F8F-A813-8B1228AFBD69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6385FA0C-B5C2-4F8F-A813-8B1228AFBD69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6385FA0C-B5C2-4F8F-A813-8B1228AFBD69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6385FA0C-B5C2-4F8F-A813-8B1228AFBD69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{642EBDE0-2114-47A7-B906-B6C37F5FD61C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{642EBDE0-2114-47A7-B906-B6C37F5FD61C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{642EBDE0-2114-47A7-B906-B6C37F5FD61C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{642EBDE0-2114-47A7-B906-B6C37F5FD61C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4AB38EDF-80DC-4589-AC10-AE05B5CF672F} = {AEFABCBD-847B-4FEB-85AA-BD06F35E4E6B}
+		{A948DD7B-2FFE-480F-AE23-ACB8D1739302} = {AEFABCBD-847B-4FEB-85AA-BD06F35E4E6B}
+		{C26A25D0-07CD-4CF9-A9F9-35ED2C44E969} = {AEFABCBD-847B-4FEB-85AA-BD06F35E4E6B}
+		{6385FA0C-B5C2-4F8F-A813-8B1228AFBD69} = {AEFABCBD-847B-4FEB-85AA-BD06F35E4E6B}
+		{642EBDE0-2114-47A7-B906-B6C37F5FD61C} = {AEFABCBD-847B-4FEB-85AA-BD06F35E4E6B}
+	EndGlobalSection
+EndGlobal

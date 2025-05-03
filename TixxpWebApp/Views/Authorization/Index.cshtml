@@ -1,0 +1,134 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DEM - Tixxp APP | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="~/assets/images/brand-logos/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="~/assets/libs/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/assets/css/styles.min.css" />
+    <link rel="stylesheet" href="~/assets/css/icons.min.css" />
+</head>
+<body class="authentication-bg">
+    <div class="square-box">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <div class="container h-100">
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                <div class="card custom-card shadow-lg">
+                    <div class="card-body p-5">
+                        <h5 class="text-center mb-4 fw-bold">Sign In</h5>
+
+                        <div class="mb-3">
+                            <label for="signin-username" class="form-label">Username</label>
+                            <input type="text" id="signin-username" class="form-control form-control-lg" placeholder="Enter username">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signin-password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" id="signin-password" class="form-control form-control-lg" placeholder="Enter password">
+                                <button class="btn btn-light border" type="button" onclick="createpassword('signin-password', this)">
+                                    <i class="ri-eye-off-line align-middle"></i>
+                                </button>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="remember-check">
+                                <label class="form-check-label" for="remember-check">Remember me</label>
+                                <a href="/Authorization/ResetPassword" class="float-end text-danger small">Forgot password?</a>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button id="login-btn" type="button" class="btn btn-primary btn-lg">Sign In</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Success Toast -->
+    <div id="solid-successToast"
+         class="toast fade position-fixed top-0 start-0 m-3 bg-success text-white"
+         role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <img class="bd-placeholder-img rounded me-2" src="~/assets/images/brand-logos/toggle-white.png" alt="logo">
+            <strong class="me-auto">Tixxp</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="success-toast-message">Giriş başarılı</div>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="solid-dangerToast"
+         class="toast fade position-fixed top-0 start-0 m-3 bg-danger text-white"
+         role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <img class="bd-placeholder-img rounded me-2" src="~/assets/images/brand-logos/toggle-white.png" alt="logo">
+            <strong class="me-auto">Tixxp</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="error-toast-message">Giriş başarısız</div>
+    </div>
+
+    <script src="~/js/app.api.js"></script>
+    <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/js/show-password.js"></script>
+    <script>
+        function showToast(type, message, redirectUrl = null) {
+            const toastId = type === "success" ? "solid-successToast" : "solid-dangerToast";
+            const toastMessageId = type === "success" ? "success-toast-message" : "error-toast-message";
+            document.getElementById(toastMessageId).textContent = message;
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            if (redirectUrl) {
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    window.location.href = redirectUrl;
+                }, { once: true });
+            }
+            toast.show();
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginBtn = document.getElementById("login-btn");
+            loginBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const username = document.getElementById("signin-username").value.trim();
+                const password = document.getElementById("signin-password").value.trim();
+                if (!username || !password) {
+                    showToast("error", "Lütfen kullanıcı adı ve şifre giriniz.");
+                    return;
+                }
+                        const data = {
+            username: username,
+            password: password
+        };
+                api.post("/Authorization/Login", data, function (res) {
+                    showToast("success", res.message || "Giriş başarılı!", res.redirectUrl);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
