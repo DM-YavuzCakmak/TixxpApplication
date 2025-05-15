@@ -29,7 +29,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Bank}/{action=Index}/{id?}");
+    pattern: "{controller=Authorization}/{action=Index}/{id?}");
 app.MapControllers(); 
 
 app.Run();

@@ -20,12 +20,11 @@ namespace Tixxp.WebApp.Controllers
         }
         #endregion
 
+
         #region Login
         [HttpPost]
         public IActionResult Login([FromBody] LoginRequestModel loginRequestModel)
         {
-
-
 
 
             return Ok();

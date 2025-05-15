@@ -28,7 +28,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
 
     public IDataResult<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
     {
-        var user = _personnelRepository.Get(x =>x.Email == loginRequestDto.Email && x.IsActive);
+        var user = _personnelRepository.Get(x => x.Email == loginRequestDto.Email && x.IsActive);
         if (user == null)
             return new ErrorDataResult<LoginResponseDto>("Kullanıcı bulunamadı.");
 
