@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Tixxp.Core.Utilities.Results.Abstract;
 
-namespace Tixxp.Business.DataTransferObjects.Personnel.Login
+namespace Tixxp.Business.DataTransferObjects.Personnel.Login;
+
+public class LoginResponseDto : IResult
 {
-    public class LoginResponseDto
-    {
-    }
+    public bool Success { get; set; }
+
+    public string Message { get; set; }
 }

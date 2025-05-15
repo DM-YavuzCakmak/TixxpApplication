@@ -14,6 +14,9 @@ public class PersonnelEntity : BaseEntity
     [Column("UserName")]
     public string UserName { get; set; }
 
+    [Column("Salt")]
+    public string Salt { get; set; }
+
     [Column("Email")]
     public string Email { get; set; }
 
