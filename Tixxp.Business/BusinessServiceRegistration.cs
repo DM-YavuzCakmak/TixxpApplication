@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tixxp.Business.Services.Abstract.BankService;
 using Tixxp.Business.Services.Abstract.Base;
+using Tixxp.Business.Services.Abstract.Counter;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Abstract.RoleService;
 using Tixxp.Business.Services.Concrete.BankService;
 using Tixxp.Business.Services.Concrete.Base;
+using Tixxp.Business.Services.Concrete.Counter;
 using Tixxp.Business.Services.Concrete.PersonnelRoleService;
 using Tixxp.Business.Services.Concrete.PersonnelService;
 using Tixxp.Business.Services.Concrete.RoleService;
@@ -25,6 +27,7 @@ namespace Tixxp.Business
 
 
             services.AddScoped<IBankService, BankService>();
+            services.AddScoped<ICounterService, CounterService>();
             return services;
         }
     }

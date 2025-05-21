@@ -3,4 +3,5 @@
 public static class SchemaConstant
 {
     public const string Default = "TixxpCommon";
+    public const string Kariye = "TixxpKariyeMosque";
 }

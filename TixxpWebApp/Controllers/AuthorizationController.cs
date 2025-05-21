@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Tixxp.Business.DataTransferObjects.Personnel.Login;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Core.Utilities.Results.Abstract;
@@ -24,11 +26,11 @@ namespace Tixxp.WebApp.Controllers
 
         #region Login
         [HttpPost]
-        public IActionResult Login([FromBody] LoginRequestModel loginRequestModel)
+        public async Task<IActionResult> Login([FromBody] LoginRequestModel loginRequestModel)
         {
             try
             {
-                IDataResult<LoginResponseDto> loginResult = _personnelService.Login(new LoginRequestDto
+                IDataResult<LoginResponseDto> loginResult = await _personnelService.Login(new LoginRequestDto
                 {
                     Email = loginRequestModel.Username,
                     Password = loginRequestModel.Password
@@ -49,5 +51,12 @@ namespace Tixxp.WebApp.Controllers
             }
         }
         #endregion
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Authorization");
+        }
     }
 }

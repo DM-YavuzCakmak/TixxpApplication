@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tixxp.Entities.Bank;
-using Tixxp.Entities.Personnel;
-using Tixxp.Entities.PersonnelRole;
-using Tixxp.Entities.Role;
-using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PersonnelRole;
+using Tixxp.Entities.Counter;
 
 namespace Tixxp.Infrastructure.DataAccess.Context
 {
@@ -19,28 +16,14 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<PersonnelEntity>(entity =>
+            modelBuilder.Entity<CounterEntity>(entity =>
             {
-                entity.ToTable("Personnel", _schema);
+                entity.ToTable("Counter", _schema);
             });
-            modelBuilder.Entity<RoleEntity>(entity =>
-            {
-                entity.ToTable("Role", _schema);
-            });
-            modelBuilder.Entity<PersonnelRoleEntity>(entity =>
-            {
-                entity.ToTable("PersonnelRole", _schema);
-            });
-            modelBuilder.Entity<BankEntity>(entity =>
-            {
-                entity.ToTable("Bank", _schema);
-            });
+
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<PersonnelEntity> Personnels { get; set; }
-        public DbSet<RoleEntity> Roles { get; set; }
-        public DbSet<PersonnelRoleEntity> PersonnelRoles { get; set; }
-        public DbSet<BankEntity> Banks { get; set; }
+        public DbSet<CounterEntity> Counters { get; set; }
     }
 }

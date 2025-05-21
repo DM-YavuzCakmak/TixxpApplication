@@ -52,12 +52,20 @@
                         <div class="d-grid mt-4">
                             <button id="login-btn" type="button" class="btn btn-primary btn-lg">Sign In</button>
                         </div>
+                        <div class="d-grid mt-2">
+                            <form action="/Authorization/Logout" method="post">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="ri-logout-box-line"></i> Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+   
     <!-- Success Toast -->
     <div id="solid-successToast" class="toast fade position-fixed top-0 start-0 m-3 bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header bg-success text-white">

@@ -6,6 +6,6 @@ using Tixxp.Entities.Personnel;
 namespace Tixxp.Business.Services.Abstract.PersonnelService;
 public interface IPersonnelService : IBaseService<PersonnelEntity>
 {
-    IDataResult<LoginResponseDto> Login(LoginRequestDto loginRequestDto);
+    Task<IDataResult<LoginResponseDto>> Login(LoginRequestDto loginRequestDto);
 
 }

@@ -11,17 +11,28 @@ namespace Tixxp.Infrastructure
     {
         public static IServiceCollection AddTixxpDbContext(this IServiceCollection services, IConfiguration configuration)
         {
+            // Schema Provider
             services.AddScoped<ISchemaProvider, SchemaProvider>();
 
+            // Dinamik veritabanı için: TixappContext
             services.AddScoped<TixappContext>(serviceProvider =>
             {
                 var schemaProvider = serviceProvider.GetRequiredService<ISchemaProvider>();
-                var schema = schemaProvider.GetSchema(); // Örnek: TixxpCommon
+                var schema = schemaProvider.GetSchema(); // Örnek: TixxpChora
                 var connStringTemplate = configuration.GetConnectionString("DefaultConnection");
                 var fullConnectionString = connStringTemplate.Replace("{InitialCatalog}", schema);
+
                 var optionsBuilder = new DbContextOptionsBuilder<TixappContext>();
                 optionsBuilder.UseSqlServer(fullConnectionString);
+
                 return new TixappContext(optionsBuilder.Options, "dbo");
+            });
+
+            // Ortak veritabanı için: CommonDbContext (her zaman TixxpCommon)
+            services.AddDbContext<CommonDbContext>(options =>
+            {
+                var commonConnection = configuration.GetConnectionString("CommonConnection");
+                options.UseSqlServer(commonConnection);
             });
 
             return services;

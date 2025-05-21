@@ -20,6 +20,9 @@ public class PersonnelEntity : BaseEntity
     [Column("Email")]
     public string Email { get; set; }
 
+    [Column("CompanyIdentifier")]
+    public string CompanyIdentifier { get; set; }
+
     [Column("Password")]
     public string Password { get; set; }
 

@@ -2,10 +2,14 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Win32;
 using Tixxp.Business.DataTransferObjects.Personnel.Login;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Concrete.Base;
+using Tixxp.Core.Utilities.Constants.SchemaConstant;
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Core.Utilities.Results.Concrete;
 using Tixxp.Entities.Personnel;
@@ -16,14 +20,17 @@ namespace Tixxp.Business.Services.Concrete.PersonnelService;
 public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
 {
     private readonly IPersonnelRepository _personnelRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public PersonnelService(IPersonnelRepository personnelRepository)
+
+    public PersonnelService(IPersonnelRepository personnelRepository, IHttpContextAccessor httpContextAccessor)
         : base(personnelRepository)
     {
         _personnelRepository = personnelRepository;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public IDataResult<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
+    public async Task<IDataResult<LoginResponseDto>> Login(LoginRequestDto loginRequestDto)
     {
         var user = _personnelRepository.Get(x => x.Email == loginRequestDto.Email && x.IsActive);
         if (user == null)
@@ -38,12 +45,26 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         if (user.Password != computedHash)
             return new ErrorDataResult<LoginResponseDto>("Şifre hatalı.");
 
+        // ✅ Claims oluştur
         var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
-    };
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+            new Claim("CompanyIdentifier", user.CompanyIdentifier ?? SchemaConstant.Default)
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        // ✅ Cookie ile oturum başlat
+        await _httpContextAccessor.HttpContext.SignInAsync(
+       CookieAuthenticationDefaults.AuthenticationScheme,
+       principal,
+       new AuthenticationProperties
+       {
+           IsPersistent = false // ❗ Tarayıcı kapanınca cookie silinir
+       });
 
         var loginResponseDto = new LoginResponseDto
         {
