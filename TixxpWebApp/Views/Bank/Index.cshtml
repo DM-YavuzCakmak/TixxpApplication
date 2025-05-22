@@ -4,12 +4,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+
 <div class="main-content app-content">
     <div class="container-fluid">
 
-        <!-- Page Header -->
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Banka Listesi</h1>
+            <button class="btn btn-primary" onclick="openAddModal()">+ Ekle</button>
         </div>
 
         <div class="row">
@@ -22,6 +24,7 @@
                                     <tr>
                                         <th>Adı</th>
                                         <th>Muhasebe Kodu</th>
+                                        <th>İşlem</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -32,34 +35,21 @@
                                             <tr>
                                                 <td>@bank.Name</td>
                                                 <td>@bank.AccountingCode</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-warning" onclick="openEditModal(@bank.Id, '@bank.Name', '@bank.AccountingCode')">Düzenle</button>
+                                                    <button class="btn btn-sm btn-danger" onclick="deleteBank(@bank.Id)">Sil</button>
+                                                </td>
                                             </tr>
                                         }
                                     }
                                     else
                                     {
                                         <tr>
-                                            <td colspan="2" class="text-center">Kayıt bulunamadı.</td>
+                                            <td colspan="3" class="text-center">Kıyat bulunamadı.</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-
-                    <div class="modal fade" id="showModal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-light p-3">
-                                    <h5 class="modal-title">Banka Detay</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Buraya detay içeriği gelecek.</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kapat</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -67,3 +57,84 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="bankModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Banka</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bankForm">
+                    <input type="hidden" id="bankId" name="Id" />
+
+                    <div class="mb-3">
+                        <label>Adı</label>
+                        <input type="text" class="form-control" id="bankName" name="Name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Muhasebe Kodu</label>
+                        <input type="text" class="form-control" id="bankAccountingCode" name="AccountingCode" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function openAddModal() {
+            $('#bankForm')[0].reset();
+            $('#bankId').val('');
+            $('#modalTitle').text('Banka Ekle');
+            $('#bankModal').modal('show');
+        }
+
+        function openEditModal(id, name, accountingCode) {
+            $('#bankId').val(id);
+            $('#bankName').val(name);
+            $('#bankAccountingCode').val(accountingCode);
+            $('#modalTitle').text('Banka Güncelle');
+            $('#bankModal').modal('show');
+        }
+
+        $('#bankForm').submit(function (e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.post('/Bank/Save', formData, function (response) {
+                if (response.success) {
+                    Swal.fire('Başarılı!', response.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Hata', response.message, 'error');
+                }
+            });
+        });
+
+        function deleteBank(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu banka silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, sil!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Bank/Delete', { id: id }, function (response) {
+                        if (response.success) {
+                            Swal.fire('Silindi!', response.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Hata', response.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

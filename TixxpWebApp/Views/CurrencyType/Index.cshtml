@@ -1,0 +1,147 @@
+﻿@model List<Tixxp.Entities.CurrencyType.CurrencyTypeEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Para Birimi Listesi</h1>
+            <button class="btn btn-primary" onclick="openAddModal()">+ Ekle</button>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-nowrap w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Adı</th>
+                                        <th>Sembol</th>
+                                        <th>Etiket</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        foreach (var currency in Model)
+                                        {
+                                            <tr>
+                                                <td>@currency.Name</td>
+                                                <td>@currency.Symbol</td>
+                                                <td>@currency.Tag</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-warning" onclick="openEditModal(@currency.Id, '@currency.Name', '@currency.Symbol', '@currency.Tag')">Düzenle</button>
+                                                    <button class="btn btn-sm btn-danger" onclick="deleteCurrency(@currency.Id)">Sil</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center">Kayıt bulunamadı.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="currencyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Para Birimi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="currencyForm">
+                    <input type="hidden" id="currencyId" name="Id" />
+
+                    <div class="mb-3">
+                        <label>Adı</label>
+                        <input type="text" class="form-control" id="currencyName" name="Name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Sembol</label>
+                        <input type="text" class="form-control" id="currencySymbol" name="Symbol" />
+                    </div>
+                    <div class="mb-3">
+                        <label>Etiket</label>
+                        <input type="text" class="form-control" id="currencyTag" name="Tag" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function openAddModal() {
+            $('#currencyForm')[0].reset();
+            $('#currencyId').val('');
+            $('#modalTitle').text('Para Birimi Ekle');
+            $('#currencyModal').modal('show');
+        }
+
+        function openEditModal(id, name, symbol, tag) {
+            $('#currencyId').val(id);
+            $('#currencyName').val(name);
+            $('#currencySymbol').val(symbol);
+            $('#currencyTag').val(tag);
+            $('#modalTitle').text('Para Birimi Güncelle');
+            $('#currencyModal').modal('show');
+        }
+
+        $('#currencyForm').submit(function (e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.post('/CurrencyType/Save', formData, function (response) {
+                if (response.success) {
+                    Swal.fire('Başarılı!', response.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Hata', response.message, 'error');
+                }
+            });
+        });
+
+        function deleteCurrency(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu para birimi silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, sil!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/CurrencyType/Delete', { id: id }, function (response) {
+                        if (response.success) {
+                            Swal.fire('Silindi!', response.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Hata', response.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

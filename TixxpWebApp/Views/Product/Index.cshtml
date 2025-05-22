@@ -1,0 +1,151 @@
+﻿@model List<Tixxp.Entities.Product.ProductEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Ürün Listesi</h1>
+            <button class="btn btn-primary" onclick="openEditModal(0)">+ Yeni Ürün</button>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <div class="card-title">Ürünler</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-nowrap w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Ürün Adı</th>
+                                        <th>Kodu</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        foreach (var product in Model)
+                                        {
+                                            <tr>
+                                                <td>@product.Name</td>
+                                                <td>@product.Code</td>
+                                                <td>
+                                                    <div class="hstack gap-2 fs-15">
+                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                           onclick="openEditModal(@product.Id)">
+                                                            <i class="ri-edit-line"></i>
+                                                        </a>
+                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                           onclick="confirmDelete(@product.Id)">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr><td colspan="3" class="text-center">Kayıt bulunamadı.</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ürün Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-light p-3">
+                <h5 class="modal-title">Ürün Bilgisi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProductForm">
+                    <input type="hidden" id="editId" name="Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Ürün Adı</label>
+                        <input type="text" class="form-control" id="editName" name="Name" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kodu</label>
+                        <input type="text" class="form-control" id="editCode" name="Code" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openEditModal(id) {
+            if (id === 0) {
+                $('#editId').val('');
+                $('#editName').val('');
+                $('#editCode').val('');
+                $('#editProductModal').modal('show');
+                return;
+            }
+
+            $.get('/Product/GetById', { id: id }, function (data) {
+                $('#editId').val(data.id);
+                $('#editName').val(data.name);
+                $('#editCode').val(data.code);
+                $('#editProductModal').modal('show');
+            }).fail(function () {
+                Swal.fire({ icon: 'error', title: 'Hata', text: 'Ürün verisi alınamadı.' });
+            });
+        }
+
+        $('#editProductForm').submit(function (e) {
+            e.preventDefault();
+            const formData = $(this).serialize();
+
+            $.post('/Product/Save', formData, function (response) {
+                if (response.success) {
+                    Swal.fire({ icon: 'success', title: 'Başarılı', text: response.message }).then(() => location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
+                }
+            });
+        });
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu ürünü silmek üzeresiniz.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Product/Delete', { id: id }, function (response) {
+                        if (response.success) {
+                            Swal.fire({ icon: 'success', title: 'Silindi', text: response.message }).then(() => location.reload());
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

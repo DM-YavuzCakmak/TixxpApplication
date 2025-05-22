@@ -46,4 +46,10 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity, new()
         _repository.Delete(entity);
         return new SuccessResult("Kayıt silindi.");
     }
+
+    public IDataResult<T> AddAndReturn(T entity)
+    {
+        var result = _repository.AddAndReturn(entity);
+        return new SuccessDataResult<T>(result, "Kayıt başarıyla eklendi.");
+    }
 }

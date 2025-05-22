@@ -26,5 +26,39 @@ namespace Tixxp.WebApp.Controllers
                 return View(new List<BankEntity>());
             }
         }
+
+        [HttpPost]
+        public IActionResult Save(BankEntity model)
+        {
+            if (model.Id > 0)
+            {
+                model.CreatedBy = 6;
+                model.UpdatedBy = 6;
+                model.Created_Date = DateTime.Now;
+                model.Updated_Date = DateTime.Now;
+                var result = _bankService.Update(model);
+                return Json(new { success = result.Success, message = result.Message });
+            }
+            else
+            {
+                model.CreatedBy = 6;
+                model.Created_Date = DateTime.Now;
+                var result = _bankService.Add(model);
+                return Json(new { success = result.Success, message = result.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Delete(long id)
+        {
+            var entity = _bankService.GetById(id).Data;
+            if (entity == null)
+                return Json(new { success = false, message = "Kayıt bulunamadı." });
+
+            entity.IsDeleted = true;
+            var result = _bankService.Update(entity);
+            return Json(new { success = result.Success, message = result.Message });
+        }
+
     }
 }

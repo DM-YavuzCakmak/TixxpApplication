@@ -1,0 +1,170 @@
+﻿@model List<Tixxp.WebApp.Models.ProductPrice.ProductWithPriceViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Ürün Pos Satışı";
+}
+
+<div class="page">
+    <div class="main-content app-content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Cart Items -->
+                <div class="col-xxl-9">
+                    <div class="card custom-card" id="cart-container-delete">
+                        <div class="card-header">
+                            <div class="card-title">Satıştaki Ürünler</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>Ürün Adı</th>
+                                            <th>Ürün Kodu</th>
+                                            <th>Fiyat</th>
+                                            <th>Adet</th>
+                                            <th>Total Fiyat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr data-product-id="@item.ProductId">
+                                                <td>@item.Name</td>
+                                                <td>@item.Code</td>
+                                                <td>$@item.Price</td>
+                                                <td>
+                                                    <div class="input-group rounded flex-nowrap">
+                                                        <button class="btn btn-icon btn-light input-group-text product-quantity-minus"><i class="ri-subtract-line"></i></button>
+                                                        <input type="text" class="form-control text-center product-qty" value="0" data-price="@item.Price" />
+                                                        <button class="btn btn-icon btn-light input-group-text product-quantity-plus"><i class="ri-add-line"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td class="product-total">$@item.Price</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Section -->
+                <div class="col-xxl-3">
+                    <div class="card custom-card">
+                        <div class="card-body p-0">
+                            <div class="p-3 border-bottom border-block-end-dashed">
+                                <div class="input-group mb-1">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Kupon Kodu">
+                                    <button class="btn btn-primary input-group-text">Uygula</button>
+                                </div>
+                                <a href="javascript:void(0);" class="fs-12 text-success">İlk satın almada 10% indirim uygulanmaktadır.</a>
+                            </div>
+
+                            <div class="p-3 border-bottom border-block-end-dashed">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">Ara Toplam</span>
+                                    <span id="subtotal" class="fw-medium">$0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">İndirim</span>
+                                    <span class="text-success fw-medium">- $0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Ödenecek Tutar</span>
+                                    <span id="grand-total" class="fw-bold text-primary">$0.00</span>
+                                </div>
+                            </div>
+                            <div class="p-3 d-grid">
+                                <button id="checkout-button" class="btn btn-primary btn-wave mb-2">Proceed To Checkout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function calculateCart() {
+            let subtotal = 0;
+            document.querySelectorAll('.product-qty').forEach(function (input) {
+                const price = parseFloat(input.dataset.price);
+                const qty = parseInt(input.value) || 0;
+                const total = price * qty;
+                input.closest('tr').querySelector('.product-total').textContent = `$${total.toFixed(2)}`;
+                subtotal += total;
+            });
+
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('grand-total').textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        function getProductData() {
+            const data = [];
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const productId = parseInt(row.getAttribute("data-product-id"));
+                const price = parseFloat(row.querySelector('.product-qty').dataset.price);
+                const quantity = parseInt(row.querySelector('.product-qty').value) || 0;
+                if (quantity > 0) {
+                    data.push({ productId, price, quantity });
+                }
+            });
+            return data;
+        }
+
+        async function postProductData() {
+            const data = getProductData();
+            const response = await fetch('/ProductSaleCheckOut/Submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.isSuccess) {
+                    window.location.href = `/ProductSaleCheckOut/Index?productSaleId=${result.productSaleId}`;
+                } else {
+                    alert("Sunucu hatası: " + (result.message || "Bilinmeyen hata."));
+                }
+            } else {
+                alert("İstek başarısız oldu.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.product-quantity-plus').forEach(btn =>
+                btn.addEventListener('click', function () {
+                    const input = this.parentElement.querySelector('.product-qty');
+                    input.value = parseInt(input.value) + 1;
+                    calculateCart();
+                })
+            );
+
+            document.querySelectorAll('.product-quantity-minus').forEach(btn =>
+                btn.addEventListener('click', function () {
+                    const input = this.parentElement.querySelector('.product-qty');
+                    input.value = Math.max(0, parseInt(input.value) - 1);
+                    calculateCart();
+                })
+            );
+
+            document.querySelectorAll('.product-qty').forEach(input => {
+                input.addEventListener('change', calculateCart);
+                input.addEventListener('keyup', calculateCart);
+            });
+
+            document.getElementById('checkout-button').addEventListener('click', postProductData);
+
+            calculateCart();
+        });
+    </script>
+}
+
+

@@ -58,4 +58,13 @@ public class EfEntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEnti
         _context.Entry(entity).State = EntityState.Modified;
         _context.SaveChanges();
     }
+
+    public TEntity AddAndReturn(TEntity entity)
+    {
+        entity.Created_Date = DateTime.Now;
+        entity.IsDeleted = false;
+        _context.Set<TEntity>().Add(entity);
+        _context.SaveChanges();
+        return entity; // => burada Id dahil tüm değerleriyle geri döner
+    }
 }

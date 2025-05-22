@@ -51,6 +51,8 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+            new Claim("FirstName", user.FirstName ?? string.Empty),
+            new Claim("LastName", user.LastName ?? string.Empty),
             new Claim("CompanyIdentifier", user.CompanyIdentifier ?? SchemaConstant.Default)
         };
 
