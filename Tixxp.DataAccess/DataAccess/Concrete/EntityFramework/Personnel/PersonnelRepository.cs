@@ -5,9 +5,9 @@ using Tixxp.Infrastructure.DataAccess.Context;
 
 namespace Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Personnel;
 
-public class PersonnelRepository : EfEntityRepositoryBase<PersonnelEntity, TixappContext>, IPersonnelRepository
+public class PersonnelRepository : EfEntityRepositoryBase<PersonnelEntity, CommonDbContext>, IPersonnelRepository
 {
-    public PersonnelRepository(TixappContext context) : base(context)
+    public PersonnelRepository(CommonDbContext context) : base(context)
     {
     }
 }

@@ -25,7 +25,8 @@ namespace Tixxp.WebApp.Controllers
         {
             var result = _productSaleDetailService.GetListWithInclude(x => !x.IsDeleted, x => x.Product);
 
-            var grouped = result.Data
+            // Günlük veriler
+            var groupedDaily = result.Data
                 .GroupBy(x => new
                 {
                     Date = x.Created_Date.ToString("yyyy-MM-dd"),
@@ -38,9 +39,24 @@ namespace Tixxp.WebApp.Controllers
                     Quantity = g.Sum(x => x.Quantity)
                 }).ToList();
 
-            ViewBag.ProductSaleChartData = grouped;
+            // Aylık veriler
+            var groupedMonthly = result.Data
+                .GroupBy(x => new
+                {
+                    Date = x.Created_Date.ToString("yyyy-MM"),
+                    ProductName = x.Product.Name
+                })
+                .Select(g => new ProductSaleStackedReportDto
+                {
+                    Date = g.Key.Date,
+                    ProductName = g.Key.ProductName,
+                    Quantity = g.Sum(x => x.Quantity)
+                }).ToList();
 
-            return View("ProductSaleReport"); 
+            ViewBag.ProductSaleChartData = groupedDaily;
+            ViewBag.MonthlyProductSaleChartData = groupedMonthly;
+
+            return View("ProductSaleReport");
         }
     }
 }

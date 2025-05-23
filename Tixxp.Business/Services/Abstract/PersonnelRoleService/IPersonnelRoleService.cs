@@ -1,5 +1,8 @@
-﻿namespace Tixxp.Business.Services.Abstract.PersonnelRoleService;
+﻿using Tixxp.Business.Services.Abstract.Base;
+using Tixxp.Entities.PersonnelRole;
 
-public interface IPersonnelRoleService
+namespace Tixxp.Business.Services.Abstract.PersonnelRoleService;
+
+public interface IPersonnelRoleService : IBaseService<PersonnelRoleEntity>
 {
 }

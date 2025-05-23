@@ -1,0 +1,306 @@
+﻿@model List<Tixxp.Entities.Personnel.PersonnelEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .text-bg-purple {
+        background-color: #8e44ad;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+
+    .bg-light-subtle {
+        background-color: #f8f8fc;
+    }
+</style>
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Kullanıcı Listesi</h1>
+            <button class="btn btn-primary" onclick="openEditModal(0)">+ Yeni Kullanıcı</button>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <div class="card-title">Kullanıcılar</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-nowrap w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Ad</th>
+                                        <th>Soyad</th>
+                                        <th>Email</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        foreach (var personnel in Model)
+                                        {
+                                            <tr>
+                                                <td>@personnel.FirstName</td>
+                                                <td>@personnel.LastName</td>
+                                                <td>@personnel.Email</td>
+                                                <td>
+                                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                        <!-- Eski işlem butonları -->
+                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="openEditModal(@personnel.Id)">
+                                                            <i class="ri-edit-line"></i>
+                                                        </a>
+                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="confirmDelete(@personnel.Id)">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </a>
+                                                        <!-- Yeni mor temalı rol butonları -->
+                                                        <button class="btn btn-sm text-white" style="background-color:#6f42c1;" onclick="openAssignRoleModal(@personnel.Id)">
+                                                            <i class="ri-shield-user-line me-1"></i> Rol Ata
+                                                        </button>
+                                                        <button class="btn btn-sm text-white" style="background-color:#9b59b6;" onclick="showRoles(@personnel.Id)">
+                                                            <i class="ri-eye-line me-1"></i> Rolleri Göster
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr><td colspan="4" class="text-center">Kayıt bulunamadı.</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="showRolesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-light p-3">
+                <h5 class="modal-title">Kullanıcının Rolleri</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="roleTagsContainer" class="d-flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Kullanıcı Modal -->
+<div class="modal fade" id="editPersonnelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-light p-3">
+                <h5 class="modal-title">Kullanıcı Bilgisi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPersonnelForm">
+                    <input type="hidden" id="editId" name="Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Ad</label>
+                        <input type="text" class="form-control" name="FirstName" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Soyad</label>
+                        <input type="text" class="form-control" name="LastName" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="Email" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Telefon</label>
+                        <input type="text" class="form-control" name="Phone" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Şifre</label>
+                        <input type="password" class="form-control" name="Password" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kullanıcı Rol Atama Modal -->
+<div class="modal fade" id="assignRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-light p-3">
+                <h5 class="modal-title">Rol Ata</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignRoleForm">
+                    <input type="hidden" id="assignRolePersonnelId" name="PersonnelId" />
+                    <div class="mb-3">
+                        <label class="form-label">Rol Seçin</label>
+                        <select class="form-control" name="RoleId" id="roleSelect" required>
+                            <option value="">-- Rol seçiniz --</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Ata</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+                function showRoles(personnelId) {
+            $.get('/Personnel/GetRolesByPersonnelId', { personnelId }, function (response) {
+                const container = $('#roleTagsContainer');
+                container.empty();
+
+                if (response.success && response.data.length > 0) {
+                    response.data.forEach(function (role) {
+                        container.append(`<span class="text-bg-purple">${role.name}</span>`);
+                    });
+                } else {
+                    container.append('<p>Rol bulunamadı.</p>');
+                }
+
+                $('#showRolesModal').modal('show');
+            }).fail(function () {
+                Swal.fire({ icon: 'error', title: 'Hata', text: 'Roller alınırken hata oluştu.' });
+            });
+        }
+
+
+        function openAssignRoleModal(personnelId) {
+            $('#assignRolePersonnelId').val(personnelId);
+
+            // Rolleri çek
+            $.get('/Personnel/GetAllRole', function (response) {
+                const roleSelect = $('#roleSelect');
+                roleSelect.empty();
+                if (response.success && response.data.length > 0) {
+                    roleSelect.append('<option value="">-- Rol seçiniz --</option>');
+                    response.data.forEach(function (role) {
+                        roleSelect.append('<option value="' + role.id + '">' + role.name + '</option>');
+                    });
+                } else {
+                    roleSelect.append('<option value="">Rol bulunamadı</option>');
+                }
+                $('#assignRoleModal').modal('show');
+            }).fail(function () {
+                Swal.fire({ icon: 'error', title: 'Hata', text: 'Roller alınırken hata oluştu.' });
+            });
+        }
+
+        $('#assignRoleForm').submit(function (e) {
+            e.preventDefault();
+            const formData = $(this).serialize();
+
+            $.post('/Personnel/AssignRole', formData, function (response) {
+                if (response.success) {
+                    Swal.fire({ icon: 'success', title: 'Başarılı', text: response.message }).then(() => {
+                        $('#assignRoleModal').modal('hide');
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
+                }
+            }).fail(function () {
+                Swal.fire({ icon: 'error', title: 'Hata', text: 'Rol atama sırasında hata oluştu.' });
+            });
+        });
+
+        function openEditModal(id) {
+            if (id === 0) {
+                $('#editPersonnelForm')[0].reset();
+                $('#editId').val('');
+                $('#editPersonnelForm input[name="Password"]').prop('required', true);
+                $('#editPersonnelModal').modal('show');
+                return;
+            }
+
+            $.get('/Personnel/GetById', { id: id }, function (data) {
+                if (data.success) {
+                    const d = data.data;
+                    $('#editId').val(d.id);
+                    $('#editPersonnelForm input[name="FirstName"]').val(d.firstName);
+                    $('#editPersonnelForm input[name="LastName"]').val(d.lastName);
+                    $('#editPersonnelForm input[name="Email"]').val(d.email);
+                    $('#editPersonnelForm input[name="Phone"]').val(d.phone);
+                    $('#editPersonnelForm input[name="Password"]').val('******').prop('required', false);
+                    $('#editPersonnelModal').modal('show');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Hata', text: data.message });
+                }
+            }).fail(function () {
+                Swal.fire({ icon: 'error', title: 'Hata', text: 'Kullanıcı bilgisi alınamadı.' });
+            });
+        }
+
+        $('#editPersonnelForm').submit(function (e) {
+            e.preventDefault();
+
+            const passwordInput = $('#editPersonnelForm input[name="Password"]');
+            if (passwordInput.val() === '******') {
+                passwordInput.prop('disabled', true);
+            }
+
+            const formData = $(this).serialize();
+
+            passwordInput.prop('disabled', false);
+
+            $.post('/Personnel/Save', formData, function (response) {
+                if (response.success) {
+                    Swal.fire({ icon: 'success', title: 'Başarılı', text: response.message }).then(() => location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
+                }
+            }).fail(function () {
+                Swal.fire({ icon: 'error', title: 'Hata', text: 'Kayıt sırasında bir hata oluştu.' });
+            });
+        });
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu kullanıcıyı silmek üzeresiniz.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Personnel/Delete', { id: id }, function (response) {
+                        if (response.success) {
+                            Swal.fire({ icon: 'success', title: 'Silindi', text: response.message }).then(() => location.reload());
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
+                        }
+                    }).fail(function () {
+                        Swal.fire({ icon: 'error', title: 'Hata', text: 'Silme işlemi sırasında bir hata oluştu.' });
+                    });
+                }
+            });
+        }
+    </script>
+}

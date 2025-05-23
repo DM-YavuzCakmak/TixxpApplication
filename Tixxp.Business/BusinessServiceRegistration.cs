@@ -3,6 +3,7 @@ using Tixxp.Business.Services.Abstract.BankService;
 using Tixxp.Business.Services.Abstract.Base;
 using Tixxp.Business.Services.Abstract.Counter;
 using Tixxp.Business.Services.Abstract.CurrencyType;
+using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Business.Services.Abstract.InvoiceType;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
@@ -16,6 +17,7 @@ using Tixxp.Business.Services.Concrete.BankService;
 using Tixxp.Business.Services.Concrete.Base;
 using Tixxp.Business.Services.Concrete.Counter;
 using Tixxp.Business.Services.Concrete.CurrencyType;
+using Tixxp.Business.Services.Concrete.Event;
 using Tixxp.Business.Services.Concrete.InvoiceType;
 using Tixxp.Business.Services.Concrete.PersonnelRoleService;
 using Tixxp.Business.Services.Concrete.PersonnelService;
@@ -48,6 +50,7 @@ namespace Tixxp.Business
             services.AddScoped<IProductSaleDetailService, ProductSaleDetailService>();
             services.AddScoped<IProductSaleService, ProductSaleService>();
             services.AddScoped<IProductSaleInvoiceInfoService, ProductSaleInvoiceInfoService>();
+            services.AddScoped<IEventService, EventService>();
             return services;
         }
     }

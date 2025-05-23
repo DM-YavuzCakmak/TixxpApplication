@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 using Tixxp.Business.Services.Abstract.Base;
 using Tixxp.Core.DataAccess.EntityFramework;
 using Tixxp.Core.Entities;
@@ -61,7 +62,15 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity, new()
 
     public IDataResult<List<T>> GetListWithInclude(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
     {
-        var list = _repository.GetListWithInclude(filter, includes).ToList(); 
+        var list = _repository.GetListWithInclude(filter, includes).ToList();
         return new SuccessDataResult<List<T>>(list);
+    }
+
+    public IDataResult<T> GetFirstOrDefault(Expression<Func<T, bool>> filter)
+    {
+        var result = _repository.GetFirstOrDefault(filter);
+        if (result != null)
+            return new SuccessDataResult<T>(result);
+        return new ErrorDataResult<T>("Kayıt bulunamadı.");
     }
 }

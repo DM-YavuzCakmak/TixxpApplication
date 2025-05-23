@@ -2,20 +2,36 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Ürün Satış Raporu";
 
-    var chartDataJson = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ProductSaleChartData ?? new List<object>());
+    var dailyChartDataJson = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ProductSaleChartData ?? new List<object>());
+    var monthlyChartDataJson = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.MonthlyProductSaleChartData ?? new List<object>());
 }
 
 <div class="page">
     <div class="main-content app-content">
         <div class="container-fluid">
+            <!-- Günlük Ürün Satış Raporu -->
             <div class="row">
                 <div class="col-xl-10 mx-auto">
                     <div class="card custom-card mt-4">
-                        <div class="card-header">
-                            <div class="card-title">Ürün Satış Raporu</div>
+                        <div class="card-header" style="background: linear-gradient(to right, #dc5c6b, #a057ae); color: white;">
+                            <div class="card-title">🗓️ Günlük Ürün Satış Raporu</div>
                         </div>
                         <div class="card-body">
-                            <div id="productsalereport" style="height: 400px;"></div>
+                            <div id="daily-productsalereport" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aylık Ürün Satış Raporu -->
+            <div class="row">
+                <div class="col-xl-10 mx-auto">
+                    <div class="card custom-card mt-4">
+                        <div class="card-header" style="background: linear-gradient(to right, #dc5c6b, #a057ae); color: white;">
+                            <div class="card-title">📅 Aylık Ürün Satış Raporu</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="monthly-productsalereport" style="height: 400px;"></div>
                         </div>
                     </div>
                 </div>
@@ -26,16 +42,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    var data = @Html.Raw(chartDataJson);
+    const dailyData = @Html.Raw(dailyChartDataJson);
+    const monthlyData = @Html.Raw(monthlyChartDataJson);
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const categories = [...new Set(data.map(d => d.Date))];
-        const products = [...new Set(data.map(d => d.ProductName))];
+    function renderChart(containerId, dataSet, title) {
+        const categories = [...new Set(dataSet.map(d => d.Date))];
+        const products = [...new Set(dataSet.map(d => d.ProductName))];
 
         const series = products.map(product => ({
             name: product,
             data: categories.map(date => {
-                const match = data.find(d => d.ProductName === product && d.Date === date);
+                const match = dataSet.find(d => d.ProductName === product && d.Date === date);
                 return match ? match.Quantity : 0;
             })
         }));
@@ -47,63 +64,37 @@
                 height: 400,
                 stacked: true,
                 stackType: '100%',
-                toolbar: {
-                    show: true,
-                    tools: {
-                        download: true,
-                        zoom: true,
-                        pan: false,
-                        reset: true
-                    }
-                },
-                zoom: {
-                    enabled: true
-                }
+                toolbar: { show: true }
             },
-            grid: {
-                borderColor: '#f2f5f7'
-            },
-            colors: ['#ff0000', '#000000', '#8c9097', '#5b67c7', '#f5b849', '#23b7e5'],
+            colors: ['#dc3545', '#6610f2', '#198754', '#fd7e14', '#0dcaf0'],
             xaxis: {
                 categories: categories,
                 labels: {
-                    style: {
-                        colors: "#8c9097",
-                        fontSize: '11px',
-                        fontWeight: 600
-                    }
+                    style: { colors: "#8c9097", fontSize: '12px', fontWeight: 600 }
                 }
             },
             yaxis: {
                 labels: {
-                    style: {
-                        colors: "#8c9097",
-                        fontSize: '11px',
-                        fontWeight: 600
-                    }
+                    style: { colors: "#8c9097", fontSize: '12px', fontWeight: 600 }
                 }
             },
-            fill: {
-                opacity: 1
-            },
+            fill: { opacity: 1 },
             legend: {
                 position: 'right',
                 offsetY: 10,
-                markers: {
-                    width: 12,
-                    height: 12,
-                    radius: 12
-                },
-                labels: {
-                    colors: '#000'
-                }
+                labels: { colors: '#333' }
             },
             dataLabels: {
                 enabled: true
             }
         };
 
-        const chart = new ApexCharts(document.querySelector("#productsalereport"), options);
+        const chart = new ApexCharts(document.querySelector(`#${containerId}`), options);
         chart.render();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        renderChart("daily-productsalereport", dailyData, "Günlük Ürün Satış Raporu");
+        renderChart("monthly-productsalereport", monthlyData, "Aylık Ürün Satış Raporu");
     });
 </script>

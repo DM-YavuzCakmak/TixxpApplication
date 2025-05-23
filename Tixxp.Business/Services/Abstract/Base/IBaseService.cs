@@ -8,6 +8,7 @@ namespace Tixxp.Business.Services.Abstract.Base
     {
         IDataResult<T> GetById(long id);
         IDataResult<List<T>> GetAll();
+        IDataResult<T> GetFirstOrDefault(Expression<Func<T, bool>> filter);
         IResult Add(T entity);
         IResult Update(T entity);
         IResult Delete(T entity);
