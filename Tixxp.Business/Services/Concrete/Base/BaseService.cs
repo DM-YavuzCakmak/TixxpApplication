@@ -1,4 +1,5 @@
-﻿using Tixxp.Business.Services.Abstract.Base;
+﻿using System.Linq.Expressions;
+using Tixxp.Business.Services.Abstract.Base;
 using Tixxp.Core.DataAccess.EntityFramework;
 using Tixxp.Core.Entities;
 using Tixxp.Core.Utilities.Results.Abstract;
@@ -51,5 +52,16 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity, new()
     {
         var result = _repository.AddAndReturn(entity);
         return new SuccessDataResult<T>(result, "Kayıt başarıyla eklendi.");
+    }
+    public IDataResult<List<T>> GetList(Expression<Func<T, bool>> filter)
+    {
+        var list = _repository.GetList(filter).ToList();
+        return new SuccessDataResult<List<T>>(list);
+    }
+
+    public IDataResult<List<T>> GetListWithInclude(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+    {
+        var list = _repository.GetListWithInclude(filter, includes).ToList(); 
+        return new SuccessDataResult<List<T>>(list);
     }
 }

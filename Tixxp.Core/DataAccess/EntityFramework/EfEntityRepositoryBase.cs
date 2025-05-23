@@ -47,6 +47,18 @@ public class EfEntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEnti
         return filter == null ? query.ToList() : query.Where(filter).ToList();
     }
 
+    public IList<TEntity> GetListWithInclude(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] includes)
+    {
+        IQueryable<TEntity> query = _context.Set<TEntity>().Where(x => !x.IsDeleted);
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return query.Where(filter).ToList();
+    }
+
     public TEntity? GetFirstOrDefault(Expression<Func<TEntity, bool>> filter)
     {
         return _context.Set<TEntity>().Where(x => !x.IsDeleted).FirstOrDefault(filter);

@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
+using Tixxp.Entities.Personnel;
+using Tixxp.Entities.Product;
 
 namespace Tixxp.Entities.ProductSaleDetail;
 
@@ -14,5 +16,8 @@ public class ProductSaleDetailEntity : BaseEntity
 
     [Column("Quantity")]
     public int Quantity { get; set; }
+
+    [ForeignKey(nameof(ProductId))]
+    public virtual ProductEntity Product { get; set; }
 }
  

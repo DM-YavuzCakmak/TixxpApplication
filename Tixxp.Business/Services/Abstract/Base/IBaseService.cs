@@ -1,4 +1,5 @@
-﻿using Tixxp.Core.Entities;
+﻿using System.Linq.Expressions;
+using Tixxp.Core.Entities;
 using Tixxp.Core.Utilities.Results.Abstract;
 
 namespace Tixxp.Business.Services.Abstract.Base
@@ -11,5 +12,8 @@ namespace Tixxp.Business.Services.Abstract.Base
         IResult Update(T entity);
         IResult Delete(T entity);
         IDataResult<T> AddAndReturn(T entity);
+        IDataResult<List<T>> GetList(Expression<Func<T, bool>> filter);
+        IDataResult<List<T>> GetListWithInclude(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tixxp.Business.Services.Abstract.InvoiceType;
+using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
 using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
@@ -15,14 +16,16 @@ namespace Tixxp.WebApp.Controllers
     {
         private readonly IInvoiceTypeService _invoiceTypeService;
         private readonly IProductSaleService _productSaleService;
+        private readonly IProductPriceService _productPriceService;
         private readonly IProductSaleDetailService _productSaleDetailService;
         private readonly IProductSaleInvoiceInfoService _productSaleInvoiceInfoService;
-        public ProductSaleCheckOutController(IInvoiceTypeService invoiceTypeService, IProductSaleService productSaleService, IProductSaleDetailService productSaleDetailService, IProductSaleInvoiceInfoService productSaleInvoiceInfoService)
+        public ProductSaleCheckOutController(IInvoiceTypeService invoiceTypeService, IProductSaleService productSaleService, IProductSaleDetailService productSaleDetailService, IProductSaleInvoiceInfoService productSaleInvoiceInfoService, IProductPriceService productPriceService)
         {
             _invoiceTypeService = invoiceTypeService;
             _productSaleService = productSaleService;
             _productSaleDetailService = productSaleDetailService;
             _productSaleInvoiceInfoService = productSaleInvoiceInfoService;
+            _productPriceService = productPriceService;
         }
 
         public IActionResult Index(long productSaleId)
@@ -35,11 +38,25 @@ namespace Tixxp.WebApp.Controllers
             return View();
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetOrderSummary(long productSaleId)
         {
-            //var result = await _productSaleService.GetSummaryByProductSaleId(productSaleId);
-            return Ok(); // JSON olarak Quantity, Price, ProductName, Total gibi alanlar olacak
+            List<ProductSaleSummaryDto> productSaleSummaryDtos = new List<ProductSaleSummaryDto>();
+            var productSaleDetails = _productSaleDetailService.GetListWithInclude(x => x.ProductSaleId == productSaleId, x => x.Product);
+            if (productSaleDetails.Success)
+            {
+                foreach (var productSaleDetailEntity in productSaleDetails.Data)
+                {
+                    ProductSaleSummaryDto productSaleSummaryDto = new ProductSaleSummaryDto();
+                    productSaleSummaryDto.Price = _productPriceService.GetById(productSaleDetailEntity.ProductId).Data.Price;
+                    productSaleSummaryDto.Quantity = productSaleDetailEntity.Quantity;
+                    productSaleSummaryDto.ProductName = productSaleDetailEntity.Product.Name;
+                    productSaleSummaryDtos.Add(productSaleSummaryDto);
+                }
+            }
+
+            return Ok(productSaleSummaryDtos);
         }
 
         /// <summary>

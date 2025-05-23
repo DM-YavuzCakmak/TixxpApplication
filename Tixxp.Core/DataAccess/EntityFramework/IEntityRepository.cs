@@ -8,6 +8,7 @@ public interface IEntityRepository<T> where T : class, IEntity, new()
     IList<T> GetAll();
     T Get(Expression<Func<T, bool>> filter);
     IList<T> GetList(Expression<Func<T, bool>> filter = null);
+    IList<T> GetListWithInclude(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
     T? GetFirstOrDefault(Expression<Func<T, bool>> filter);
     void Add(T entity);
     void Update(T entity);
