@@ -1,0 +1,109 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-nav-layout="vertical" data-vertical-style="overlay" data-theme-mode="light" data-header-styles="light" data-menu-styles="light" data-toggled="close">
+
+<head>
+    <!-- Meta Data -->
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Şifre Yenile - Admin Paneli</title>
+    <meta name="Description" content="Şifre Yenileme Sayfası">
+    <link rel="icon" href="../assets/images/brand-logos/favicon.ico" type="image/x-icon">
+
+    <!-- Styles -->
+    <link id="style" href="../assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/styles.min.css" rel="stylesheet">
+    <link href="../assets/css/icons.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body class="authentication-bg">
+
+    <div class="square-box">
+        <!-- Arka plan kutuları -->
+        <div></div><div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div><div></div>
+    </div>
+
+    <div class="container-lg">
+        <div class="row justify-content-center align-items-center authentication authentication-basic h-100">
+            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-6 col-sm-8 col-12">
+                <div class="my-4 d-flex justify-content-center">
+                    <a href="index.html">
+                        <img src="../assets/images/brand-logos/desktop-dark.png" alt="logo" class="desktop-dark">
+                    </a>
+                </div>
+                <div class="card custom-card">
+                    <div class="card-body p-5">
+                        <p class="h5 fw-medium mb-2 text-center">Şifre Yenile</p>
+                        <div class="row gy-3">
+                            <div class="col-xl-12">
+                                <div class="col-xl-12">
+                                    <label for="reset-email" class="form-label text-default">Email</label>
+                                    <input type="email" class="form-control form-control-lg" id="reset-email" placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="col-xl-12">
+                                <label for="reset-newpassword" class="form-label text-default">Yeni Şifre</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control form-control-lg" id="reset-newpassword" placeholder="Yeni Şifre">
+                                    <button class="btn btn-light border" type="button" onclick="createpassword('reset-newpassword',this)"><i class="ri-eye-off-line align-middle"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 mb-2">
+                                <label for="reset-confirmpassword" class="form-label text-default">Yeni Şifre (Tekrar)</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control form-control-lg" id="reset-confirmpassword" placeholder="Yeni Şifre (Tekrar)">
+                                    <button class="btn btn-light border" type="button" onclick="createpassword('reset-confirmpassword',this)"><i class="ri-eye-off-line align-middle"></i></button>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="defaultCheck1">
+                                        <label class="form-check-label text-muted fw-normal" for="defaultCheck1">
+                                            Şifreyi Hatırla?
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 d-grid mt-2">
+                                <button class="btn btn-lg btn-primary" onclick="showSuccessPopup()">Onayla</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/show-password.js"></script>
+    <script>
+        function showSuccessPopup() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Şifre Yenileme Maili Gönderildi',
+                text: 'Şifre yenileme bağlantısı mail adresinize gönderilmiştir.',
+                confirmButtonText: 'Tamam',
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/Authorization/Index';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

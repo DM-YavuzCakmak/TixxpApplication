@@ -52,6 +52,13 @@ namespace Tixxp.WebApp.Controllers
         }
         #endregion
 
+        #region ResetPassword
+        public IActionResult ResetPassword()
+        {
+            return View("ResetPasswrod");
+        }
+        #endregion
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
