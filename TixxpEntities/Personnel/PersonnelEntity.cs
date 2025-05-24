@@ -37,4 +37,11 @@ public class PersonnelEntity : BaseEntity
 
     [Column("LoginTypeId")]
     public long LoginType { get; set; } = 0;
+
+
+    [Column("ParentId")]
+    public long? ParentId { get; set; }
+
+    [ForeignKey("ParentId")]
+    public virtual PersonnelEntity? Parent { get; set; }
 }

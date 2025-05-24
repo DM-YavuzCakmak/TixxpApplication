@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
+using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.Product;
 
 namespace Tixxp.Entities.ProductPrice;
@@ -21,4 +22,7 @@ public class ProductPriceEntity : BaseEntity
 
     [ForeignKey(nameof(ProductId))]
     public virtual ProductEntity Product { get; set; }
+
+    [NotMapped]
+    public virtual CurrencyTypeEntity CurrencyType { get; set; }
 }

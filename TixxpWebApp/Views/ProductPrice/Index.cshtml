@@ -1,0 +1,209 @@
+﻿@model List<Tixxp.Entities.ProductPrice.ProductPriceEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currencyTypes = ViewBag.CurrencyTypes as List<Tixxp.Entities.CurrencyType.CurrencyTypeEntity> ?? new();
+    var productsWithoutPrice = ViewBag.ProductsWithoutPrice as List<Tixxp.Entities.Product.ProductEntity> ?? new();
+}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Ürün Fiyat Listesi</h1>
+            <button class="btn btn-primary btn-sm" onclick="openAddPriceModal()">+ Yeni Fiyat</button>
+        </div>
+
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>Ürün</th>
+                                <th>Para Birimi</th>
+                                <th>Fiyat</th>
+                                <th>KDV (%)</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var price in Model)
+                            {
+                                <tr>
+                                    <td>@price.Product?.Name</td>
+                                    <td>@price.CurrencyType?.Name</td>
+                                    <td>@price.Price ₺</td>
+                                    <td>@price.VatRate</td>
+                                    <td>
+                                        <div class="hstack gap-2 fs-15">
+                                            <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="openEditPriceModal(@price.Id)">
+                                                <i class="ri-edit-line"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="confirmDeletePrice(@price.Id)">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yeni Fiyat Ekle Modalı -->
+<div class="modal fade" id="addPriceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-light p-3">
+                <h5 class="modal-title">Yeni Ürün Fiyatı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPriceForm">
+                    <div class="mb-3">
+                        <label class="form-label">Ürün</label>
+                        <select class="form-select" name="ProductId" required>
+                            @foreach (var product in productsWithoutPrice)
+                            {
+                                <option value="@product.Id">@product.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Para Birimi</label>
+                        <select class="form-select" name="CurrencyTypeId" required>
+                            @foreach (var currency in currencyTypes)
+                            {
+                                <option value="@currency.Id">@currency.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fiyat</label>
+                        <input type="number" class="form-control" name="Price" step="0.01" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">KDV (%)</label>
+                        <input type="number" class="form-control" name="VatRate" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fiyat Güncelle Modalı -->
+<div class="modal fade" id="editPriceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-light p-3">
+                <h5 class="modal-title">Fiyat Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPriceForm">
+                    <input type="hidden" name="Id" id="editPriceId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Ürün</label>
+                        <input type="text" class="form-control" id="editProductName" disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Para Birimi</label>
+                        <select class="form-select" name="CurrencyTypeId" id="editCurrencyTypeId" required>
+                            @foreach (var currency in currencyTypes)
+                            {
+                                <option value="@currency.Id">@currency.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fiyat</label>
+                        <input type="number" class="form-control" id="editPrice" name="Price" step="0.01" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">KDV (%)</label>
+                        <input type="number" class="form-control" id="editVatRate" name="VatRate" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Güncelle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openAddPriceModal() {
+            $('#addPriceForm')[0].reset();
+            $('#addPriceModal').modal('show');
+        }
+
+            function openEditPriceModal(id) {
+            $.get('/ProductPrice/GetById', { id: id }, function (data) {
+                $('#editPriceId').val(data.id);
+                $('#editProductName').val(data.product.name);
+                $('#editCurrencyTypeId').val(data.currencyTypeId); // <-- updated dropdown selection
+                $('#editPrice').val(data.price);
+                $('#editVatRate').val(data.vatRate);
+                $('#editPriceModal').modal('show');
+            }).fail(function () {
+                Swal.fire("Hata", "Fiyat verisi alınamadı.", "error");
+            });
+        }
+
+        $('#addPriceForm').submit(function (e) {
+            e.preventDefault();
+            const formData = $(this).serialize();
+            $.post('/ProductPrice/Save', formData, function (response) {
+                if (response.success) {
+                    Swal.fire("Başarılı", response.message, "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Hata", response.message, "error");
+                }
+            });
+        });
+
+        $('#editPriceForm').submit(function (e) {
+            e.preventDefault();
+            const formData = $(this).serialize();
+            $.post('/ProductPrice/Update', formData, function (response) {
+                if (response.success) {
+                    Swal.fire("Başarılı", response.message, "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Hata", response.message, "error");
+                }
+            });
+        });
+
+        function confirmDeletePrice(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu fiyat kaydını silmek üzeresiniz.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/ProductPrice/Delete', { id: id }, function (response) {
+                        if (response.success) {
+                            Swal.fire("Silindi", response.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Hata", response.message, "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

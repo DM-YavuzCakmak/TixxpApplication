@@ -46,6 +46,41 @@ namespace Tixxp.WebApp.Controllers
         }
 
         [HttpGet]
+        public JsonResult GetHierarchyTree()
+        {
+            var personnelIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (personnelIdClaim == null)
+                return Json(new { success = false, message = "Oturum bulunamadı" });
+
+            long personnelId = Convert.ToInt64(personnelIdClaim.Value);
+            var currentUser = _personnelService.GetById(personnelId);
+            if (!currentUser.Success || currentUser.Data == null)
+                return Json(new { success = false, message = "Kullanıcı bilgisi alınamadı" });
+
+            var listResult = _personnelService.GetList(x => x.CompanyIdentifier == currentUser.Data.CompanyIdentifier && !x.IsDeleted);
+            if (!listResult.Success || listResult.Data == null)
+                return Json(new { success = false, message = "Veri alınamadı" });
+
+            var allPersonnel = listResult.Data;
+
+            var tree = BuildTree(null, allPersonnel);
+
+            return Json(new { success = true, data = tree });
+        }
+
+        private List<object> BuildTree(long? parentId, IEnumerable<PersonnelEntity> all)
+        {
+            return all
+                .Where(x => x.ParentId == parentId)
+                .Select(x => new
+                {
+                    id = x.Id,
+                    name = $"{x.FirstName} {x.LastName}",
+                    children = BuildTree(x.Id, all)
+                }).ToList<object>();
+        }
+
+        [HttpGet]
         public JsonResult GetById(long id)
         {
             var result = _personnelService.GetById(id);
