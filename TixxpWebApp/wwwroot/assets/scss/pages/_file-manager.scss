@@ -1,0 +1,26 @@
+
+/* start::file-manager */
+@media screen and (min-width: 768px) {
+  .file-manager-list {
+    height: 133px;
+  }
+}
+
+.file-manager-icon {
+  width: 55px;
+  height: 55px;
+  padding: 7px !important;
+}
+
+.all-folders {
+  .card-footer {
+    padding: 1rem 1.5rem;
+    background: none;
+  }
+}
+.file-manger-icon img {
+  width: 70px;
+  height: 70px;
+}
+
+/* end::file-manager */

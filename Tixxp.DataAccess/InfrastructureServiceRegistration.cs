@@ -8,6 +8,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.Bank;
 using Tixxp.Infrastructure.DataAccess.Abstract.Counter;
 using Tixxp.Infrastructure.DataAccess.Abstract.CurrencyType;
 using Tixxp.Infrastructure.DataAccess.Abstract.Event;
+using Tixxp.Infrastructure.DataAccess.Abstract.Guide;
 using Tixxp.Infrastructure.DataAccess.Abstract.InvoiceType;
 using Tixxp.Infrastructure.DataAccess.Abstract.Personnel;
 using Tixxp.Infrastructure.DataAccess.Abstract.PersonnelRole;
@@ -21,6 +22,7 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Bank;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Counter;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.CurrencyType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Event;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Guide;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.InvoiceType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Personnel;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PersonnelRole;
@@ -78,6 +80,7 @@ namespace Tixxp.Infrastructure
             services.AddScoped<IProductSaleRepository, ProductSaleRepository>();
             services.AddScoped<IProductSaleInvoiceInfoRepository, ProductSaleInvoiceInfoRepository>();
             services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IGuideRepository, GuideRepository>();
 
             return services;
         }

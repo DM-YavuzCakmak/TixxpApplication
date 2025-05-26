@@ -44,4 +44,8 @@ public class PersonnelEntity : BaseEntity
 
     [ForeignKey("ParentId")]
     public virtual PersonnelEntity? Parent { get; set; }
+
+    [Column("ProfilePhotoPath")]
+    public string? ProfilePhotoPath { get; set; }
+
 }

@@ -10,5 +10,8 @@ public class ProductEntity : BaseEntity
     public string Name { get; set; }
 
     [Column("Code")]
-    public string Code { get; set; } 
+    public string Code { get; set; }
+
+    [Column("ImageFilePath")]
+    public string ImageFilePath { get; set; }
 }

@@ -2,6 +2,7 @@
 using Tixxp.Entities.Bank;
 using Tixxp.Entities.Counter;
 using Tixxp.Entities.Events;
+using Tixxp.Entities.Guide;
 using Tixxp.Entities.Product;
 using Tixxp.Entities.ProductPrice;
 using Tixxp.Entities.ProductSale;
@@ -46,6 +47,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
             {
                 entity.ToTable("ProductSaleInvoiceInfo", _schema);
             });
+            modelBuilder.Entity<GuideEntity>(entity =>
+            {
+                entity.ToTable("Guide", _schema);
+            });
             modelBuilder.Entity<EventEntity>(entity =>
             {
                 entity.ToTable("Event", _schema);
@@ -54,6 +59,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         }
 
         public DbSet<CounterEntity> Counters { get; set; }
+        public DbSet<GuideEntity> Guides { get; set; }
         public DbSet<EventEntity> Events { get; set; }
         public DbSet<ProductSaleEntity> ProductSales { get; set; }
         public DbSet<ProductPriceEntity> ProductPrices { get; set; }

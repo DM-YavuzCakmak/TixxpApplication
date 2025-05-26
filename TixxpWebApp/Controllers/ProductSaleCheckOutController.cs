@@ -52,6 +52,7 @@ namespace Tixxp.WebApp.Controllers
                     productSaleSummaryDto.Price = _productPriceService.GetById(productSaleDetailEntity.ProductId).Data.Price;
                     productSaleSummaryDto.Quantity = productSaleDetailEntity.Quantity;
                     productSaleSummaryDto.ProductName = productSaleDetailEntity.Product.Name;
+                    productSaleSummaryDto.ProductImageUrl = productSaleDetailEntity.Product.ImageFilePath;
                     productSaleSummaryDtos.Add(productSaleSummaryDto);
                 }
             }
@@ -104,6 +105,7 @@ namespace Tixxp.WebApp.Controllers
             if (productSaleCheckOutItems.Any())
             {
                 ProductSaleEntity productSaleEntity = new ProductSaleEntity();
+                productSaleEntity.CounterId = 1;
                 var newProductSaleEntity = _productSaleService.AddAndReturn(productSaleEntity);
 
                 foreach (var productSaleCheckOutItem in productSaleCheckOutItems)

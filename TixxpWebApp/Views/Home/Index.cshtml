@@ -1,170 +1,350 @@
-﻿<!DOCTYPE html>
-<html lang="en" dir="ltr" data-nav-layout="vertical" data-theme-mode="light" data-header-styles="gradient" data-menu-styles="light" data-toggled="close">
+﻿@model List<Tixxp.Entities.Personnel.PersonnelEntity>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<head>
+<style>
+    .personal-goals-list::-webkit-scrollbar {
+        width: 6px;
+    }
 
-    <!-- Meta Data -->
-    <meta charset="UTF-8">
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title> Adminor - Bootstrap 5 Premium Admin & Dashboard Template </title>
-    <meta name="Description" content="Bootstrap Responsive Admin Web Dashboard HTML5 Template">
-    <meta name="Author" content="Spruko Technologies Private Limited">
-    <meta name="keywords" content="admin template,template css and html,dashboard html,admin,html5 template,html dashboard template,dashboard template,admindashboard,admin dashboard,dashboard,ui dashboard,bootstrap dashboard,html admin template">
+    .personal-goals-list::-webkit-scrollbar-thumb {
+        background: #cccccc;
+        border-radius: 3px;
+    }
 
-    <!-- Favicon -->
-    <link rel="icon" href="../assets/images/brand-logos/favicon.ico" type="image/x-icon">
+    .personal-goals-list:hover::-webkit-scrollbar-thumb {
+        background: #999999;
+    }
+</style>
 
-    <!-- Choices JS -->
-    <script src="../assets/libs/choices.js/public/assets/scripts/choices.min.js"></script>
+<!-- Start::app-content -->
+<div class="main-content app-content">
+    <div class="container-fluid">
 
-    <!-- Main Theme Js -->
-    <script src="../assets/js/main.js"></script>
-
-    <!-- Bootstrap Css -->
-    <link id="style" href="../assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Style Css -->
-    <link href="../assets/css/styles.min.css" rel="stylesheet">
-
-    <!-- Icons Css -->
-    <link href="../assets/css/icons.css" rel="stylesheet">
-
-    <!-- Node Waves Css -->
-    <link href="../assets/libs/node-waves/waves.min.css" rel="stylesheet">
-
-    <!-- Simplebar Css -->
-    <link href="../assets/libs/simplebar/simplebar.min.css" rel="stylesheet">
-
-    <!-- Color Picker Css -->
-    <link rel="stylesheet" href="../assets/libs/flatpickr/flatpickr.min.css">
-    <link rel="stylesheet" href="../assets/libs/simonwep/pickr/themes/nano.min.css">
-
-    <!-- Choices Css -->
-    <link rel="stylesheet" href="../assets/libs/choices.js/public/assets/styles/choices.min.css">
-</head>
-
-<body>
-
- 
-
-    <div class="page">
-        <!-- Start::app-content -->
-        <div class="main-content app-content">
-            <div class="container-fluid">
-
-                <!-- Page Header -->
-                <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-                    <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Empty Page</h1>
-                    <div class="ms-md-1 ms-0">
-                        <nav>
-                            <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item text-fixed-white"><a href="javascript:void(0);" class="text-fixed-white">Pages</a></li>
-                                <li class="breadcrumb-item active text-fixed-white" aria-current="page">Empty Page</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-                <!-- Page Header Close -->
-                <!-- Start::row-1 -->
-                <div class="row">
-                </div>
-                <!--End::row-1 -->
-
+        <!-- Page Header -->
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Anasayfa</h1>
+            <div class="ms-md-1 ms-0">
+                <nav>
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item active text-fixed-white" aria-current="page">Anasayfa</li>
+                    </ol>
+                </nav>
             </div>
         </div>
-        <!-- End::app-content -->
-
-        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <div class="input-group">
-                            <a href="javascript:void(0);" class="input-group-text" id="Search-Grid"><i class="fe fe-search header-link-icon fs-18"></i></a>
-                            <input type="search" class="form-control border-0 px-2" placeholder="Search" aria-label="Username">
-                            <a href="javascript:void(0);" class="input-group-text" id="voice-search"><i class="fe fe-mic header-link-icon"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-light btn-icon" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fe fe-more-vertical"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="javascript:void(0);">Action</a></li>
-                                <li><a class="dropdown-item" href="javascript:void(0);">Another action</a></li>
-                                <li><a class="dropdown-item" href="javascript:void(0);">Something else here</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="javascript:void(0);">Separated link</a></li>
-                            </ul>
-                        </div>
-                        <div class="mt-4">
-                            <p class="font-weight-semibold text-muted mb-2">Are You Looking For...</p>
-                            <span class="search-tags"><i class="fe fe-user me-2"></i>People<a href="javascript:void(0)" class="tag-addon"><i class="fe fe-x"></i></a></span>
-                            <span class="search-tags"><i class="fe fe-file-text me-2"></i>Pages<a href="javascript:void(0)" class="tag-addon"><i class="fe fe-x"></i></a></span>
-                            <span class="search-tags"><i class="fe fe-align-left me-2"></i>Articles<a href="javascript:void(0)" class="tag-addon"><i class="fe fe-x"></i></a></span>
-                            <span class="search-tags"><i class="fe fe-server me-2"></i>Tags<a href="javascript:void(0)" class="tag-addon"><i class="fe fe-x"></i></a></span>
-                        </div>
-                        <div class="my-4">
-                            <p class="font-weight-semibold text-muted mb-2">Recent Search :</p>
-                            <div class="p-2 border br-5 d-flex align-items-center text-muted mb-2 alert">
-                                <a href="notifications.html"><span>Notifications</span></a>
-                                <a class="ms-auto lh-1" href="javascript:void(0);" data-bs-dismiss="alert" aria-label="Close"><i class="fe fe-x text-muted"></i></a>
+        <!-- Page Header Close -->
+        <!-- Start::row-1 -->
+        <div class="row row-sm">
+            <div class="col-xl-6 col-xxl-3 col-sm-12 col-lg-6 col-md-6">
+                <div class="card  custom-card  widgets-cards bg-danger-gradient shadow-danger text-default border-0">
+                    <div class="card-body py-0">
+                        <div class="d-flex align-items-center">
+                            <div id="total-orders"></div>
+                            <div class="ms-2 mt-2">
+                                <h2 class="mb-0 fs-22 text-fixed-white">Orders</h2>
+                                <div class="">
+                                    <span class="fs-12 text-fixed-white"><i class="fe fe-arrow-up-right"></i></span>
+                                    <span class="fs-12 text-fixed-white op-8">+73.59%</span>
+                                </div>
                             </div>
-                            <div class="p-2 border br-5 d-flex align-items-center text-muted mb-2 alert">
-                                <a href="alerts.html"><span>Alerts</span></a>
-                                <a class="ms-auto lh-1" href="javascript:void(0);" data-bs-dismiss="alert" aria-label="Close"><i class="fe fe-x text-muted"></i></a>
-                            </div>
-                            <div class="p-2 border br-5 d-flex align-items-center text-muted mb-0 alert">
-                                <a href="mail.html"><span>Mail</span></a>
-                                <a class="ms-auto lh-1" href="javascript:void(0);" data-bs-dismiss="alert" aria-label="Close"><i class="fe fe-x text-muted"></i></a>
-                            </div>
+                            <h3 class="mt-3 ms-auto text-fixed-white">8758</h3>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <div class="btn-group ms-auto">
-                            <button class="btn btn-sm btn-primary-light">Search</button>
-                            <button class="btn btn-sm btn-primary">Clear Recents</button>
+                </div>
+            </div>
+            <div class="col-xl-6 col-xxl-3 col-sm-12 col-lg-6 col-md-6">
+                <div class="card custom-card  widgets-cards bg-success-gradient shadow-success text-default border-0">
+                    <div class="card-body py-0">
+                        <div class="d-flex align-items-center">
+                            <div id="total-views"></div>
+                            <div class="ms-2 mt-2">
+                                <h2 class="mb-0 fs-22 text-fixed-white">Views</h2>
+                                <div class="">
+                                    <span class="fs-12 text-fixed-white"><i class="fe fe-arrow-down-right"></i></span>
+                                    <span class="fs-12 text-fixed-white op-8">-49.29%</span>
+                                </div>
+                            </div>
+                            <h3 class="mt-3 ms-auto text-fixed-white">8758</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-xxl-3 col-sm-12 col-lg-6 col-md-6">
+                <div class="card  custom-card  widgets-cards bg-secondary-gradient shadow-secondary text-default border-0">
+                    <div class="card-body py-0">
+                        <div class="d-flex align-items-center">
+                            <div id="total-earnings"></div>
+                            <div class="ms-2 mt-2">
+                                <h2 class="mb-0 fs-22 text-fixed-white">Earnings</h2>
+                                <div class="">
+                                    <span class="fs-12 text-fixed-white"><i class="fe fe-arrow-up-right"></i></span>
+                                    <span class="fs-12 text-fixed-white op-8">+86.29%</span>
+                                </div>
+                            </div>
+                            <h3 class="mt-3 ms-auto text-fixed-white">8758</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-xxl-3 col-sm-12 col-lg-6 col-md-6">
+                <div class="card custom-card  widgets-cards bg-info-gradient shadow-info text-default border-0">
+                    <div class="card-body py-0">
+                        <div class="d-flex align-items-center">
+                            <div id="total-comments"></div>
+                            <div class="ms-2 mt-2">
+                                <h2 class="mb-0 fs-22 text-fixed-white">Comments</h2>
+                                <div class="">
+                                    <span class="fs-12  text-fixed-white"><i class="fe fe-arrow-down-right"></i></span>
+                                    <span class="fs-12  text-fixed-white op-8">-33.29%</span>
+                                </div>
+                            </div>
+                            <h3 class="mt-3 ms-auto  text-fixed-white">8758</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!--End::row-1 -->
+        <!-- Start:: row-2 -->
+        <div class="row">
+            <div class="col-xxl-8 col-xl-8 col-lg-7 col-md-12 col-sm-12">
+                <div class="card custom-card">
+                    <div class="card-header justify-content-between flex-wrap">
+                        <div class="card-title">
+                            Sales Growth
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="sales-statistics" class="p-3"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <div class="card-title">Order Statistics</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="lineChart1" class=""></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End:: row-2 -->
+        <!-- Start:: row-3 -->
+        <div class="row">
+
+
+            <div class="col-xl-3 col-md-6 col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <div class="card-title">Günlük Ürün Satışı Yapanlar</div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled personal-goals-list mb-0" style="max-height: 360px; overflow-y: auto;">
+                            @if (ViewBag.DailySellers != null)
+                            {
+                                foreach (var item in ViewBag.DailySellers)
+                                {
+                                    <li class="mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <span class="avatar avatar-sm text-default">
+                                                <img src="@item.ProfilePhotoPath" alt="img" class="rounded-1" style="width: 32px; height: 32px; object-fit: cover;">
+                                            </span>
+                                            <div class="flex-fill ms-2">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <span class="d-block h6 mb-1">@item.FirstName @item.LastName</span>
+                                                    <span class="d-block h6">@item.TotalSales</span>
+                                                </div>
+                                                <div class="progress progress-animate progress-xs" role="progressbar" aria-valuenow="@item.Percent" aria-valuemin="0" aria-valuemax="100">
+                                                    <div class="progress-bar progress-bar-striped bg-info" style="width: @item.Percent%"></div>
+                                                </div>
+                                                <small class="text-muted">@item.Date.ToString("dd.MM.yyyy")</small>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li><span class="text-muted">Kayıt bulunamadı</span></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <div class="card-title">Kullanıcılar</div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled personal-goals-list mb-0" style="max-height: 360px; overflow-y: auto;">
+                            @foreach (var user in ViewBag.PersonnelList)
+                            {
+                                <li class="mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <span class="avatar avatar-sm text-default">
+                                            <img src="@user.ProfilePhotoPath" alt="img" class="rounded-1" style="width: 32px; height: 32px; object-fit: cover;">
+                                        </span>
+                                        <div class="flex-fill ms-2">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <span class="d-block h6 mb-1">@user.FirstName @user.LastName</span>
+                                                <span class="badge bg-success text-white">Aktif</span>
+                                            </div>
+                                            <div class="text-muted fs-12">Şirket Kullanıcısı</div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-xl-3 col-md-6 col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <div class="card-title">Ürün Satışları</div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled personal-goals-list mb-0" style="max-height: 360px; overflow-y: auto;">
+                            @if (ViewBag.CounterSales != null)
+                            {
+                                foreach (var item in ViewBag.CounterSales)
+                                {
+                                    <li class="mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <span class="avatar avatar-sm bg-primary-transparent text-primary fw-bold rounded-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="fe fe-monitor"></i>
+                                            </span>
+                                            <div class="flex-fill ms-2">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <span class="d-block h6 mb-1">@item.CounterName</span>
+                                                    <span class="badge bg-primary text-white">@item.TotalSales</span>
+                                                </div>
+                                                <div class="text-muted fs-12">Toplam Satış</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="mb-2">
+                                    <span class="text-muted">Kayıt bulunamadı</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-xxl-3 col-xl-6 col-lg-6 col-md-6">
+                <div class="card custom-card">
+                    <div class="card-body text-center profile p-0">
+                        <div class="image">
+                            <img src="~/assets/images/media/media-9.jpg" alt="background" class="profile-img">
+                            <div class="box img-absolute">
+                                <div class="img-1">
+                                    <img src="@ViewBag.CurrentUser?.ProfilePhotoPath" alt="profile" style="width: 80px; height: 80px; object-fit: cover;" class="rounded-circle border">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-6 box">
+                            <div class="p-4">
+                                <h5 class="mt-5 mb-0">@ViewBag.CurrentUser?.FirstName @ViewBag.CurrentUser?.LastName</h5>
+                                <span class="mt-2 mb-0 badge bg-primary">Giriş Yapan Kullanıcı</span>
+
+                                <p class="mt-2 text-muted">
+                                    Sisteme en son @ViewBag.CurrentUser?.Updated_Date?.ToString("dd.MM.yyyy HH:mm") tarihinde giriş yaptı.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- End:: row-3 -->
+
+            <div class="col-lg-12">
+                <div class="card custom-card">
+                    <div class="card-header border-bottom">
+                        <h3 class="card-title tx-18">
+                            <label class="main-content-label tx-15">Satışlar</label>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Scrollable alan burası -->
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-bordered text-nowrap border-bottom mb-0 border" id="recentorders">
+                                <thead class="sticky-top bg-white">
+                                    <tr>
+                                        <th class="wd-lg-10p">Kullanıcı</th>
+                                        <th class="wd-lg-10p">Sipariş No</th>
+                                        <th class="wd-lg-10p">Tarih</th>
+                                        <th class="wd-lg-10p">Tutar</th>
+                                        <th class="wd-lg-10p">Ödeme Yeri</th>
+                                        <th class="wd-lg-10p">Durum</th>
+                                        <th class="wd-lg-10p">Ürün Detayı</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ViewBag.RecentSales)
+                                    {
+                                        <tr>
+                                            <td class="font-weight-normal d-flex border-0 align-items-center">
+                                                <span class="avatar avatar-sm me-2">
+                                                    <img alt="avatar" class="rounded-circle" src="@item.Avatar" style="width:32px; height:32px; object-fit:cover;">
+                                                </span>
+                                                <span class="mt-1">@item.CustomerName</span>
+                                            </td>
+                                            <td class="font-weight-normal">@item.OrderId</td>
+                                            <td class="text-muted tx-13">@item.Date</td>
+                                            <td class="font-weight-normal">@item.TotalPrice</td>
+                                            <td class="font-weight-normal">@item.PaymentMethod</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-success-transparent text-success px-2">@item.Status</span>
+                                            </td>
+                                            <td class="text-dark tx-13">
+                                                <a href="javascript:void(0);"
+                                                   tabindex="0"
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   data-bs-toggle="popover"
+                                                   data-bs-html="true"
+                                                   data-bs-trigger="focus"
+                                                   data-bs-placement="left"
+                                                   data-bs-content="@Html.Raw(item.DetailHtml)">
+                                                    <i class="fe fe-eye"></i> Gör
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
     </div>
-
-
-    <!-- Scroll To Top -->
-    <div class="scrollToTop">
-        <span class="arrow"><i class="ri-arrow-up-s-fill fs-20"></i></span>
-    </div>
-    <div id="responsive-overlay"></div>
-    <!-- Scroll To Top -->
-    <!-- Popper JS -->
-    <script src="../assets/libs/popperjs/core/umd/popper.min.js"></script>
-
-    <!-- Bootstrap JS -->
-    <script src="../assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Defaultmenu JS -->
-    <script src="../assets/js/defaultmenu.min.js"></script>
-
-    <!-- Node Waves JS-->
-    <script src="../assets/libs/node-waves/waves.min.js"></script>
-
-    <!-- Sticky JS -->
-    <script src="../assets/js/sticky.js"></script>
-
-    <!-- Simplebar JS -->
-    <script src="../assets/libs/simplebar/simplebar.min.js"></script>
-    <script src="../assets/js/simplebar.js"></script>
-
-    <!-- Color Picker JS -->
-    <script src="../assets/libs/simonwep/pickr/pickr.es5.min.js"></script>
-
-
-
-    <!-- Custom-Switcher JS -->
-    <script src="../assets/js/custom-switcher.min.js"></script>
-
-    <!-- Custom JS -->
-    <script src="../assets/js/custom.js"></script>
-
-</body>
-
-</html>
+    <!-- End::app-content -->
+    @section Scripts {
+        <script>
+            $(function () {
+                $('[data-bs-toggle="popover"]').popover({
+                    html: true,
+                    trigger: 'focus',
+                    placement: 'left'
+                });
+            });
+        </script>
+    }
