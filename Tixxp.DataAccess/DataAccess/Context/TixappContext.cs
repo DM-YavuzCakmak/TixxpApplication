@@ -10,6 +10,7 @@ using Tixxp.Entities.ProductPrice;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.Entities.ProductSaleInvoiceInfo;
+using Tixxp.Entities.Session;
 using Tixxp.Entities.TicketSubType;
 using Tixxp.Entities.TicketType;
 
@@ -75,6 +76,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
             {
                 entity.ToTable("TicketSubType", _schema);
             });
+            modelBuilder.Entity<SessionEntity>(entity =>
+            {
+                entity.ToTable("Session", _schema);
+            });
             base.OnModelCreating(modelBuilder);
         }
 
@@ -90,5 +95,6 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<AgencyContractEntity> AgencyContracts { get; set; }
         public DbSet<TicketTypeEntity> TicketTypes { get; set; }
         public DbSet<TicketSubTypeEntity> TicketSubTypes { get; set; }
+        public DbSet<SessionEntity> Sessions { get; set; }
     }
 }

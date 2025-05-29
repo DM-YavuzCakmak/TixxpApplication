@@ -1,0 +1,233 @@
+﻿@using Tixxp.Core.Utilities.Helper
+@using Tixxp.Entities.Session
+@using Tixxp.Entities.Events
+@model List<SessionEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Seans Listesi";
+    var events = ViewBag.Events as List<EventEntity>;
+}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Seans Listesi</h1>
+            <button class="btn btn-primary btn-sm" onclick="openEditSessionModal(0)">+ Yeni Seans</button>
+        </div>
+
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Etkinlik</th>
+                                <th>Tarih</th>
+                                <th>Planlanan Saat</th>
+                                <th>Kapasite</th>
+                                <th>B2C</th>
+                                <th>B2B</th>
+                                <th>İptal</th>
+                                <th>Giriş Başlangıç (dk)</th>
+                                <th>Giriş Bitiş (dk)</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Event?.Name</td>
+                                        <td>@item.EventDate.ToString("dd.MM.yyyy")</td>
+                                        <td>@item.PlannedTime.ToString(@"hh\:mm")</td>
+                                        <td>@item.SessionCapacity</td>
+                                        <td>@(item.AvailableOnB2C ? "Açık" : "Kapalı")</td>
+                                        <td>@(item.AvailableOnB2B ? "Açık" : "Kapalı")</td>
+                                        <td>@(item.IsCancelled ? "Evet" : "Hayır")</td>
+                                        <td>@item.ShowEntryStartBeforeEventTimeInMinutes</td>
+                                        <td>@item.ShowEntryEndAfterEventTimeInMinutes</td>
+                                        <td>
+                                            <div class="hstack gap-2">
+                                                <a class="btn btn-sm btn-light" onclick="openEditSessionModal(@item.Id)">
+                                                    <i class="ri-edit-line"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-light" onclick="confirmDeleteSession(@item.Id)">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="10" class="text-center">Kayıt bulunamadı.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editSessionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Seans Düzenle</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editSessionForm">
+                    <input type="hidden" id="sessionId" name="Id" />
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Etkinlik</label>
+                            <select class="form-select" id="eventId" name="EventId" required>
+                                <option value="">Seçiniz</option>
+                                @foreach (var ev in events)
+                                {
+                                    <option value="@ev.Id">@ev.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Tarih</label>
+                            <input type="date" class="form-control" id="eventDate" name="EventDate" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Planlanan Saat</label>
+                            <input type="time" class="form-control" id="plannedTime" name="PlannedTime" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Kapasite</label>
+                            <input type="number" class="form-control" id="sessionCapacity" name="SessionCapacity" required />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Giriş Başlangıç (dk)</label>
+                            <input type="number" class="form-control" id="showStart" name="ShowEntryStartBeforeEventTimeInMinutes" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Giriş Bitiş (dk)</label>
+                            <input type="number" class="form-control" id="showEnd" name="ShowEntryEndAfterEventTimeInMinutes" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>B2C</label>
+                            <select class="form-select" id="availableOnB2C">
+                                <option value="true">Açık</option>
+                                <option value="false">Kapalı</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>B2B</label>
+                            <select class="form-select" id="availableOnB2B">
+                                <option value="true">Açık</option>
+                                <option value="false">Kapalı</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>İptal Durumu</label>
+                            <select class="form-select" id="isCancelled">
+                                <option value="false">Hayır</option>
+                                <option value="true">Evet</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openEditSessionModal(id) {
+            const modal = $('#editSessionModal');
+            const form = $('#editSessionForm');
+            if (id === 0) {
+                form[0].reset();
+                $('#sessionId').val(0);
+                modal.find('.modal-title').text('Seans Ekle');
+                modal.modal('show');
+                return;
+            }
+
+            $.get('/Session/GetById', { id: id }, function (data) {
+                $('#sessionId').val(data.id);
+                $('#eventId').val(data.eventId);
+                $('#eventDate').val(data.eventDate);
+                $('#plannedTime').val(data.plannedTime);
+                $('#sessionCapacity').val(data.sessionCapacity);
+                $('#availableOnB2C').val(data.availableOnB2C.toString());
+                $('#availableOnB2B').val(data.availableOnB2B.toString());
+                $('#isCancelled').val(data.isCancelled.toString());
+                $('#showStart').val(data.showEntryStartBefore);
+                $('#showEnd').val(data.showEntryEndAfter);
+                modal.find('.modal-title').text('Seans Düzenle');
+                modal.modal('show');
+            }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
+        }
+
+        $('#editSessionForm').submit(function (e) {
+            e.preventDefault();
+
+            const id = Number($('#sessionId').val());
+            const data = {
+                Id: id,
+                EventId: $('#eventId').val(),
+                EventDate: $('#eventDate').val(),
+                PlannedTime: $('#plannedTime').val() + ':00',
+                SessionCapacity: $('#sessionCapacity').val(),
+                AvailableOnB2C: $('#availableOnB2C').val() === 'true',
+                AvailableOnB2B: $('#availableOnB2B').val() === 'true',
+                IsCancelled: $('#isCancelled').val() === 'true',
+                ShowEntryStartBeforeEventTimeInMinutes: $('#showStart').val(),
+                ShowEntryEndAfterEventTimeInMinutes: $('#showEnd').val()
+            };
+
+            const url = id === 0 ? '/Session/Create' : '/Session/Update';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire("Başarılı", res.message, "success").then(() => location.reload());
+                    } else {
+                        Swal.fire("Hata", res.message, "error");
+                    }
+                },
+                error: () => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error")
+            });
+        });
+
+        function confirmDeleteSession(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu seansı silmek üzeresiniz.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $.post('/Session/Delete', { id: id }, function (res) {
+                        if (res.success) {
+                            Swal.fire("Silindi", res.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Hata", res.message, "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

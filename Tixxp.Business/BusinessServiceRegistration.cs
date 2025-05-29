@@ -17,6 +17,7 @@ using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
 using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.RoleService;
+using Tixxp.Business.Services.Abstract.Session;
 using Tixxp.Business.Services.Abstract.TicketSubType;
 using Tixxp.Business.Services.Abstract.TicketType;
 using Tixxp.Business.Services.Concrete.Agency;
@@ -37,6 +38,7 @@ using Tixxp.Business.Services.Concrete.ProductSale;
 using Tixxp.Business.Services.Concrete.ProductSaleDetail;
 using Tixxp.Business.Services.Concrete.ProductSaleInvoiceInfo;
 using Tixxp.Business.Services.Concrete.RoleService;
+using Tixxp.Business.Services.Concrete.Session;
 using Tixxp.Business.Services.Concrete.TicketSubType;
 using Tixxp.Business.Services.Concrete.TicketType;
 
@@ -60,6 +62,7 @@ namespace Tixxp.Business
             services.AddScoped<IAgencyContractService, AgencyContractService>();
             services.AddScoped<ITicketTypeService, TicketTypeService>();
             services.AddScoped<ITicketSubTypeService, TicketSubTypeService>();
+            services.AddScoped<ISessionService, SessionService>();
 
             services.AddScoped<ICounterService, CounterService>();
             services.AddScoped<IProductService, ProductService>();
