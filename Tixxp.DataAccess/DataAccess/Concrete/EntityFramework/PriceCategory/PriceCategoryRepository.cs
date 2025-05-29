@@ -5,9 +5,9 @@ using Tixxp.Infrastructure.DataAccess.Context;
 
 namespace Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PriceCategory;
 
-public class PriceCategoryRepository : EfEntityRepositoryBase<PriceCategoryEntity, CommonDbContext>, IPriceCategoryRepository
+public class PriceCategoryRepository : EfEntityRepositoryBase<PriceCategoryEntity, TixappContext>, IPriceCategoryRepository
 {
-    public PriceCategoryRepository(CommonDbContext context) : base(context)
+    public PriceCategoryRepository(TixappContext context) : base(context)
     {
     }
 }

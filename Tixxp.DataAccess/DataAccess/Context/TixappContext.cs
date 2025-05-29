@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Tixxp.Entities.AgencyContract;
 using Tixxp.Entities.Bank;
 using Tixxp.Entities.Counter;
 using Tixxp.Entities.Events;
 using Tixxp.Entities.Guide;
+using Tixxp.Entities.PriceCategory;
 using Tixxp.Entities.Product;
 using Tixxp.Entities.ProductPrice;
 using Tixxp.Entities.ProductSale;
@@ -55,6 +57,14 @@ namespace Tixxp.Infrastructure.DataAccess.Context
             {
                 entity.ToTable("Event", _schema);
             });
+            modelBuilder.Entity<AgencyContractEntity>(entity =>
+            {
+                entity.ToTable("AgencyContract", _schema);
+            });
+            modelBuilder.Entity<PriceCategoryEntity>(entity =>
+            {
+                entity.ToTable("PriceCategory", _schema);
+            });
             base.OnModelCreating(modelBuilder);
         }
 
@@ -66,5 +76,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<ProductSaleDetailEntity> ProductSaleDetails { get; set; }
         public DbSet<ProductSaleInvoiceInfoEntity> ProductSaleInvoiceInfos { get; set; }
         public DbSet<ProductEntity> Products { get; set; }
+        public DbSet<PriceCategoryEntity> PriceCategories { get; set; }
+        public DbSet<AgencyContractEntity> AgencyContracts { get; set; }
     }
 }

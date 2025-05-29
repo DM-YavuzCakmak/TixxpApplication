@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tixxp.Business.Services.Abstract.Agency;
+using Tixxp.Business.Services.Abstract.AgencyContract;
 using Tixxp.Business.Services.Abstract.BankService;
 using Tixxp.Business.Services.Abstract.Base;
 using Tixxp.Business.Services.Abstract.Counter;
@@ -17,6 +18,7 @@ using Tixxp.Business.Services.Abstract.ProductSaleDetail;
 using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.RoleService;
 using Tixxp.Business.Services.Concrete.Agency;
+using Tixxp.Business.Services.Concrete.AgencyContract;
 using Tixxp.Business.Services.Concrete.BankService;
 using Tixxp.Business.Services.Concrete.Base;
 using Tixxp.Business.Services.Concrete.Counter;
@@ -51,6 +53,7 @@ namespace Tixxp.Business
             services.AddScoped<IInvoiceTypeService, InvoiceTypeService>();
             services.AddScoped<IAgencyService, AgencyService>();
             services.AddScoped<IPriceCategoryService, PriceCategoryService>();
+            services.AddScoped<IAgencyContractService, AgencyContractService>();
 
             services.AddScoped<ICounterService, CounterService>();
             services.AddScoped<IProductService, ProductService>();
