@@ -8,7 +8,6 @@ public class AgencyService : BaseService<AgencyEntity>, IAgencyService
 {
     private readonly IAgencyRepository _agencyRepository;
 
-
     public AgencyService(IAgencyRepository agencyRepository)
         : base(agencyRepository)
     {

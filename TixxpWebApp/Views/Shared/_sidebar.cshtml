@@ -10,8 +10,6 @@
     <!-- End::main-sidebar-header -->
     <!-- Start::main-sidebar -->
     <div class="main-sidebar" id="sidebar-scroll">
-
-        <!-- Start::nav -->
         <nav class="main-menu-container nav nav-pills flex-column sub-open">
             <div class="main-sidebar-loggedin text-center py-4">
                 <div class="app-sidebar__user">
@@ -27,8 +25,7 @@
                 </div>
             </div>
 
-            <ul class="main-menu">
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-line-icons/css/simple-line-icons.css">
+            <ul class="main-menu text-wrap">
 
                 <!-- Start::Satış -->
                 <li class="slide has-sub">
@@ -38,41 +35,29 @@
                         <i class="fe fe-chevron-right side-menu__angle"></i>
                     </a>
                     <ul class="slide-menu child1">
-                        <li class="slide side-menu__label1">
-                            <a href="javascript:void(0)">Satış Menüsü</a>
-                        </li>
+                        <li class="slide side-menu__label1"><a href="#">Satış Menüsü</a></li>
                         <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
+                            <a href="#" class="side-menu__item">
                                 Ürün Satışı
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child2">
-                                <li class="slide">
-                                    <a href="/ProductSale/Index" class="side-menu__item">Gişe Satışı</a>
-                                </li>
-                               @*  <li class="slide">
-                                    <a href="/ProductSales/Online" class="side-menu__item">Web Satış</a>
-                                </li> *@
+                                <li class="slide"><a href="/ProductSale/Index" class="side-menu__item">Gişe Satışı</a></li>
                             </ul>
                         </li>
                         <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
+                            <a href="#" class="side-menu__item">
                                 Bilet Satışı
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child2">
-                                <li class="slide">
-                                    <a href="/TicketSales/Booth" class="side-menu__item">Gişe Satışı</a>
-                                </li>
-                                <li class="slide">
-                                    <a href="/TicketSales/Web" class="side-menu__item">Web Satışı</a>
-                                </li>
+                                <li class="slide"><a href="/TicketSales/Booth" class="side-menu__item">Gişe Satışı</a></li>
+                                <li class="slide"><a href="/TicketSales/Web" class="side-menu__item">Web Satışı</a></li>
                             </ul>
                         </li>
                     </ul>
                 </li>
                 <!-- End::Satış -->
-
                 <!-- Start::Raporlar -->
                 <li class="slide has-sub">
                     <a href="javascript:void(0);" class="side-menu__item">
@@ -81,43 +66,29 @@
                         <i class="fe fe-chevron-right side-menu__angle"></i>
                     </a>
                     <ul class="slide-menu child1">
-                        <li class="slide side-menu__label1">
-                            <a href="javascript:void(0)">Rapor Menüsü</a>
-                        </li>
+                        <li class="slide side-menu__label1"><a href="#">Rapor Menüsü</a></li>
                         <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
+                            <a href="#" class="side-menu__item">
                                 Ürün Satışı
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child2">
-                                <li class="slide">
-                                    <a href="/Report/ProductSaleReport" class="side-menu__item">Ürün Satış Raporu</a>
-                                </li>
-                                @*  <li class="slide">
-                                    <a href="/ProductSales/Online" class="side-menu__item">Web Satış</a>
-                                </li> *@
+                                <li class="slide"><a href="/Report/ProductSaleReport" class="side-menu__item">Ürün Satış Raporu</a></li>
                             </ul>
                         </li>
                         <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
+                            <a href="#" class="side-menu__item">
                                 Bilet Satışı
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child2">
-                                <li class="slide">
-                                    <a href="/TicketSales/Booth" class="side-menu__item">Gişe Satışı</a>
-                                </li>
-                                <li class="slide">
-                                    <a href="/TicketSales/Web" class="side-menu__item">Web Satışı</a>
-                                </li>
+                                <li class="slide"><a href="/TicketSales/Booth" class="side-menu__item">Gişe Satışı</a></li>
+                                <li class="slide"><a href="/TicketSales/Web" class="side-menu__item">Web Satışı</a></li>
                             </ul>
                         </li>
                     </ul>
                 </li>
                 <!-- End::Raporlar -->
-
-
-
                 <!-- Start::Ayarlar -->
                 <li class="slide has-sub">
                     <a href="javascript:void(0);" class="side-menu__item">
@@ -126,112 +97,94 @@
                         <i class="fe fe-chevron-right side-menu__angle"></i>
                     </a>
                     <ul class="slide-menu child1">
+
                         <li class="slide">
                             <a href="/PriceCategory/Index" class="side-menu__item">
-                                <i class="fa fa-money" ></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Fiyat Kategorisi</span>
+                                <i class="fa fa-money"></i>
+                                <span class="side-menu__label ms-2">Fiyat Kategorisi</span>
                             </a>
                         </li>
+
                         <li class="slide">
                             <a href="/Guide/Index" class="side-menu__item">
                                 <i class="fa fa-camera"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Rehber</span>
+                                <span class="side-menu__label ms-2">Rehber</span>
                             </a>
                         </li>
+
                         <li class="slide has-sub">
                             <a href="javascript:void(0);" class="side-menu__item">
                                 <i class="fa fa-building"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Acente</span>
+                                <span class="side-menu__label ms-2">Acente</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
                                 <li class="slide">
-                                    <a href="/Agency/Index" class="side-menu__item">
-                                        <span class="side-menu__label">Acente Listesi</span>
-                                    </a>
+                                    <a href="/Agency/Index" class="side-menu__item">Acente Listesi</a>
                                 </li>
                                 <li class="slide">
-                                    <a href="/AgencyContract/Index" class="side-menu__item">
-                                        <span class="side-menu__label">Acente Fiyat Kategori Listesi</span>
-                                    </a>
+                                    <a href="/AgencyContract/Index" class="side-menu__item text-wrap">Acente Fiyat<br />Kategori Listesi</a>
                                 </li>
                             </ul>
                         </li>
+
                         <li class="slide">
                             <a href="/CurrencyType/Index" class="side-menu__item">
                                 <i class="bi bi-bar-chart-line"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Para Birimi</span>
+                                <span class="side-menu__label ms-2">Para Birimi</span>
                             </a>
                         </li>
-                        <li class="slide">
-                            <a href="/CurrencyRate/Index" class="side-menu__item">
-                                <i class="bi bi-bar-chart-line"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Kur Listesi</span>
-                            </a>
-                        </li>
+                       
+
                         <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
+                            <a href="#" class="side-menu__item">
                                 <i class="bi bi-basket"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Etkinlik</span>
+                                <span class="side-menu__label ms-2">Etkinlik</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
-                                <li class="slide">
-                                    <a href="/Event/Index" class="side-menu__item">
-                                        <span class="side-menu__label">Etkinlik Listesi</span>
-                                    </a>
-                                </li>
-                                <li class="slide">
-                                    <a href="/Event/Index" class="side-menu__item">
-                                        <span class="side-menu__label">Seans Listesi</span>
-                                    </a>
-                                </li>
+                                <li class="slide"><a href="/Event/Index" class="side-menu__item">Etkinlik Listesi</a></li>
+                                <li class="slide"><a href="/Event/Index" class="side-menu__item">Seans Listesi</a></li>
                             </ul>
                         </li>
+
                         <li class="slide">
                             <a href="/Bank/Index" class="side-menu__item">
                                 <i class="bx bx-box"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Banka</span>
+                                <span class="side-menu__label ms-2">Banka</span>
                             </a>
                         </li>
+
                         <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
+                            <a href="#" class="side-menu__item">
                                 <i class="bi bi-basket"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Ürün</span>
+                                <span class="side-menu__label ms-2">Ürün</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
-                                <li class="slide">
-                                    <a href="/Product/Index" class="side-menu__item">
-                                        <span class="side-menu__label">Ürün Listesi</span>
-                                    </a>
-                                </li>
-                                <li class="slide">
-                                    <a href="/ProductPrice/Index" class="side-menu__item">
-                                        <span class="side-menu__label">Ürün Fiyat Listesi</span>
-                                    </a>
-                                </li>
+                                <li class="slide"><a href="/Product/Index" class="side-menu__item">Ürün Listesi</a></li>
+                                <li class="slide"><a href="/ProductPrice/Index" class="side-menu__item">Ürün Fiyat Listesi</a></li>
                             </ul>
                         </li>
+
                         <li class="slide">
                             <a href="/Personnel/Index" class="side-menu__item">
                                 <i class="si si-user"></i>
-                                <span class="side-menu__label" style="margin-left: 8px;">Kullanıcılar</span>
+                                <span class="side-menu__label ms-2">Kullanıcılar</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-
                 <!-- End::Ayarlar -->
+
             </ul>
+
             <div class="slide-right" id="slide-right">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
                     <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z"></path>
                 </svg>
             </div>
         </nav>
-        <!-- End::nav -->
-
     </div>
     <!-- End::main-sidebar -->
 
