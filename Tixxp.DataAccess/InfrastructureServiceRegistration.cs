@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using Tixxp.Core.Utilities.Filters.SchemaProvider.Abstract;
 using Tixxp.Core.Utilities.Filters.SchemaProvider.Concrete;
+using Tixxp.Infrastructure.DataAccess.Abstract.Agency;
 using Tixxp.Infrastructure.DataAccess.Abstract.Bank;
 using Tixxp.Infrastructure.DataAccess.Abstract.Counter;
 using Tixxp.Infrastructure.DataAccess.Abstract.CurrencyType;
@@ -12,12 +13,14 @@ using Tixxp.Infrastructure.DataAccess.Abstract.Guide;
 using Tixxp.Infrastructure.DataAccess.Abstract.InvoiceType;
 using Tixxp.Infrastructure.DataAccess.Abstract.Personnel;
 using Tixxp.Infrastructure.DataAccess.Abstract.PersonnelRole;
+using Tixxp.Infrastructure.DataAccess.Abstract.PriceCategory;
 using Tixxp.Infrastructure.DataAccess.Abstract.Product;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductPrice;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Abstract.Role;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Agency;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Bank;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Counter;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.CurrencyType;
@@ -26,6 +29,7 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Guide;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.InvoiceType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Personnel;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PersonnelRole;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PriceCategory;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Product;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductPrice;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSale;
@@ -70,6 +74,8 @@ namespace Tixxp.Infrastructure
             services.AddScoped<ICurrencyTypeRepository, CurrencyTypeRepository>();
             services.AddScoped<IBankRepository, BankRepository>();
             services.AddScoped<IInvoiceTypeRepository, InvoiceTypeRepository>();
+            services.AddScoped<IAgencyRepository, AgencyRepository>();
+            services.AddScoped<IPriceCategoryRepository, PriceCategoryRepository>();
 
 
             // Dinamik veritabanı kullanan repositoryler
