@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using Tixxp.Core.Utilities.Filters.SchemaProvider.Abstract;
 using Tixxp.Core.Utilities.Filters.SchemaProvider.Concrete;
+using Tixxp.Infrastructure.DataAccess.Abstract.Agency;
 using Tixxp.Infrastructure.DataAccess.Abstract.Bank;
 using Tixxp.Infrastructure.DataAccess.Abstract.Counter;
 using Tixxp.Infrastructure.DataAccess.Abstract.CurrencyType;
@@ -18,6 +19,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Abstract.Role;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Agency;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Bank;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Counter;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.CurrencyType;
@@ -70,6 +72,7 @@ namespace Tixxp.Infrastructure
             services.AddScoped<ICurrencyTypeRepository, CurrencyTypeRepository>();
             services.AddScoped<IBankRepository, BankRepository>();
             services.AddScoped<IInvoiceTypeRepository, InvoiceTypeRepository>();
+            services.AddScoped<IAgencyRepository, AgencyRepository>();
 
 
             // Dinamik veritabanı kullanan repositoryler
