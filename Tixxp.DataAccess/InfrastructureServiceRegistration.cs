@@ -21,6 +21,8 @@ using Tixxp.Infrastructure.DataAccess.Abstract.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Abstract.Role;
+using Tixxp.Infrastructure.DataAccess.Abstract.TicketSubType;
+using Tixxp.Infrastructure.DataAccess.Abstract.TicketType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Agency;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.AgencyContract;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Bank;
@@ -38,6 +40,8 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Role;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketSubType;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketType;
 using Tixxp.Infrastructure.DataAccess.Context;
 
 namespace Tixxp.Infrastructure
@@ -90,6 +94,8 @@ namespace Tixxp.Infrastructure
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IGuideRepository, GuideRepository>();
             services.AddScoped<IAgencyContractRepository, AgencyContractRepository>();
+            services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
+            services.AddScoped<ITicketSubTypeRepository, TicketSubTypeRepository>();
 
             return services;
         }

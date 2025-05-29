@@ -10,6 +10,8 @@ using Tixxp.Entities.ProductPrice;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.Entities.ProductSaleInvoiceInfo;
+using Tixxp.Entities.TicketSubType;
+using Tixxp.Entities.TicketType;
 
 namespace Tixxp.Infrastructure.DataAccess.Context
 {
@@ -65,6 +67,14 @@ namespace Tixxp.Infrastructure.DataAccess.Context
             {
                 entity.ToTable("PriceCategory", _schema);
             });
+            modelBuilder.Entity<TicketTypeEntity>(entity =>
+            {
+                entity.ToTable("TicketType", _schema);
+            });
+            modelBuilder.Entity<TicketSubTypeEntity>(entity =>
+            {
+                entity.ToTable("TicketSubType", _schema);
+            });
             base.OnModelCreating(modelBuilder);
         }
 
@@ -78,5 +88,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<ProductEntity> Products { get; set; }
         public DbSet<PriceCategoryEntity> PriceCategories { get; set; }
         public DbSet<AgencyContractEntity> AgencyContracts { get; set; }
+        public DbSet<TicketTypeEntity> TicketTypes { get; set; }
+        public DbSet<TicketSubTypeEntity> TicketSubTypes { get; set; }
     }
 }
