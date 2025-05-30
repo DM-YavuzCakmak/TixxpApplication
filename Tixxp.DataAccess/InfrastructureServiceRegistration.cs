@@ -22,6 +22,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Abstract.Role;
+using Tixxp.Infrastructure.DataAccess.Abstract.SeasonalPrice;
 using Tixxp.Infrastructure.DataAccess.Abstract.Session;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketType;
@@ -43,6 +44,7 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Role;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SeasonalPrice;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Session;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketType;
@@ -87,6 +89,7 @@ namespace Tixxp.Infrastructure
             services.AddScoped<IAgencyRepository, AgencyRepository>();
             services.AddScoped<IPriceCategoryRepository, PriceCategoryRepository>();
             services.AddScoped<IMuseumRepository, MuseumRepository>();
+            services.AddScoped<ISeasonalPriceRepository, SeasonalPriceRepository>();
 
 
             // Dinamik veritabanı kullanan repositoryler

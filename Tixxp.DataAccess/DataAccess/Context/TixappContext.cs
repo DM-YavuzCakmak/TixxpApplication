@@ -10,6 +10,7 @@ using Tixxp.Entities.ProductPrice;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.Entities.ProductSaleInvoiceInfo;
+using Tixxp.Entities.SeasonalPrice;
 using Tixxp.Entities.Session;
 using Tixxp.Entities.TicketSubType;
 using Tixxp.Entities.TicketType;
@@ -80,6 +81,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
             {
                 entity.ToTable("Session", _schema);
             });
+            modelBuilder.Entity<SeasonalPriceEntity>(entity =>
+            {
+                entity.ToTable("SeasonalPrice", _schema);
+            });
             base.OnModelCreating(modelBuilder);
         }
 
@@ -96,5 +101,6 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<TicketTypeEntity> TicketTypes { get; set; }
         public DbSet<TicketSubTypeEntity> TicketSubTypes { get; set; }
         public DbSet<SessionEntity> Sessions { get; set; }
+        public DbSet<SeasonalPriceEntity> SeasonalPrices { get; set; }
     }
 }
