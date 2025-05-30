@@ -1,0 +1,158 @@
+﻿@using Tixxp.Entities.Museum
+@model List<MuseumEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Müze Listesi";
+}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Müze Listesi</h1>
+            <button class="btn btn-primary btn-sm" onclick="openEditMuseumModal(0)">+ Yeni Müze</button>
+        </div>
+
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Adı</th>
+                                <th>Kod</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Name</td>
+                                        <td>@item.Identifier</td>
+                                        <td>
+                                            <div class="hstack gap-2">
+                                                <a class="btn btn-sm btn-light" onclick="openEditMuseumModal(@item.Id)">
+                                                    <i class="ri-edit-line"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-light" onclick="confirmDeleteMuseum(@item.Id)">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="3" class="text-center">Kayıt bulunamadı.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editMuseumModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Müze Düzenle</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editMuseumForm">
+                    <input type="hidden" id="museumId" name="Id" />
+                    <div class="mb-3">
+                        <label>Müze Adı</label>
+                        <input type="text" class="form-control" id="museumName" name="Name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Kod (Identifier)</label>
+                        <input type="text" class="form-control" id="museumIdentifier" name="Identifier" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openEditMuseumModal(id) {
+            const modal = $('#editMuseumModal');
+            const form = $('#editMuseumForm');
+
+            if (id === 0) {
+                form[0].reset();
+                $('#museumId').val(0);
+                modal.find('.modal-title').text('Müze Ekle');
+                modal.modal('show');
+                return;
+            }
+
+            $.get('/Museum/GetById', { id: id }, function (data) {
+                $('#museumId').val(data.id);
+                $('#museumName').val(data.name);
+                $('#museumIdentifier').val(data.identifier);
+                modal.find('.modal-title').text('Müze Düzenle');
+                modal.modal('show');
+            }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
+        }
+
+        $('#editMuseumForm').submit(function (e) {
+            e.preventDefault();
+
+            const id = Number($('#museumId').val());
+            const data = {
+                Id: id,
+                Name: $('#museumName').val(),
+                Identifier: $('#museumIdentifier').val()
+            };
+
+            const url = id === 0 ? '/Museum/Create' : '/Museum/Update';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire("Başarılı", res.message, "success").then(() => location.reload());
+                    } else {
+                        Swal.fire("Hata", res.message, "error");
+                    }
+                },
+                error: () => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error")
+            });
+        });
+
+        function confirmDeleteMuseum(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu müzeyi silmek üzeresiniz.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $.post('/Museum/Delete', { id: id }, function (res) {
+                        if (res.success) {
+                            Swal.fire("Silindi", res.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Hata", res.message, "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

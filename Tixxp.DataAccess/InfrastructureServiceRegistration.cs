@@ -12,6 +12,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.CurrencyType;
 using Tixxp.Infrastructure.DataAccess.Abstract.Event;
 using Tixxp.Infrastructure.DataAccess.Abstract.Guide;
 using Tixxp.Infrastructure.DataAccess.Abstract.InvoiceType;
+using Tixxp.Infrastructure.DataAccess.Abstract.Museum;
 using Tixxp.Infrastructure.DataAccess.Abstract.Personnel;
 using Tixxp.Infrastructure.DataAccess.Abstract.PersonnelRole;
 using Tixxp.Infrastructure.DataAccess.Abstract.PriceCategory;
@@ -32,6 +33,7 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.CurrencyType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Event;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Guide;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.InvoiceType;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Museum;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Personnel;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PersonnelRole;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PriceCategory;
@@ -84,6 +86,7 @@ namespace Tixxp.Infrastructure
             services.AddScoped<IInvoiceTypeRepository, InvoiceTypeRepository>();
             services.AddScoped<IAgencyRepository, AgencyRepository>();
             services.AddScoped<IPriceCategoryRepository, PriceCategoryRepository>();
+            services.AddScoped<IMuseumRepository, MuseumRepository>();
 
 
             // Dinamik veritabanı kullanan repositoryler

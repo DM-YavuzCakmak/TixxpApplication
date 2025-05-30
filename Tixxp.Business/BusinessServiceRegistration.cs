@@ -8,6 +8,7 @@ using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Business.Services.Abstract.Guide;
 using Tixxp.Business.Services.Abstract.InvoiceType;
+using Tixxp.Business.Services.Abstract.Museum;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Abstract.PriceCategory;
@@ -29,6 +30,7 @@ using Tixxp.Business.Services.Concrete.CurrencyType;
 using Tixxp.Business.Services.Concrete.Event;
 using Tixxp.Business.Services.Concrete.Guide;
 using Tixxp.Business.Services.Concrete.InvoiceType;
+using Tixxp.Business.Services.Concrete.Museum;
 using Tixxp.Business.Services.Concrete.PersonnelRoleService;
 using Tixxp.Business.Services.Concrete.PersonnelService;
 using Tixxp.Business.Services.Concrete.PriceCategory;
@@ -63,6 +65,7 @@ namespace Tixxp.Business
             services.AddScoped<ITicketTypeService, TicketTypeService>();
             services.AddScoped<ITicketSubTypeService, TicketSubTypeService>();
             services.AddScoped<ISessionService, SessionService>();
+            services.AddScoped<IMuseumService, MuseumService>();
 
             services.AddScoped<ICounterService, CounterService>();
             services.AddScoped<IProductService, ProductService>();
