@@ -103,7 +103,7 @@ namespace Tixxp.WebApp.Controllers
                 .ToList();
 
             // 5. Max satışa göre yüzde hesapla
-            var maxSales = grouped.Max(x => x.TotalSales);
+            var maxSales = grouped.Any() ? grouped.Max(x => x.TotalSales) : 0;
             var viewData = grouped.Select(x => new
             {
                 x.Id,
@@ -112,7 +112,7 @@ namespace Tixxp.WebApp.Controllers
                 x.ProfilePhotoPath,
                 x.Date,
                 x.TotalSales,
-                Percent = maxSales > 0 ? (int)Math.Round((double)x.TotalSales / maxSales * 100) : 249
+                Percent = maxSales > 0 ? (int)Math.Round((double)x.TotalSales / maxSales * 100) : 0
             }).ToList();
 
 
