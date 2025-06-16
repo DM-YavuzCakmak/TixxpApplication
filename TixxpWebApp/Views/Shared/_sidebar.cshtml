@@ -1,14 +1,10 @@
 ﻿<!-- Start::app-sidebar -->
 <aside class="app-sidebar sticky" id="sidebar">
-
-    <!-- Start::main-sidebar-header -->
     <div class="main-sidebar-header text-center py-3">
         <a href="/Home/Index" class="header-logo d-block">
             <img src="../assets/images/brand-logos/TixxpLogo.jpg" alt="logo" class="desktop-logo mx-auto d-block">
         </a>
     </div>
-    <!-- End::main-sidebar-header -->
-    <!-- Start::main-sidebar -->
     <div class="main-sidebar" id="sidebar-scroll">
         <nav class="main-menu-container nav nav-pills flex-column sub-open">
             <div class="main-sidebar-loggedin text-center py-4">
@@ -20,76 +16,71 @@
                         <h6 class="mb-0 fs-15 fw-semibold text-dark">
                             @User.FindFirst("FirstName")?.Value @User.FindFirst("LastName")?.Value
                         </h6>
-                        <span class="text-muted fs-12">Web Kullanıcısı</span>
                     </div>
                 </div>
             </div>
-
             <ul class="main-menu text-wrap">
 
-                <!-- Start::Satış -->
-                <li class="slide has-sub">
-                    <a href="javascript:void(0);" class="side-menu__item">
-                        <i class="bx bx-cart-alt side-menu__icon"></i>
-                        <span class="side-menu__label">Satış</span>
-                        <i class="fe fe-chevron-right side-menu__angle"></i>
-                    </a>
-                    <ul class="slide-menu child1">
-                        <li class="slide side-menu__label1"><a href="#">Satış Menüsü</a></li>
-                        <li class="slide has-sub">
-                            <a href="#" class="side-menu__item">
-                                Ürün Satışı
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child2">
-                                <li class="slide"><a href="/ProductSale/Index" class="side-menu__item">Gişe Satışı</a></li>
-                            </ul>
-                        </li>
-                        <li class="slide has-sub">
-                            <a href="#" class="side-menu__item">
-                                Bilet Satışı
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child2">
-                                <li class="slide"><a href="/TicketSales/Booth" class="side-menu__item">Gişe Satışı</a></li>
-                                <li class="slide"><a href="/TicketSales/Web" class="side-menu__item">Web Satışı</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <!-- End::Satış -->
-                <!-- Start::Raporlar -->
-                <li class="slide has-sub">
-                    <a href="javascript:void(0);" class="side-menu__item">
-                        <i class="bx bx-bar-chart-alt side-menu__icon"></i>
-                        <span class="side-menu__label">Rapor</span>
-                        <i class="fe fe-chevron-right side-menu__angle"></i>
-                    </a>
-                    <ul class="slide-menu child1">
-                        <li class="slide side-menu__label1"><a href="#">Rapor Menüsü</a></li>
-                        <li class="slide has-sub">
-                            <a href="#" class="side-menu__item">
-                                Ürün Satışı
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child2">
-                                <li class="slide"><a href="/Report/ProductSaleReport" class="side-menu__item">Ürün Satış Raporu</a></li>
-                            </ul>
-                        </li>
-                        <li class="slide has-sub">
-                            <a href="#" class="side-menu__item">
-                                Bilet Satışı
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child2">
-                                <li class="slide"><a href="/TicketSales/Booth" class="side-menu__item">Gişe Satışı</a></li>
-                                <li class="slide"><a href="/TicketSales/Web" class="side-menu__item">Web Satışı</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <!-- End::Raporlar -->
-                <!-- Start::Ayarlar -->
+                @* Satış *@
+                @if (User.IsInRole("TIXXP_PRODUCT_SALE") || User.IsInRole("TIXXP_RESERVATION_SALE") || User.IsInRole("TIXXP_TICKET_SALE_BOOTH") || User.IsInRole("TIXXP_TICKET_SALE_WEB"))
+                {
+                    <li class="slide has-sub">
+                        <a href="javascript:void(0);" class="side-menu__item">
+                            <i class="bx bx-cart-alt side-menu__icon"></i>
+                            <span class="side-menu__label">Satış</span>
+                            <i class="fe fe-chevron-right side-menu__angle"></i>
+                        </a>
+                        <ul class="slide-menu child1">
+                            @if (User.IsInRole("TIXXP_PRODUCT_SALE"))
+                            {
+                                <li class="slide has-sub">
+                                    <a href="#" class="side-menu__item"> Ürün Satışı<i class="fe fe-chevron-right side-menu__angle"></i></a>
+                                    <ul class="slide-menu child2">
+                                        <li class="slide"><a href="/ProductSale/Index" class="side-menu__item">GİŞE Satışı</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            @if (User.IsInRole("TIXXP_TICKET_SALE_BOOTH") || User.IsInRole("TIXXP_TICKET_SALE_WEB"))
+                            {
+                                <li class="slide has-sub">
+                                    <a href="#" class="side-menu__item">Bilet Satışı<i class="fe fe-chevron-right side-menu__angle"></i></a>
+                                    <ul class="slide-menu child2">
+                                        @if (User.IsInRole("TIXXP_TICKET_SALE_BOOTH"))
+                                        {
+                                            <li class="slide"><a href="/TicketSales/Booth" class="side-menu__item">GİŞE Satışı</a></li>
+                                        }
+                                        @if (User.IsInRole("TIXXP_TICKET_SALE_WEB"))
+                                        {
+                                            <li class="slide"><a href="/TicketSales/Web" class="side-menu__item">Web Satışı</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+
+                @* Rapor *@
+                @if (User.IsInRole("TIXXP_REPORT_PRODUCT_SALE"))
+                {
+                    <li class="slide has-sub">
+                        <a href="javascript:void(0);" class="side-menu__item">
+                            <i class="bx bx-bar-chart-alt side-menu__icon"></i>
+                            <span class="side-menu__label">Rapor</span>
+                            <i class="fe fe-chevron-right side-menu__angle"></i>
+                        </a>
+                        <ul class="slide-menu child1">
+                            <li class="slide has-sub">
+                                <a href="#" class="side-menu__item">Ürün Satışı<i class="fe fe-chevron-right side-menu__angle"></i></a>
+                                <ul class="slide-menu child2">
+                                    <li class="slide"><a href="/Report/ProductSaleReport" class="side-menu__item">Ürün Satış Raporu</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                }
+
+                @* Tanımlamalar *@
                 <li class="slide has-sub">
                     <a href="javascript:void(0);" class="side-menu__item">
                         <i class="bx bx-cog side-menu__icon"></i>
@@ -97,119 +88,106 @@
                         <i class="fe fe-chevron-right side-menu__angle"></i>
                     </a>
                     <ul class="slide-menu child1">
-
-                        <li class="slide">
-                            <a href="/SeasonalPrice/Index" class="side-menu__item">
-                                <i class="fa fa-university"></i>
-                                <span class="side-menu__label ms-2">Seasonal Price</span>
-                            </a>
-                        </li>
-
-
-                        <li class="slide">
-                            <a href="/Museum/Index" class="side-menu__item">
-                                <i class="fa fa-university"></i>
-                                <span class="side-menu__label ms-2">Müze</span>
-                            </a>
-                        </li>
-
-                        <li class="slide">
-                            <a href="/PriceCategory/Index" class="side-menu__item">
-                                <i class="fa fa-money"></i>
-                                <span class="side-menu__label ms-2">Fiyat Kategorisi</span>
-                            </a>
-                        </li>
-
-                        <li class="slide">
-                            <a href="/Guide/Index" class="side-menu__item">
-                                <i class="fa fa-camera"></i>
-                                <span class="side-menu__label ms-2">Rehber</span>
-                            </a>
-                        </li>
-
-                        <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
-                                <i class="fa fa-building"></i>
-                                <span class="side-menu__label ms-2">Acente</span>
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child1">
-                                <li class="slide">
-                                    <a href="/Agency/Index" class="side-menu__item">Acente Listesi</a>
-                                </li>
-                                <li class="slide">
-                                    <a href="/AgencyContract/Index" class="side-menu__item text-wrap">Acente Fiyat<br />Kategori Listesi</a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li class="slide has-sub">
-                            <a href="javascript:void(0);" class="side-menu__item">
-                                <i class="fa fa-ticket"></i>
-                                <span class="side-menu__label ms-2">Bilet</span>
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child1">
-                                <li class="slide">
-                                    <a href="/TicketType/Index" class="side-menu__item">Bilet Tip Listesi</a>
-                                </li>
-                                <li class="slide">
-                                    <a href="/TicketSubType/Index" class="side-menu__item text-wrap">Bilet Alt Tip<br />Listesi</a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li class="slide">
-                            <a href="/CurrencyType/Index" class="side-menu__item">
-                                <i class="bi bi-bar-chart-line"></i>
-                                <span class="side-menu__label ms-2">Para Birimi</span>
-                            </a>
-                        </li>
-                       
-
-                        <li class="slide has-sub">
-                            <a href="#" class="side-menu__item">
-                                <i class="bi bi-basket"></i>
-                                <span class="side-menu__label ms-2">Etkinlik</span>
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child1">
-                                <li class="slide"><a href="/Event/Index" class="side-menu__item">Etkinlik Listesi</a></li>
-                                <li class="slide"><a href="/Session/Index" class="side-menu__item">Seans Listesi</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="slide">
-                            <a href="/Bank/Index" class="side-menu__item">
-                                <i class="bx bx-box"></i>
-                                <span class="side-menu__label ms-2">Banka</span>
-                            </a>
-                        </li>
-
-                        <li class="slide has-sub">
-                            <a href="#" class="side-menu__item">
-                                <i class="bi bi-basket"></i>
-                                <span class="side-menu__label ms-2">Ürün</span>
-                                <i class="fe fe-chevron-right side-menu__angle"></i>
-                            </a>
-                            <ul class="slide-menu child1">
-                                <li class="slide"><a href="/Product/Index" class="side-menu__item">Ürün Listesi</a></li>
-                                <li class="slide"><a href="/ProductPrice/Index" class="side-menu__item">Ürün Fiyat Listesi</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="slide">
-                            <a href="/Personnel/Index" class="side-menu__item">
-                                <i class="si si-user"></i>
-                                <span class="side-menu__label ms-2">Kullanıcılar</span>
-                            </a>
-                        </li>
+                        @if (User.IsInRole("TIXXP_SEASONAL_PRICE"))
+                        {
+                            <li class="slide">
+                                <a href="/SeasonalPrice/Index" class="side-menu__item">
+                                    <i class="bi bi-tags-fill"></i>
+                                    <span class="side-menu__label ms-2">Seasonal Price</span>
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole("TIXXP_MUSEUM"))
+                        {
+                            <li class="slide"><a href="/Museum/Index" class="side-menu__item"><i class="fa fa-university"></i><span class="side-menu__label ms-2">Müze</span></a></li>
+                        }
+                        @if (User.IsInRole("TIXXP_PRICE_CATEGORY"))
+                        {
+                            <li class="slide"><a href="/PriceCategory/Index" class="side-menu__item"><i class="fa fa-money"></i><span class="side-menu__label ms-2">Fiyat Kategorisi</span></a></li>
+                        }
+                        @if (User.IsInRole("TIXXP_GUIDE"))
+                        {
+                            <li class="slide"><a href="/Guide/Index" class="side-menu__item"><i class="fa fa-camera"></i><span class="side-menu__label ms-2">Rehber</span></a></li>
+                        }
+                        @if (User.IsInRole("TIXXP_AGENCY_LIST") || User.IsInRole("TIXXP_AGENCY_CONTRACT"))
+                        {
+                            <li class="slide has-sub">
+                                <a href="#" class="side-menu__item"><i class="fa fa-building"></i><span class="side-menu__label ms-2">Acente</span><i class="fe fe-chevron-right side-menu__angle"></i></a>
+                                <ul class="slide-menu child1">
+                                    @if (User.IsInRole("TIXXP_AGENCY_LIST"))
+                                    {
+                                        <li class="slide"><a href="/Agency/Index" class="side-menu__item">Acente Listesi</a></li>
+                                    }
+                                    @if (User.IsInRole("TIXXP_AGENCY_CONTRACT"))
+                                    {
+                                        <li class="slide"><a href="/AgencyContract/Index" class="side-menu__item text-wrap">Acente Fiyat<br />Kategori Listesi</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("TIXXP_TICKET_TYPE") || User.IsInRole("TIXXP_TICKET_SUBTYPE"))
+                        {
+                            <li class="slide has-sub">
+                                <a href="#" class="side-menu__item"><i class="fa fa-ticket"></i><span class="side-menu__label ms-2">Bilet</span><i class="fe fe-chevron-right side-menu__angle"></i></a>
+                                <ul class="slide-menu child1">
+                                    @if (User.IsInRole("TIXXP_TICKET_TYPE"))
+                                    {
+                                        <li class="slide"><a href="/TicketType/Index" class="side-menu__item">Bilet Tip Listesi</a></li>
+                                    }
+                                    @if (User.IsInRole("TIXXP_TICKET_SUBTYPE"))
+                                    {
+                                        <li class="slide"><a href="/TicketSubType/Index" class="side-menu__item text-wrap">Bilet Alt Tip<br />Listesi</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("TIXXP_CURRENCY_TYPE"))
+                        {
+                            <li class="slide"><a href="/CurrencyType/Index" class="side-menu__item"><i class="bi bi-bar-chart-line"></i><span class="side-menu__label ms-2">Para Birimi</span></a></li>
+                        }
+                        @if (User.IsInRole("TIXXP_EVENT_LIST") || User.IsInRole("TIXXP_SESSION_LIST"))
+                        {
+                            <li class="slide has-sub">
+                                <a href="#" class="side-menu__item"><i class="bi bi-basket"></i><span class="side-menu__label ms-2">Etkinlik</span><i class="fe fe-chevron-right side-menu__angle"></i></a>
+                                <ul class="slide-menu child1">
+                                    @if (User.IsInRole("TIXXP_EVENT_LIST"))
+                                    {
+                                        <li class="slide"><a href="/Event/Index" class="side-menu__item">Etkinlik Listesi</a></li>
+                                    }
+                                    @if (User.IsInRole("TIXXP_SESSION_LIST"))
+                                    {
+                                        <li class="slide"><a href="/Session/Index" class="side-menu__item">Seans Listesi</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("TIXXP_BANK"))
+                        {
+                            <li class="slide"><a href="/Bank/Index" class="side-menu__item"><i class="bx bx-box"></i><span class="side-menu__label ms-2">Banka</span></a></li>
+                        }
+                        @if (User.IsInRole("TIXXP_PRODUCT_LIST") || User.IsInRole("TIXXP_PRODUCT_PRICE_LIST"))
+                        {
+                            <li class="slide has-sub">
+                                <a href="#" class="side-menu__item"><i class="bi bi-basket"></i><span class="side-menu__label ms-2">Ürün</span><i class="fe fe-chevron-right side-menu__angle"></i></a>
+                                <ul class="slide-menu child1">
+                                    @if (User.IsInRole("TIXXP_PRODUCT_LIST"))
+                                    {
+                                        <li class="slide"><a href="/Product/Index" class="side-menu__item">Ürün Listesi</a></li>
+                                    }
+                                    @if (User.IsInRole("TIXXP_PRODUCT_PRICE_LIST"))
+                                    {
+                                        <li class="slide"><a href="/ProductPrice/Index" class="side-menu__item">Ürün Fiyat Listesi</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("TIXXP_PERSONNEL"))
+                        {
+                            <li class="slide"><a href="/Personnel/Index" class="side-menu__item"><i class="bi bi-people"></i><span class="side-menu__label ms-2">Kullanıcılar</span></a></li>
+                        }
                     </ul>
                 </li>
-                <!-- End::Ayarlar -->
-
             </ul>
-
             <div class="slide-right" id="slide-right">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
                     <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z"></path>
@@ -217,7 +195,5 @@
             </div>
         </nav>
     </div>
-    <!-- End::main-sidebar -->
-
 </aside>
 <!-- End::app-sidebar -->

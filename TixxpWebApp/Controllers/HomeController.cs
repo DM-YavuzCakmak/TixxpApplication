@@ -31,7 +31,7 @@ namespace Tixxp.WebApp.Controllers
             #region Kullanıcıalr
             var personnelIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (personnelIdClaim == null)
-                return RedirectToAction("Login", "Auth");
+                return RedirectToAction("Test", "Auth");
 
             long personnelId = Convert.ToInt64(personnelIdClaim.Value);
 

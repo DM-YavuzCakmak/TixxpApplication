@@ -35,7 +35,7 @@
         <div class="header-content-right">
 
             <!-- Start::header-element -->
-            <div class="header-element header-search">
+           @*  <div class="header-element header-search">
                 <!-- Start::header-link -->
                 <a href="javascript:void(0);" class="header-link search-icon" id="searchButton">
                     <i class="bx bx-search-alt-2 header-link-icon"></i>
@@ -53,10 +53,10 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </div> *@
             <!-- End::header-element -->
             <!-- Start::header-element -->
-            <div class="header-element country-selector">
+           @*  <div class="header-element country-selector">
                 <!-- Start::header-link|dropdown-toggle -->
                 <a href="javascript:void(0);" class="header-link dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown">
                     <img src="../assets/images/flags/us_flag.jpg" alt="img" class="rounded-circle header-link-icon">
@@ -112,7 +112,7 @@
                         </a>
                     </li>
                 </ul>
-            </div>
+            </div> *@
             <!-- End::header-element -->
             <!-- Start::header-element -->
             <div class="header-element header-theme-mode">
@@ -133,7 +133,7 @@
             </div>
             <!-- End::header-element -->
             <!-- Start::header-element -->
-            <div class="header-element cart-dropdown">
+           @*  <div class="header-element cart-dropdown">
                 <!-- Start::header-link|dropdown-toggle -->
                 <a href="javascript:void(0);" class="header-link d-sm-block d-none dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown">
                     <i class="bx bx-cart header-link-icon"></i>
@@ -278,10 +278,10 @@
                     </div>
                 </div>
                 <!-- End::main-header-dropdown -->
-            </div>
+            </div> *@
             <!-- End::header-element -->
             <!-- Start::header-element -->
-            <div class="header-element meassage-dropdown">
+            @* <div class="header-element meassage-dropdown">
                 <!-- Start::header-link|dropdown-toggle -->
                 <a href="javascript:void(0);" class="header-link d-sm-block d-none dropdown-toggle" data-bs-auto-close="outside"
                    data-bs-toggle="dropdown">
@@ -433,10 +433,10 @@
                     </div>
                 </div>
                 <!-- End::main-header-dropdown -->
-            </div>
+            </div> *@
             <!-- End::header-element -->
             <!-- Start::header-element -->
-            <div class="header-element notifications-dropdown">
+          @*   <div class="header-element notifications-dropdown">
                 <!-- Start::header-link|dropdown-toggle -->
                 <a href="javascript:void(0);" class="header-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" id="messageDropdown" aria-expanded="false">
                     <i class="bx bx-bell header-link-icon"></i>
@@ -533,10 +533,10 @@
                     </div>
                 </div>
                 <!-- End::main-header-dropdown -->
-            </div>
+            </div> *@
             <!-- End::header-element -->
             <!-- Start::header-element -->
-            <div class="header-element header-shortcuts-dropdown">
+           @*  <div class="header-element header-shortcuts-dropdown">
                 <!-- Start::header-link|dropdown-toggle -->
                 <a href="javascript:void(0);" class="header-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" id="notificationDropdown" aria-expanded="false">
                     <i class="bx bx-grid-alt header-link-icon"></i>
@@ -635,7 +635,7 @@
                     </div>
                 </div>
                 <!-- End::main-header-dropdown -->
-            </div>
+            </div> *@
             <!-- End::header-element -->
             <!-- Start::header-element -->
             <div class="header-element header-fullscreen">
@@ -660,14 +660,14 @@
                 <!-- End::header-link|dropdown-toggle -->
                 <ul class="main-header-dropdown dropdown-menu pt-0 overflow-hidden header-profile-dropdown  border-transparent dropdown-menu-end" aria-labelledby="mainHeaderProfile">
                     <li class="main-header-profile header-img bg-primary rounded-top-1 p-3 text-fixed-white text-center">
-                        <p class="fw-medium mb-0 lh-1">Json Taylor</p>
-                        <span class="op-7 fw-normal d-block fs-11">Web Designer</span>
+                        <p class="fw-medium mb-0 lh-1">@User.FindFirst("FirstName")?.Value @User.FindFirst("LastName")?.Value</p>
                     </li>
-                    <li><a class="dropdown-item d-flex" href="profile.html"><i class="fe fe-user fs-18 me-2 op-7"></i>My Profile</a></li>
+                   @*  <li><a class="dropdown-item d-flex" href="profile.html"><i class="fe fe-user fs-18 me-2 op-7"></i>My Profile</a></li>
                     <li><a class="dropdown-item d-flex" href="profile.html"><i class="fe fe-edit fs-18 me-2 op-7"></i>Edit Profile</a></li>
                     <li><a class="dropdown-item d-flex border-block-end" href="settings.html"><i class="fe fe-clock fs-18 me-2 op-7"></i> Activity Logs</a></li>
-                    <li><a class="dropdown-item d-flex" href="settings.html"><i class="ti ti-adjustments-horizontal fs-18 me-2 op-7"></i>Account Settings</a></li>
-                    <li><a class="dropdown-item d-flex" href="sign-in.html"><i class="fe fe-log-out fs-18 me-2 op-7"></i>Sign Out</a></li>
+                    <li><a class="dropdown-item d-flex" href="settings.html"><i class="ti ti-adjustments-horizontal fs-18 me-2 op-7"></i>Account Settings</a></li> *@
+                    <li><a class="dropdown-item d-flex" href="/Authorization/LogoutGet"><i class="fe fe-log-out fs-18 me-2 op-7"></i>Sign Out</a></li>
+                    
                 </ul>
             </div>
             <!-- End::header-element -->

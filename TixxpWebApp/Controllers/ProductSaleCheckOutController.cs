@@ -106,6 +106,7 @@ namespace Tixxp.WebApp.Controllers
             {
                 ProductSaleEntity productSaleEntity = new ProductSaleEntity();
                 productSaleEntity.CounterId = 1;
+                productSaleEntity.CreatedBy = 13;
                 var newProductSaleEntity = _productSaleService.AddAndReturn(productSaleEntity);
 
                 foreach (var productSaleCheckOutItem in productSaleCheckOutItems)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Tixxp.Business;
 using Tixxp.Infrastructure;
 using Tixxp.WebApp.Middlewares;
@@ -13,16 +14,26 @@ builder.Services.AddBusinessServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddTixxpDbContext(builder.Configuration);
 
+// ✅ Cookie Policy (IIS ve Chrome için önemli)
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => false;
+    options.MinimumSameSitePolicy = SameSiteMode.Lax; // 'None' da olabilir
+});
+
 // ✅ Authentication servisi
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Authorization/Index";
+        options.AccessDeniedPath = "/Authorization/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
-        options.SlidingExpiration = false;
+        options.SlidingExpiration = true;
         options.Cookie.IsEssential = true;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax; // Cookie’nin gönderilmesini engellemesin
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // IIS HTTP'de sorun çıkmasın diye
+        options.Cookie.Name = "TixxpAuth"; // Özel isim vererek çakışmayı önle
     });
 
 var app = builder.Build();
@@ -39,7 +50,16 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// ✅ Authentication middleware'leri
+// ✅ IIS Proxy ve Cookie için Forwarded Headers
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// ✅ Cookie policy middleware
+app.UseCookiePolicy();
+
+// ✅ Authentication & Authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -65,5 +65,12 @@ namespace Tixxp.WebApp.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Authorization");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> LogoutGet()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Authorization");
+        }
     }
 }
