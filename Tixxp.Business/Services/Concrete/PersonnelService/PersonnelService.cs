@@ -39,7 +39,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         if (user == null)
             return new ErrorDataResult<LoginResponseDto>("Kullanıcı bulunamadı.");
 
-        if (string.IsNullOrEmpty(user.Salt))
+        if (string.IsNullOrWhiteSpace(user.Salt))
             return new ErrorDataResult<LoginResponseDto>("Kullanıcı salt bilgisi eksik.");
 
         var saltBytes = Convert.FromBase64String(user.Salt);

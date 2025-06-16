@@ -125,14 +125,14 @@ namespace Tixxp.WebApp.Controllers
             {
                 // Yeni kullanıcı ekleme
                 model.UserName = model.Email;
-                model.Password = "123456"; // Şifreleme yapılabilir
+                model.Password = model.Password; // Şifreleme yapılabilir
                 model.IsActive = true;
                 model.IsDeleted = false;
                 model.Created_Date = DateTime.Now;
                 model.CreatedBy = currentUserId;
                 model.LoginType = 1;
                 model.NationalIdNumber = "123";
-                model.Salt = "aaa"; // Geliştirilmesi önerilir
+                model.Salt = "vbqC3whcKoa3WGE+beehFg=="; // Geliştirilmesi önerilir
                 model.CompanyIdentifier = currentUserResult.Data.CompanyIdentifier;
 
                 var addResult = _personnelService.Add(model);
