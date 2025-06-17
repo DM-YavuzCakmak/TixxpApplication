@@ -8,7 +8,10 @@
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Acente Listesi</h1>
-            <button class="btn btn-primary btn-sm" onclick="openEditAgencyModal(0)">+ Yeni Acente</button>
+            @if (User.IsInRole("TIXXP_AGENCY_ADD"))
+            {
+                <button class="btn btn-primary btn-sm" onclick="openEditAgencyModal(0)">+ Yeni Acente</button>
+            }
         </div>
 
         <div class="row">
@@ -23,7 +26,10 @@
                                 <thead>
                                     <tr>
                                         <th>Adı</th>
-                                        <th>İşlem</th>
+                                        @if (User.IsInRole("TIXXP_AGENCY_EDIT") || User.IsInRole("TIXXP_AGENCY_DELETE"))
+                                        {
+                                            <th>İşlem</th>
+                                        }
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -33,18 +39,27 @@
                                         {
                                             <tr>
                                                 <td>@item.Name</td>
-                                                <td>
-                                                    <div class="hstack gap-2 fs-15">
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="openEditAgencyModal(@item.Id)">
-                                                            <i class="ri-edit-line"></i>
-                                                        </a>
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="confirmDeleteAgency(@item.Id)">
-                                                            <i class="ri-delete-bin-line"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
+                                                @if (User.IsInRole("TIXXP_AGENCY_EDIT") || User.IsInRole("TIXXP_AGENCY_DELETE"))
+                                                {
+                                                    <td>
+                                                        <div class="hstack gap-2 fs-15">
+                                                            @if (User.IsInRole("TIXXP_AGENCY_EDIT"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="openEditAgencyModal(@item.Id)">
+                                                                    <i class="ri-edit-line"></i>
+                                                                </a>
+                                                            }
+                                                            @if (User.IsInRole("TIXXP_AGENCY_DELETE"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="confirmDeleteAgency(@item.Id)">
+                                                                    <i class="ri-delete-bin-line"></i>
+                                                                </a>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                }
                                             </tr>
                                         }
                                     }

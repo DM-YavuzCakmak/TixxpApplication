@@ -6,6 +6,8 @@ using Tixxp.Entities.Personnel;
 namespace Tixxp.Business.Services.Abstract.PersonnelService;
 public interface IPersonnelService : IBaseService<PersonnelEntity>
 {
+    public byte[] GenerateSalt(int size = 16);
+    public string GenerateSha256Hash(byte[] saltBytes, string plainPassword);
     Task<IDataResult<LoginResponseDto>> Login(LoginRequestDto loginRequestDto);
 
 }

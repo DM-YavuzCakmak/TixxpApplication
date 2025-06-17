@@ -12,7 +12,10 @@
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Sezonluk Fiyatlar</h1>
-            <button class="btn btn-primary btn-sm" onclick="openEditSeasonalPriceModal(0)">+ Yeni Sezon Fiyatı</button>
+            @if (User.IsInRole("TIXXP_SEASONAL_PRICE_ADD"))
+            {
+                <button class="btn btn-primary btn-sm" onclick="openEditSeasonalPriceModal(0)">+ Yeni Sezon Fiyatı</button>
+            }
         </div>
 
         <div class="card custom-card">
@@ -25,7 +28,10 @@
                                 <th>Sezon Adı</th>
                                 <th>Başlangıç</th>
                                 <th>Bitiş</th>
-                                <th>İşlem</th>
+                                @if (User.IsInRole("TIXXP_SEASONAL_PRICE_EDIT") || User.IsInRole("TIXXP_SEASONAL_PRICE_DELETE"))
+                                {
+                                    <th>İşlem</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
@@ -38,16 +44,25 @@
                                         <td>@item.SeasonName</td>
                                         <td>@item.StartDate.ToString("dd.MM.yyyy")</td>
                                         <td>@item.EndDate.ToString("dd.MM.yyyy")</td>
-                                        <td>
-                                            <div class="hstack gap-2">
-                                                <a class="btn btn-sm btn-light" onclick="openEditSeasonalPriceModal(@item.Id)">
-                                                    <i class="ri-edit-line"></i>
-                                                </a>
-                                                <a class="btn btn-sm btn-light" onclick="confirmDeleteSeasonalPrice(@item.Id)">
-                                                    <i class="ri-delete-bin-line"></i>
-                                                </a>
-                                            </div>
-                                        </td>
+                                        @if (User.IsInRole("TIXXP_SEASONAL_PRICE_EDIT") || User.IsInRole("TIXXP_SEASONAL_PRICE_DELETE"))
+                                        {
+                                            <td>
+                                                <div class="hstack gap-2">
+                                                    @if (User.IsInRole("TIXXP_SEASONAL_PRICE_EDIT"))
+                                                    {
+                                                        <a class="btn btn-sm btn-light" onclick="openEditSeasonalPriceModal(@item.Id)">
+                                                            <i class="ri-edit-line"></i>
+                                                        </a>
+                                                    }
+                                                    @if (User.IsInRole("TIXXP_SEASONAL_PRICE_DELETE"))
+                                                    {
+                                                        <a class="btn btn-sm btn-light" onclick="confirmDeleteSeasonalPrice(@item.Id)">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        }
                                     </tr>
                                 }
                             }

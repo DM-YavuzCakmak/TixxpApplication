@@ -128,7 +128,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         return new SuccessResult("Kayıt başarılı.");
     }
 
-    private byte[] GenerateSalt(int size = 16)
+    public byte[] GenerateSalt(int size = 16)
     {
         var salt = new byte[size];
         using var rng = RandomNumberGenerator.Create();
@@ -136,7 +136,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         return salt;
     }
 
-    private string GenerateSha256Hash(byte[] saltBytes, string plainPassword)
+    public string GenerateSha256Hash(byte[] saltBytes, string plainPassword)
     {
         var passwordBytes = Encoding.UTF8.GetBytes(plainPassword);
         var combinedBytes = saltBytes.Concat(passwordBytes).ToArray();

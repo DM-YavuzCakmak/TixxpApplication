@@ -1,6 +1,7 @@
 ﻿// CONTROLLER
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Tixxp.Business.DataTransferObjects.Personnel.Login;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Abstract.RoleService;
@@ -104,10 +105,13 @@ namespace Tixxp.WebApp.Controllers
             return Json(new { success = false, message = "Kullanıcı bulunamadı." });
         }
 
+
         [HttpPost]
         public JsonResult Save(PersonnelEntity model)
         {
-            if (string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName) || string.IsNullOrWhiteSpace(model.Email))
+            if (string.IsNullOrWhiteSpace(model.FirstName) ||
+                string.IsNullOrWhiteSpace(model.LastName) ||
+                string.IsNullOrWhiteSpace(model.Email))
             {
                 return Json(new ErrorResult("Zorunlu alanlar doldurulmalıdır."));
             }
@@ -117,6 +121,8 @@ namespace Tixxp.WebApp.Controllers
                 return Json(new ErrorResult("Oturum bilgisi bulunamadı."));
 
             long currentUserId = Convert.ToInt64(currentUserIdStr);
+
+            // Kullanıcının sistemde varlığını kontrol et
             var currentUserResult = _personnelService.GetById(currentUserId);
             if (!currentUserResult.Success || currentUserResult.Data == null)
                 return Json(new ErrorResult("Kullanıcı bilgisi alınamadı."));
@@ -124,23 +130,29 @@ namespace Tixxp.WebApp.Controllers
             if (model.Id == 0)
             {
                 // Yeni kullanıcı ekleme
+                if (string.IsNullOrWhiteSpace(model.Password))
+                    return Json(new ErrorResult("Şifre alanı zorunludur."));
+
+                var saltBytes = _personnelService.GenerateSalt();
+                var saltBase64 = Convert.ToBase64String(saltBytes);
+                var hash = _personnelService.GenerateSha256Hash(saltBytes, model.Password);
+
                 model.UserName = model.Email;
-                model.Password = model.Password; // Şifreleme yapılabilir
+                model.Password = hash;
+                model.Salt = saltBase64;
                 model.IsActive = true;
                 model.IsDeleted = false;
+                model.LoginType = 1;
                 model.Created_Date = DateTime.Now;
                 model.CreatedBy = currentUserId;
-                model.LoginType = 1;
-                model.NationalIdNumber = "123";
-                model.Salt = "vbqC3whcKoa3WGE+beehFg=="; // Geliştirilmesi önerilir
                 model.CompanyIdentifier = currentUserResult.Data.CompanyIdentifier;
 
+                model.NationalIdNumber ??= "123";
                 var addResult = _personnelService.Add(model);
                 return Json(addResult);
             }
             else
             {
-                // Mevcut kullanıcı güncelleme
                 var existing = _personnelService.GetById(model.Id);
                 if (!existing.Success || existing.Data == null)
                     return Json(new ErrorResult("Güncellenecek kullanıcı bulunamadı."));

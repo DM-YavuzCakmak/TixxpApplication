@@ -10,7 +10,10 @@
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Müze Listesi</h1>
-            <button class="btn btn-primary btn-sm" onclick="openEditMuseumModal(0)">+ Yeni Müze</button>
+            @if (User.IsInRole("TIXXP_MUSEUM_ADD"))
+            {
+                <button class="btn btn-primary btn-sm" onclick="openEditMuseumModal(0)">+ Yeni Müze</button>
+            }
         </div>
 
         <div class="card custom-card">
@@ -21,7 +24,10 @@
                             <tr>
                                 <th>Adı</th>
                                 <th>Kod</th>
-                                <th>İşlem</th>
+                                @if (User.IsInRole("TIXXP_MUSEUM_EDIT") || User.IsInRole("TIXXP_MUSEUM_DELETE"))
+                                {
+                                    <th>İşlem</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
@@ -32,16 +38,25 @@
                                     <tr>
                                         <td>@item.Name</td>
                                         <td>@item.Identifier</td>
-                                        <td>
-                                            <div class="hstack gap-2">
-                                                <a class="btn btn-sm btn-light" onclick="openEditMuseumModal(@item.Id)">
-                                                    <i class="ri-edit-line"></i>
-                                                </a>
-                                                <a class="btn btn-sm btn-light" onclick="confirmDeleteMuseum(@item.Id)">
-                                                    <i class="ri-delete-bin-line"></i>
-                                                </a>
-                                            </div>
-                                        </td>
+                                        @if (User.IsInRole("TIXXP_MUSEUM_EDIT") || User.IsInRole("TIXXP_MUSEUM_DELETE"))
+                                        {
+                                            <td>
+                                                <div class="hstack gap-2">
+                                                    @if (User.IsInRole("TIXXP_MUSEUM_EDIT"))
+                                                    {
+                                                        <a class="btn btn-sm btn-light" onclick="openEditMuseumModal(@item.Id)">
+                                                            <i class="ri-edit-line"></i>
+                                                        </a>
+                                                    }
+                                                    @if (User.IsInRole("TIXXP_MUSEUM_DELETE"))
+                                                    {
+                                                        <a class="btn btn-sm btn-light" onclick="confirmDeleteMuseum(@item.Id)">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        }
                                     </tr>
                                 }
                             }
