@@ -14,11 +14,4 @@
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="Views\Authorization\ResetPasswrod.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

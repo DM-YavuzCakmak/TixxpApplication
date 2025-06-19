@@ -1,10 +1,52 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
+using System.Globalization;
 using Tixxp.Business;
 using Tixxp.Infrastructure;
 using Tixxp.WebApp.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
+
+#region Localization
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix);
+
+builder.Services.AddLocalization(options =>
+{
+    options.ResourcesPath = "Resources";
+});
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("tr-TR"),
+        new CultureInfo("en-US"),
+        new CultureInfo("el-GR"),
+        new CultureInfo("ja-JP"),
+        new CultureInfo("fr-FR"),
+        new CultureInfo("zh-CN"),
+        new CultureInfo("ko-KR"),
+        new CultureInfo("es-AR"),
+        new CultureInfo("ru-RU")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("en-US");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+
+    // 🔥 Buraya ekliyoruz
+    options.RequestCultureProviders = new List<IRequestCultureProvider>
+    {
+        new QueryStringRequestCultureProvider(), // ?culture=tr-TR&ui-culture=tr-TR
+        new CookieRequestCultureProvider(),
+        new AcceptLanguageHeaderRequestCultureProvider()
+    };
+});
+#endregion
+
 
 // Services
 builder.Services.AddControllersWithViews();
@@ -37,6 +79,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 var app = builder.Build();
+var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+app.UseRequestLocalization(localizationOptions);
 
 // Middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();

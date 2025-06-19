@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer;
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -29,19 +31,16 @@
                         <div class="text-center mb-4">
                             <img src="~/assets/images/brand-logos/TixxpLogo.jpg" alt="Tixxp Logo" style="max-width: 120px;">
                         </div>
-
-
-                        <h5 class="text-center mb-4 fw-bold">Giriş Yap</h5>
-
+                        <h5 class="text-center mb-4 fw-bold">@Localizer["authorization.INDEX.LOGIN.BIG"]</h5>
                         <div class="mb-3">
-                            <label for="signin-username" class="form-label">E-Mail</label>
-                            <input type="text" id="signin-username" class="form-control form-control-lg" placeholder="Enter username">
+                            <label for="signin-username" class="form-label">@Localizer["authorization.INDEX.E-Mail"]</label>
+                            <input type="text" id="signin-username" class="form-control form-control-lg" placeholder="@Localizer["authorization.INDEX.E-Mail.PlaceHolder"]">
                         </div>
 
                         <div class="mb-3">
-                            <label for="signin-password" class="form-label">Şifre</label>
+                            <label for="signin-password" class="form-label">@Localizer["authorization.INDEX.PASSWORD"]</label>
                             <div class="input-group">
-                                <input type="password" id="signin-password" class="form-control form-control-lg" placeholder="Enter password">
+                                <input type="password" id="signin-password" class="form-control form-control-lg" placeholder="@Localizer["authorization.INDEX.PASSWORD.PlaceHolder"]">
                                 <button class="btn btn-light border" type="button" onclick="createpassword('signin-password', this)">
                                     <i class="ri-eye-off-line align-middle"></i>
                                 </button>
@@ -49,14 +48,14 @@
                             <div class="form-check mt-2 d-flex justify-content-between align-items-center">
                                 <div>
                                     <input type="checkbox" class="form-check-input" id="remember-check">
-                                    <label class="form-check-label" for="remember-check">Beni Hatırla</label>
+                                    <label class="form-check-label" for="remember-check">@Localizer["authorization.INDEX.Remember.Me"]</label>
                                 </div>
-                                <a href="/Authorization/ResetPassword" class="text-danger small">Şifremi Unuttum?</a>
+                                <a href="/Authorization/ResetPassword" class="text-danger small">@Localizer["authorization.INDEX.Forgot.Password"]</a>
                             </div>
                         </div>
 
                         <div class="d-grid mt-4">
-                            <button id="login-btn" type="button" class="btn btn-primary btn-lg">Giriş Yap</button>
+                            <button id="login-btn" type="button" class="btn btn-primary btn-lg">@Localizer["authorization.INDEX.SignIn.Camel.Case"]</button>
                         </div>
                         <div class="d-grid mt-2">
                             <form action="/Authorization/Logout" method="post">
