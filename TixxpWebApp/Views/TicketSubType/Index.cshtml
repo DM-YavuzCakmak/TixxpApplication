@@ -9,7 +9,10 @@
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Bilet Alt Tip Listesi</h1>
-            <button class="btn btn-primary btn-sm" onclick="openEditTicketSubTypeModal(0)">+ Yeni Alt Tip</button>
+            @if (User.IsInRole("TIXXP_TICKET_SUBTYPE_ADD"))
+            {
+                <button class="btn btn-primary btn-sm" onclick="openEditTicketSubTypeModal(0)">+ Yeni Alt Tip</button>
+            }
         </div>
 
         <div class="row">
@@ -26,7 +29,10 @@
                                         <th>Adı</th>
                                         <th>Açıklama</th>
                                         <th>Bilet Tipi</th>
-                                        <th>İşlem</th>
+                                        @if (User.IsInRole("TIXXP_TICKET_SUBTYPE_EDIT") || User.IsInRole("TIXXP_TICKET_SUBTYPE_DELETE"))
+                                        {
+                                            <th>İşlem</th>
+                                        }
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,16 +44,27 @@
                                                 <td>@item.Name</td>
                                                 <td>@item.Description</td>
                                                 <td>@item.TicketType?.Name</td>
-                                                <td>
-                                                    <div class="hstack gap-2 fs-15">
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="openEditTicketSubTypeModal(@item.Id)">
-                                                            <i class="ri-edit-line"></i>
-                                                        </a>
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="confirmDeleteTicketSubType(@item.Id)">
-                                                            <i class="ri-delete-bin-line"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
+                                                @if (User.IsInRole("TIXXP_TICKET_SUBTYPE_EDIT") || User.IsInRole("TIXXP_TICKET_SUBTYPE_DELETE"))
+                                                {
+                                                    <td>
+                                                        <div class="hstack gap-2 fs-15">
+                                                            @if (User.IsInRole("TIXXP_TICKET_SUBTYPE_EDIT"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="openEditTicketSubTypeModal(@item.Id)">
+                                                                    <i class="ri-edit-line"></i>
+                                                                </a>
+                                                            }
+                                                            @if (User.IsInRole("TIXXP_TICKET_SUBTYPE_DELETE"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="confirmDeleteTicketSubType(@item.Id)">
+                                                                    <i class="ri-delete-bin-line"></i>
+                                                                </a>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                }
                                             </tr>
                                         }
                                     }
@@ -64,6 +81,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Modal -->
 <div class="modal fade" id="editTicketSubTypeModal" tabindex="-1" aria-hidden="true">

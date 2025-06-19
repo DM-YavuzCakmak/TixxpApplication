@@ -9,7 +9,10 @@
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Bilet Tipi Listesi</h1>
-            <button class="btn btn-primary btn-sm" onclick="openEditTicketTypeModal(0)">+ Yeni Bilet Tipi</button>
+            @if (User.IsInRole("TIXXP_TICKET_TYPE_ADD"))
+            {
+                <button class="btn btn-primary btn-sm" onclick="openEditTicketTypeModal(0)">+ Yeni Bilet Tipi</button>
+            }
         </div>
 
         <div class="row">
@@ -24,7 +27,10 @@
                                 <thead>
                                     <tr>
                                         <th>Adı</th>
-                                        <th>İşlem</th>
+                                        @if (User.IsInRole("TIXXP_TICKET_TYPE_EDIT") || User.IsInRole("TIXXP_TICKET_TYPE_DELETE"))
+                                        {
+                                            <th>İşlem</th>
+                                        }
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -34,18 +40,27 @@
                                         {
                                             <tr>
                                                 <td>@item.Name</td>
-                                                <td>
-                                                    <div class="hstack gap-2 fs-15">
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="openEditTicketTypeModal(@item.Id)">
-                                                            <i class="ri-edit-line"></i>
-                                                        </a>
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="confirmDeleteTicketType(@item.Id)">
-                                                            <i class="ri-delete-bin-line"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
+                                                @if (User.IsInRole("TIXXP_TICKET_TYPE_EDIT") || User.IsInRole("TIXXP_TICKET_TYPE_DELETE"))
+                                                {
+                                                    <td>
+                                                        <div class="hstack gap-2 fs-15">
+                                                            @if (User.IsInRole("TIXXP_TICKET_TYPE_EDIT"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="openEditTicketTypeModal(@item.Id)">
+                                                                    <i class="ri-edit-line"></i>
+                                                                </a>
+                                                            }
+                                                            @if (User.IsInRole("TIXXP_TICKET_TYPE_DELETE"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="confirmDeleteTicketType(@item.Id)">
+                                                                    <i class="ri-delete-bin-line"></i>
+                                                                </a>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                }
                                             </tr>
                                         }
                                     }
@@ -62,6 +77,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Düzenleme Modalı -->
 <div class="modal fade" id="editTicketTypeModal" tabindex="-1" aria-hidden="true">
