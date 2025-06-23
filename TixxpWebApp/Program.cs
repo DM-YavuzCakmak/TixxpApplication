@@ -11,7 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region Localization
 builder.Services.AddControllersWithViews()
-    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix);
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization(); // BUNU EKLE
 
 builder.Services.AddLocalization(options =>
 {

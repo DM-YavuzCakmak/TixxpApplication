@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Tixxp.Business.Services.Abstract.InvoiceType;
 using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
@@ -23,18 +24,22 @@ namespace Tixxp.WebApp.Controllers
 
         private const long DefaultCounterId = 1;
 
+        private readonly IStringLocalizer<ProductSaleCheckOutController> _stringLocalizer;
+
         public ProductSaleCheckOutController(
             IInvoiceTypeService invoiceTypeService,
             IProductSaleService productSaleService,
             IProductSaleDetailService productSaleDetailService,
             IProductSaleInvoiceInfoService productSaleInvoiceInfoService,
-            IProductPriceService productPriceService)
+            IProductPriceService productPriceService,
+            IStringLocalizer<ProductSaleCheckOutController> stringLocalizer)
         {
             _invoiceTypeService = invoiceTypeService;
             _productSaleService = productSaleService;
             _productSaleDetailService = productSaleDetailService;
             _productSaleInvoiceInfoService = productSaleInvoiceInfoService;
             _productPriceService = productPriceService;
+            _stringLocalizer = stringLocalizer;
         }
 
         public IActionResult Index(long productSaleId)
@@ -119,7 +124,7 @@ namespace Tixxp.WebApp.Controllers
                 return Json(new
                 {
                     isSuccess = false,
-                    message = "Lütfen yalnızca tek bir para birimi seçerek satış işlemini gerçekleştirin."
+                    message = _stringLocalizer["productSaleCheckOutController.CURRENCY.TYPE_VALIDATION"].ToString()
                 });
             }
 
