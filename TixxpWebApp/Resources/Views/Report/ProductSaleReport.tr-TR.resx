@@ -117,55 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="home.INDEX.AMOUNT" xml:space="preserve">
-    <value>Tutar</value>
-  </data>
-  <data name="home.INDEX.COMPANY.USER" xml:space="preserve">
-    <value>Şirket Kullanıcıs</value>
-  </data>
-  <data name="home.INDEX.DAILY_PRODUCT_SELLERS" xml:space="preserve">
-    <value>Günlük Ürün Satışı Yapanlar</value>
-  </data>
-  <data name="home.INDEX.DATE" xml:space="preserve">
-    <value>Tarih</value>
-  </data>
-  <data name="home.INDEX.HOMEPAGE" xml:space="preserve">
-    <value>Ana Sayfa</value>
-  </data>
-  <data name="home.INDEX.LOGGED.IN.USER" xml:space="preserve">
-    <value>Giriş Yapan Kullanıcı</value>
-  </data>
-  <data name="home.INDEX.ORDER.NO" xml:space="preserve">
-    <value>Sipariş No</value>
-  </data>
-  <data name="home.INDEX.ORDERS" xml:space="preserve">
-    <value>Siparişler</value>
-  </data>
-  <data name="home.INDEX.PAYMENT.PLACE" xml:space="preserve">
-    <value>Ödeme Yeri</value>
-  </data>
-  <data name="home.INDEX.PRODUCT.SALES" xml:space="preserve">
-    <value>Ürün Satışları</value>
-  </data>
-  <data name="home.INDEX.PRODUCT_DETAIL" xml:space="preserve">
-    <value>Ürün Detayı</value>
-  </data>
-  <data name="home.INDEX.SALES" xml:space="preserve">
-    <value>Satışlar</value>
-  </data>
-  <data name="home.INDEX.SHOW" xml:space="preserve">
-    <value>Gör</value>
-  </data>
-  <data name="home.INDEX.STATUS" xml:space="preserve">
-    <value>Durum</value>
-  </data>
-  <data name="home.INDEX.TOTAL.SALES" xml:space="preserve">
-    <value>Toplam Satış</value>
-  </data>
-  <data name="home.INDEX.USER" xml:space="preserve">
-    <value>Kullanıcı</value>
-  </data>
-  <data name="home.INDEX.USERS" xml:space="preserve">
-    <value>Kullanıcılar</value>
+  <data name="productSaleReport.DAILY_PRODUCT_SALES_REPORT" xml:space="preserve">
+    <value>Günlük Ürün Satış Raporu</value>
   </data>
 </root>

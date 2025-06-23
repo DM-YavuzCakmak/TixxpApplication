@@ -117,7 +117,55 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Test" xml:space="preserve">
-    <value>aaaa</value>
+  <data name="home.INDEX.AMOUNT" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="home.INDEX.COMPANY.USER" xml:space="preserve">
+    <value>Company User</value>
+  </data>
+  <data name="home.INDEX.DAILY_PRODUCT_SELLERS" xml:space="preserve">
+    <value>Daily Product Sellers</value>
+  </data>
+  <data name="home.INDEX.DATE" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="home.INDEX.HOMEPAGE" xml:space="preserve">
+    <value>Home Page</value>
+  </data>
+  <data name="home.INDEX.LOGGED.IN.USER" xml:space="preserve">
+    <value>Logged In User</value>
+  </data>
+  <data name="home.INDEX.ORDER.NO" xml:space="preserve">
+    <value>Order No</value>
+  </data>
+  <data name="home.INDEX.ORDERS" xml:space="preserve">
+    <value>Orders</value>
+  </data>
+  <data name="home.INDEX.PAYMENT.PLACE" xml:space="preserve">
+    <value>Payment Place</value>
+  </data>
+  <data name="home.INDEX.PRODUCT.SALES" xml:space="preserve">
+    <value>Product Sales</value>
+  </data>
+  <data name="home.INDEX.PRODUCT_DETAIL" xml:space="preserve">
+    <value>Product Detail</value>
+  </data>
+  <data name="home.INDEX.SALES" xml:space="preserve">
+    <value>Sales</value>
+  </data>
+  <data name="home.INDEX.SHOW" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="home.INDEX.STATUS" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="home.INDEX.TOTAL.SALES" xml:space="preserve">
+    <value>Total Sales</value>
+  </data>
+  <data name="home.INDEX.USER" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="home.INDEX.USERS" xml:space="preserve">
+    <value>Users</value>
   </data>
 </root>

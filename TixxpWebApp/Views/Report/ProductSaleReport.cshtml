@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer;
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Ürün Satış Raporu";
 
@@ -14,7 +16,7 @@
                 <div class="col-xl-10 mx-auto">
                     <div class="card custom-card mt-4">
                         <div class="card-header" style="background: linear-gradient(to right, #dc5c6b, #a057ae); color: white;">
-                            <div class="card-title">🗓️ Günlük Ürün Satış Raporu</div>
+                            <div class="card-title">🗓️ @Localizer["productSaleReport.DAILY_PRODUCT_SALES_REPORT"]</div>
                         </div>
                         <div class="card-body">
                             <div id="daily-productsalereport" style="height: 400px;"></div>

@@ -26,11 +26,11 @@
 
         <!-- Page Header -->
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Anasayfa</h1>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["home.INDEX.HOMEPAGE"]</h1>
             <div class="ms-md-1 ms-0">
                 <nav>
                     <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item active text-fixed-white" aria-current="page">Anasayfa</li>
+                        <li class="breadcrumb-item active text-fixed-white" aria-current="page">@Localizer["home.INDEX.HOMEPAGE"]</li>
                     </ol>
                 </nav>
             </div>
@@ -44,7 +44,7 @@
                         <div class="d-flex align-items-center">
                             <div id="total-orders"></div>
                             <div class="ms-2 mt-2">
-                                <h2 class="mb-0 fs-22 text-fixed-white">Orders</h2>
+                                <h2 class="mb-0 fs-22 text-fixed-white">@Localizer["home.INDEX.ORDERS"]</h2>
                                 <div class="">
                                     <span class="fs-12 text-fixed-white"><i class="fe fe-arrow-up-right"></i></span>
                                     <span class="fs-12 text-fixed-white op-8">+73.59%</span>
@@ -142,7 +142,7 @@
             <div class="col-xl-3 col-md-6 col-lg-6">
                 <div class="card custom-card">
                     <div class="card-header">
-                        <div class="card-title">Günlük Ürün Satışı Yapanlar</div>
+                        <div class="card-title">@Localizer["home.INDEX.DAILY_PRODUCT_SELLERS"]</div>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled personal-goals-list mb-0" style="max-height: 360px; overflow-y: auto;">
@@ -181,7 +181,7 @@
             <div class="col-xl-3 col-md-6 col-lg-6">
                 <div class="card custom-card">
                     <div class="card-header">
-                        <div class="card-title">Kullanıcılar</div>
+                        <div class="card-title">@Localizer["home.INDEX.USERS"]</div>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled personal-goals-list mb-0" style="max-height: 360px; overflow-y: auto;">
@@ -197,7 +197,7 @@
                                                 <span class="d-block h6 mb-1">@user.FirstName @user.LastName</span>
                                                 <span class="badge bg-success text-white">Aktif</span>
                                             </div>
-                                            <div class="text-muted fs-12">Şirket Kullanıcısı</div>
+                                            <div class="text-muted fs-12">@Localizer["home.INDEX.COMPANY.USER"]</div>
                                         </div>
                                     </div>
                                 </li>
@@ -211,7 +211,7 @@
             <div class="col-xl-3 col-md-6 col-lg-6">
                 <div class="card custom-card">
                     <div class="card-header">
-                        <div class="card-title">Ürün Satışları</div>
+                        <div class="card-title">@Localizer["home.INDEX.PRODUCT.SALES"]</div>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled personal-goals-list mb-0" style="max-height: 360px; overflow-y: auto;">
@@ -229,7 +229,7 @@
                                                     <span class="d-block h6 mb-1">@item.CounterName</span>
                                                     <span class="badge bg-primary text-white">@item.TotalSales</span>
                                                 </div>
-                                                <div class="text-muted fs-12">Toplam Satış</div>
+                                                <div class="text-muted fs-12">@Localizer["home.INDEX.TOTAL.SALES"]</div>
                                             </div>
                                         </div>
                                     </li>
@@ -261,8 +261,7 @@
                         <div class="pt-6 box">
                             <div class="p-4">
                                 <h5 class="mt-5 mb-0">@ViewBag.CurrentUser?.FirstName @ViewBag.CurrentUser?.LastName</h5>
-                                <span class="mt-2 mb-0 badge bg-primary">Giriş Yapan Kullanıcı</span>
-
+                                <span class="mt-2 mb-0 badge bg-primary">@Localizer["home.INDEX.LOGGED.IN.USER"]</span>
                                 <p class="mt-2 text-muted">
                                     Sisteme en son @ViewBag.CurrentUser?.Updated_Date?.ToString("dd.MM.yyyy HH:mm") tarihinde giriş yaptı.
                                 </p>
@@ -271,15 +270,12 @@
                     </div>
                 </div>
             </div>
-
-
             <!-- End:: row-3 -->
-
             <div class="col-lg-12">
                 <div class="card custom-card">
                     <div class="card-header border-bottom">
                         <h3 class="card-title tx-18">
-                            <label class="main-content-label tx-15">Satışlar</label>
+                            <label class="main-content-label tx-15">@Localizer["home.INDEX.SALES"]</label>
                         </h3>
                     </div>
                     <div class="card-body">
@@ -288,13 +284,13 @@
                             <table class="table table-bordered text-nowrap border-bottom mb-0 border" id="recentorders">
                                 <thead class="sticky-top bg-white">
                                     <tr>
-                                        <th class="wd-lg-10p">Kullanıcı</th>
-                                        <th class="wd-lg-10p">Sipariş No</th>
-                                        <th class="wd-lg-10p">Tarih</th>
-                                        <th class="wd-lg-10p">Tutar</th>
-                                        <th class="wd-lg-10p">Ödeme Yeri</th>
-                                        <th class="wd-lg-10p">Durum</th>
-                                        <th class="wd-lg-10p">Ürün Detayı</th>
+                                        <th class="wd-lg-10p">@Localizer["home.INDEX.USER"]</th>
+                                        <th class="wd-lg-10p">@Localizer["home.INDEX.ORDER.NO"]</th>
+                                        <th class="wd-lg-10p">@Localizer["home.INDEX.DATE"]</th>
+                                        <th class="wd-lg-10p">@Localizer["home.INDEX.AMOUNT"]</th>
+                                        <th class="wd-lg-10p">@Localizer["home.INDEX.PAYMENT.PLACE"]</th>
+                                        <th class="wd-lg-10p">@Localizer["home.INDEX.STATUS"]</th>
+                                        <th class="wd-lg-10p">@Localizer["home.INDEX.PRODUCT_DETAIL"]</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -323,7 +319,7 @@
                                                    data-bs-trigger="focus"
                                                    data-bs-placement="left"
                                                    data-bs-content="@Html.Raw(item.DetailHtml)">
-                                                    <i class="fe fe-eye"></i> Gör
+                                                    <i class="fe fe-eye"></i> @Localizer["home.INDEX.SHOW"]
                                                 </a>
                                             </td>
                                         </tr>
