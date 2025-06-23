@@ -185,6 +185,10 @@
                         {
                             <li class="slide"><a href="/Personnel/Index" class="side-menu__item"><i class="bi bi-people"></i><span class="side-menu__label ms-2">User</span></a></li>
                         }
+                        @if (User.IsInRole("TIXXP_COUNTER"))
+                        {
+                            <li class="slide"><a href="/Counter/Index" class="side-menu__item"><i class="bi bi-clipboard2-x"></i><span class="side-menu__label ms-2">Counter</span></a></li>
+                        }
                     </ul>
                 </li>
             </ul>

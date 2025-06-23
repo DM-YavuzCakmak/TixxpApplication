@@ -4,6 +4,7 @@ using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
 using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
+using Tixxp.Business.Services.Extension;
 using Tixxp.Entities.InvoiceType;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
@@ -19,7 +20,15 @@ namespace Tixxp.WebApp.Controllers
         private readonly IProductPriceService _productPriceService;
         private readonly IProductSaleDetailService _productSaleDetailService;
         private readonly IProductSaleInvoiceInfoService _productSaleInvoiceInfoService;
-        public ProductSaleCheckOutController(IInvoiceTypeService invoiceTypeService, IProductSaleService productSaleService, IProductSaleDetailService productSaleDetailService, IProductSaleInvoiceInfoService productSaleInvoiceInfoService, IProductPriceService productPriceService)
+
+        private const long DefaultCounterId = 1;
+
+        public ProductSaleCheckOutController(
+            IInvoiceTypeService invoiceTypeService,
+            IProductSaleService productSaleService,
+            IProductSaleDetailService productSaleDetailService,
+            IProductSaleInvoiceInfoService productSaleInvoiceInfoService,
+            IProductPriceService productPriceService)
         {
             _invoiceTypeService = invoiceTypeService;
             _productSaleService = productSaleService;
@@ -38,101 +47,106 @@ namespace Tixxp.WebApp.Controllers
             return View();
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetOrderSummary(long productSaleId)
         {
-            List<ProductSaleSummaryDto> productSaleSummaryDtos = new List<ProductSaleSummaryDto>();
-            var productSaleDetails = _productSaleDetailService.GetListWithInclude(x => x.ProductSaleId == productSaleId, x => x.Product);
-            if (productSaleDetails.Success)
+            var summaries = new List<ProductSaleSummaryDto>();
+
+            var saleDetailsResult = _productSaleDetailService
+                .GetListWithInclude(x => x.ProductSaleId == productSaleId, x => x.Product);
+
+            if (saleDetailsResult.Success)
             {
-                foreach (var productSaleDetailEntity in productSaleDetails.Data)
+                foreach (var detail in saleDetailsResult.Data)
                 {
-                    ProductSaleSummaryDto productSaleSummaryDto = new ProductSaleSummaryDto();
-                    productSaleSummaryDto.Price = _productPriceService.GetById(productSaleDetailEntity.ProductId).Data.Price;
-                    productSaleSummaryDto.Quantity = productSaleDetailEntity.Quantity;
-                    productSaleSummaryDto.ProductName = productSaleDetailEntity.Product.Name;
-                    productSaleSummaryDto.ProductImageUrl = productSaleDetailEntity.Product.ImageFilePath;
-                    productSaleSummaryDtos.Add(productSaleSummaryDto);
+                    var priceResult = _productPriceService.GetById(detail.ProductId);
+                    var price = priceResult.Success ? priceResult.Data?.Price ?? 0 : 0;
+
+                    summaries.Add(new ProductSaleSummaryDto
+                    {
+                        ProductName = detail.Product?.Name,
+                        ProductImageUrl = detail.Product?.ImageFilePath,
+                        Quantity = detail.Quantity,
+                        Price = price
+                    });
                 }
             }
 
-            return Ok(productSaleSummaryDtos);
+            return Ok(summaries);
         }
 
-        /// <summary>
-        /// Fatura Bilgilerini Kayıt eder
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
         [HttpPost]
         public JsonResult AddInvoiceInfo([FromBody] ProductSaleInvoiceInfoModel model)
         {
-            if (model != null && model.ProductSaleId > 0)
+            if (model == null || model.ProductSaleId <= 0)
             {
-                var entity = new ProductSaleInvoiceInfoEntity
-                {
-                    ProductSaleId = model.ProductSaleId,
-                    InvoiceTypeId = model.InvoiceTypeId,
-                    IdentityNumber = model.IdentityNumber,
-                    CompanyName = model.CompanyName,
-                    TaxNumber = model.TaxNumber,
-                    TaxOffice = model.TaxOffice,
-                    CountyId = model.CountyId,
-                    CreatedBy = 6, // TODO: login olan kullanıcının Id'si ile değiştir
-                    Created_Date = DateTime.Now,
-                    IsDeleted = false
-                };
-
-                var result = _productSaleInvoiceInfoService.Add(entity);
-                if (result.Success)
-                    return Json(new { isSuccess = true });
-
-                return Json(new { isSuccess = false, message = result.Message });
+                return Json(new { isSuccess = false, message = "Geçersiz veri." });
             }
 
-            return Json(new { isSuccess = false, message = "Geçersiz veri." });
+            var entity = new ProductSaleInvoiceInfoEntity
+            {
+                ProductSaleId = model.ProductSaleId,
+                InvoiceTypeId = model.InvoiceTypeId,
+                IdentityNumber = model.IdentityNumber,
+                CompanyName = model.CompanyName,
+                TaxNumber = model.TaxNumber,
+                TaxOffice = model.TaxOffice,
+                CountyId = model.CountyId,
+                CreatedBy = User.GetUserId().Value,
+                Created_Date = DateTime.Now,
+                IsDeleted = false
+            };
+
+            var result = _productSaleInvoiceInfoService.Add(entity);
+            return Json(new
+            {
+                isSuccess = result.Success,
+                message = result.Message
+            });
         }
 
-        /// <summary>
-        /// İlk Tab'dan gelen Ürün bilgilerini kayıt eder ve Product Sale'ı oluşturur.
-        /// </summary>
-        /// <param name="productSaleCheckOutItems"></param>
-        /// <returns></returns>
         [HttpPost]
         public JsonResult Submit([FromBody] List<ProductSaleCheckOutItem> productSaleCheckOutItems)
         {
-            if (productSaleCheckOutItems.Any())
+            if (productSaleCheckOutItems == null || !productSaleCheckOutItems.Any())
             {
-                var currenyTypeIds = productSaleCheckOutItems.Select(x => x.CurrencyTypeId).Distinct().ToList();
-                if (currenyTypeIds.Count > 1)
-                {
-                    return Json(new
-                    {
-                        isSuccess = false,
-                        message = "Lütfen yalnızca tek bir para birimi seçerek satış işlemini gerçekleştirin."
-                    });
-                }
-
-
-                ProductSaleEntity productSaleEntity = new ProductSaleEntity();
-                productSaleEntity.CounterId = 1;
-                productSaleEntity.CreatedBy = 13;
-                var newProductSaleEntity = _productSaleService.AddAndReturn(productSaleEntity);
-
-                foreach (var productSaleCheckOutItem in productSaleCheckOutItems)
-                {
-                    ProductSaleDetailEntity productSaleDetailEntity = new ProductSaleDetailEntity();
-                    productSaleDetailEntity.ProductSaleId = newProductSaleEntity.Data.Id;
-                    productSaleDetailEntity.ProductId = productSaleCheckOutItem.ProductId;
-                    productSaleDetailEntity.Quantity = productSaleCheckOutItem.Quantity;
-                    _productSaleDetailService.Add(productSaleDetailEntity);
-                }
-                return Json(new { isSuccess = true, productSaleId = newProductSaleEntity.Data.Id });
+                return Json(new { isSuccess = false, message = "Ürün seçimi yapılmadı." });
             }
 
-            return Json(new { isSuccess = false });
-        }
+            var currencyTypeIds = productSaleCheckOutItems.Select(x => x.CurrencyTypeId).Distinct().ToList();
+            if (currencyTypeIds.Count > 1)
+            {
+                return Json(new
+                {
+                    isSuccess = false,
+                    message = "Lütfen yalnızca tek bir para birimi seçerek satış işlemini gerçekleştirin."
+                });
+            }
 
+            var productSale = new ProductSaleEntity
+            {
+                CounterId = DefaultCounterId,
+                CreatedBy = User.GetUserId().Value
+            };
+
+            var saleResult = _productSaleService.AddAndReturn(productSale);
+            if (!saleResult.Success || saleResult.Data == null)
+            {
+                return Json(new { isSuccess = false, message = "Satış oluşturulamadı." });
+            }
+
+            foreach (var item in productSaleCheckOutItems)
+            {
+                var detail = new ProductSaleDetailEntity
+                {
+                    ProductSaleId = saleResult.Data.Id,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity
+                };
+                _productSaleDetailService.Add(detail);
+            }
+
+            return Json(new { isSuccess = true, productSaleId = saleResult.Data.Id });
+        }
     }
 }
