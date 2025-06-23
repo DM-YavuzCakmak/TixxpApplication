@@ -29,7 +29,7 @@
                     <div class="card-body p-5">
 
                         <div class="text-center mb-4">
-                            <img src="~/assets/images/brand-logos/TixxpLogo.jpg" alt="Tixxp Logo" style="max-width: 120px;">
+                            <img src="~/assets/images/brand-logos/TixxpLogo.png" alt="Tixxp Logo" style="max-width: 120px;">
                         </div>
                         <h5 class="text-center mb-4 fw-bold">@Localizer["authorization.INDEX.LOGIN.BIG"]</h5>
                         <div class="mb-3">
@@ -57,24 +57,23 @@
                         <div class="d-grid mt-4">
                             <button id="login-btn" type="button" class="btn btn-primary btn-lg">@Localizer["authorization.INDEX.SignIn.Camel.Case"]</button>
                         </div>
-                        <div class="d-grid mt-2">
+                       @*  <div class="d-grid mt-2">
                             <form action="/Authorization/Logout" method="post">
                                 <button type="submit" class="btn btn-outline-danger btn-sm">
                                     <i class="ri-logout-box-line"></i> Çıkış Yap
                                 </button>
                             </form>
-                        </div>
+                        </div> *@
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-   
     <!-- Success Toast -->
     <div id="solid-successToast" class="toast fade position-fixed top-0 start-0 m-3 bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header bg-success text-white">
-            <img src="~/assets/images/brand-logos/toggle-white.png" class="bd-placeholder-img rounded me-2" alt="logo">
+            <img src="@Url.Content("~/assets/images/brand-logos/toggle-white.png")" class="bd-placeholder-img rounded me-2" alt="logo">
             <strong class="me-auto">Tixxp</strong>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
@@ -84,7 +83,7 @@
     <!-- Error Toast -->
     <div id="solid-dangerToast" class="toast fade position-fixed top-0 start-0 m-3 bg-danger text-white" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header bg-danger text-white">
-            <img src="~/assets/images/brand-logos/toggle-white.png" class="bd-placeholder-img rounded me-2" alt="logo">
+            <img src="@Url.Content("~/assets/images/brand-logos/toggle-white.png")" class="bd-placeholder-img rounded me-2" alt="logo">
             <strong class="me-auto">Tixxp</strong>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>

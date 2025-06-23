@@ -104,6 +104,17 @@ namespace Tixxp.WebApp.Controllers
         {
             if (productSaleCheckOutItems.Any())
             {
+                var currenyTypeIds = productSaleCheckOutItems.Select(x => x.CurrencyTypeId).Distinct().ToList();
+                if (currenyTypeIds.Count > 1)
+                {
+                    return Json(new
+                    {
+                        isSuccess = false,
+                        message = "Lütfen yalnızca tek bir para birimi seçerek satış işlemini gerçekleştirin."
+                    });
+                }
+
+
                 ProductSaleEntity productSaleEntity = new ProductSaleEntity();
                 productSaleEntity.CounterId = 1;
                 productSaleEntity.CreatedBy = 13;
