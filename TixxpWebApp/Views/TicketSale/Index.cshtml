@@ -1,0 +1,879 @@
+﻿@using Tixxp.WebApp.Models.TicketSale
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model PaymentResultModel
+
+<!-- Start::app-content -->
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Page Header -->
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Bilet Satın Al</h1>
+            <div class="ms-md-1 ms-0">
+                <nav>
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item text-fixed-white">
+                            <a href="javascript:void(0);" class="text-fixed-white">Rezervasyon</a>
+                        </li>
+                        <li class="breadcrumb-item active text-fixed-white" aria-current="page">Bilet Satın Al</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!-- Page Header Close -->
+        <!-- Tab Navigation -->
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card custom-card">
+                    <div class="card-body p-0 product-checkout">
+                        <ul class="nav nav-tabs tab-style-2 d-sm-flex d-block border-bottom border-block-end-dashed" id="myTab1" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link @(Model.Message != null ? "" : "active")" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-tab-pane" type="button" role="tab" aria-controls="event-tab" aria-selected="true" onclick="Reload()">
+                                    <i class="ri-truck-line me-2 align-middle"></i>Etkinlik
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="sesssion-tab" data-bs-toggle="tab" data-bs-target="#sesssion-tab-pane" type="button" role="tab" aria-controls="sesssion-tab" aria-selected="false" disabled>
+                                    <i class="ri-user-3-line me-2 align-middle"></i>Tarih
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail-tab-pane" type="button" role="tab" aria-controls="detail-tab" aria-selected="false" disabled>
+                                    <i class="ri-bank-card-line me-2 align-middle"></i>Detay
+                                </button>
+                            </li>
+                            <li class="nav-item @(Model.Message != null ? "active" : "")" role="presentation">
+                                <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivery-tab-pane" type="button" role="tab" aria-controls="delivered-tab" aria-selected="false" disabled>
+                                    <i class="ri-checkbox-circle-line me-2 align-middle"></i>Onay
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade @(Model.Message != null ? "" : "show active") border-0 p-0" id="event-tab-pane" role="tabpanel" aria-labelledby="event-tab" tabindex="0">
+                                <div class="p-4">
+                                    <div class="main-content">
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-xl-12">
+                                                    <div class="row" id="event-list"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade border-0 p-0" id="sesssion-tab-pane" role="tabpanel" aria-labelledby="sesssion-tab" tabindex="0">
+                                <div class="p-4">
+                                    <div class="row g-4">
+                                        <div class="col-xl-6">
+                                            <div class="card" id="customerList">
+                                                <div class="card-header border-bottom-dashed">
+                                                    <div class="row g-2 align-items-center">
+                                                        <div class="col-sm mb-4 hstack gap-2">
+                                                            <label for="dateFrom" style="margin-bottom:0;">Başlangıç </label>
+                                                            <input id="dateFrom" name="dateFrom" class="form-control" type="date" />
+                                                            <label for="dateTo" style="margin-bottom:0;">Bitiş </label>
+                                                            <input id="dateTo" name="dateTo" class="form-control" type="date" />
+                                                            <button class="btn btn-primary" onclick="onFilter()">Filtrele</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="main-content">
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12" id="KariyeInfo" style="display: none;">
+                                                    <span class="fs-15 fw-medium" style="color:red">*Kariye Camii cuma günleri ziyarete kapalıdır</span>
+                                                </div>
+                                                <div class="col-lg-12 col-xl-12">
+                                                    <div class="row" id="session-list"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade border-0 p-0" id="detail-tab-pane" role="tabpanel" aria-labelledby="detail-tab" tabindex="0">
+                                <div class="p-4">
+                                    <form id="siteform" autocomplete="chrome-off">
+                                        <div class="form-body"></div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade border-0 p-0 @(Model.Message != null ? "show active" : "")" id="delivery-tab-pane" role="tabpanel" aria-labelledby="delivery-tab" tabindex="0">
+                                <div class="p-5 checkout-payment-success my-3">
+                                    <div class="mb-5">
+                                        <h5 class="text-@(Model.IsOk ? "success" : "danger") fw-medium">
+                                            @(Model.IsOk ? "Bilet Başarıyla Oluşturuldu" : "Bilet Oluşturulurken Hata Oluştu")
+                                        </h5>
+                                    </div>
+
+                                    <div class="mb-5">
+                                        @if (Model.IsOk)
+                                        {
+                                            <div class="swal2-icon swal2-success swal2-icon-show" style="display: flex;">
+                                                <span class="swal2-success-line-tip"></span>
+                                                <span class="swal2-success-line-long"></span>
+                                                <div class="swal2-success-ring"></div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="swal2-icon swal2-error swal2-icon-show" style="display: flex;">
+                                                <span class="swal2-x-mark">
+                                                    <span class="swal2-x-mark-line-left"></span>
+                                                    <span class="swal2-x-mark-line-right"></span>
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <p class="mb-1 fs-20">@Model.Message</p>
+                                    </div>
+
+                                    <a href="Index" class="btn btn-warning">
+                                        Rezervasyon Listesine Dön<i class="fa fa-ticket ms-2"></i>
+                                    </a>
+                                    <a href="SaleTicket" class="btn btn-success">
+                                        Yeni Bilet Al<i class="bi bi-cart ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="eventId" value="0" />
+                        <input type="hidden" id="sessionId" value="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End::row-1 -->
+    </div>
+</div>
+<!-- End::app-content -->
+
+<style>
+    label.error {
+        width: 100%;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    /* Style the tab */
+    .tab {
+        overflow: hidden;
+        border-bottom: 1px solid #ccc;
+    }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 0px 16px 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+            /* Change background color of buttons on hover */
+            .tab button:hover {
+                cursor: pointer;
+            }
+
+            /* Create an active/current tablink class */
+            .tab button.active {
+                border-bottom: #133b50 1px solid;
+            }
+
+    /* Style the tab content */
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
+
+    td {
+        padding-right: 10px;
+    }
+
+    .qty-container .qty-btn-minus,
+    .qty-container .qty-btn-plus {
+        border: 1px solid #d4d4d4;
+        padding: 10px 13px;
+        font-size: 10px;
+        height: 35px;
+        width: 35px;
+        transition: 0.3s;
+    }
+
+    .qty-container .qty-btn-plus {
+        margin-left: -1px;
+    }
+
+    .qty-container .qty-btn-minus {
+        margin-right: -1px;
+    }
+
+    .qty-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .qty-container .input-qty {
+            text-align: center;
+            padding: 6px 10px;
+            border: 1px solid #d4d4d4;
+            max-width: 80px;
+        }
+</style>
+
+@section scripts {
+    <script>
+         fetch("/GetEvent")
+        .then(res => res.json())
+        .then((data) => {
+            allmemberlist = data;
+            loadTeamData(allmemberlist);
+        }).catch(err => console.error(err));
+
+        function Reload() {
+            window.location = "SaleTicket";
+        }
+
+        // load team data
+        function loadTeamData(datas) {
+            document.querySelector("#event-list").innerHTML = '';
+
+            Array.from(datas).forEach(function (teamData, index) {
+                document.querySelector("#event-list").innerHTML +=
+                    `<div class="col-xxl-4 col-xl-6 col-lg-6 col-md-6 alert wishlist-card">
+                                                                                    <div class="card custom-card item-card ">
+                                                                                        <div class="card-body pb-0">
+                                                                                            <div class="text-center zoom">
+                                                                                                                <a href="#" onclick="goToSession('` + teamData.id + `')"><img class="w-100 rounded-2" src="/assets/` + teamData.imagePath + `" alt="img" style="height:200px"></a>
+                                                                                            </div>
+                                                                                            <div class="card-body px-0 pb-3">
+                                                                                                <div class="row">
+                                                                                                    <div class="col-12">
+                                                                                                                <div class="text-center cardtitle" style="margin-bottom: 40px;">
+                                                                                                                    <a class="shop-title fs-25 fw-medium">`+ teamData.name + `</a>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col-lg-12 col">
+                                                                                                        <div class="row text-muted text-center">
+                                                                                                            <div class="col-6 border-end border-end-dashed">
+                                                                                                                        <h5 class="mb-1 projects-num">`+ teamData.startTime + `</h5>
+                                                                                                                <p class="text-muted mb-0">Başlangıç</p>
+                                                                                                            </div>
+                                                                                                            <div class="col-6">
+                                                                                                                        <h5 class="mb-1 tasks-num">`+ teamData.endTime + `</h5>
+                                                                                                                <p class="text-muted mb-0">Bitiş</p>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-footer text-center">
+                                                                                            <div class="text-center px-2">
+                                                                                                                <a href="#" onclick="goToSession('` + teamData.id + `')" class="btn btn-md btn-primary mb-md-0 mb-2 ms-2 w-45">Tarihleri Listele</a>
+                                                                                                </a>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>`;
+            });
+        }
+
+        function goToSession(eventId) {
+            $.ajax({
+                type: "GET",
+                url: "/CheckSeaseonPrice/" + eventId,
+                success: function (response) {
+                    if (response.success == true) {
+                        $('#eventId').val(eventId);
+
+                        var event = document.getElementById("event-tab-pane");
+                        event.classList.remove("active");
+                        event.classList.remove("show");
+
+                        var eventButton = document.getElementById("event-tab");
+                        eventButton.classList.remove("active");
+
+                        var sesssion = document.getElementById("sesssion-tab-pane");
+                        sesssion.classList.add("active");
+                        sesssion.classList.add("show");
+
+                        var sesssionButton = document.getElementById("sesssion-tab");
+                        sesssionButton.classList.add("active");
+
+                        if (eventId.toUpperCase() == '68505420-DABB-4F73-BC86-78F681802FFA') {
+                            debugger;
+                            document.getElementById("KariyeInfo").style.display = "block";
+                        }
+
+                        fetch("../../GetSessionsByEventId/" + eventId)
+                            .then(res => res.json())
+                            .then((data) => {
+                                allsessionlist = data.data;
+                                loadSessionData(allsessionlist);
+                            }).catch(err => console.error(err));
+                    } else {
+                        swal.fire({
+                            icon: 'error',
+                            title: 'No Available Seasonal Price',
+                            text: 'There is no seasonal price for this event.'
+                        });
+                    }
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        }
+
+        function loadSessionData(datas) {
+            document.querySelector("#session-list").innerHTML = '';
+
+            Array.from(datas).forEach(function (teamData, index) {
+                var checkBookmark = teamData.bookmark ? "active" : "";
+                var isUserProfile = teamData.memberImg ? '<img src="/' + teamData.memberImg + '" alt="" class="member-img img-fluid d-block rounded-circle" />'
+                    : '<div class="avatar-title border bg-light text-primary rounded-circle text-uppercase">' + teamData.nickname + '</div>';
+
+                if (teamData.isCancelled == false) {
+                    document.querySelector("#session-list").innerHTML +=
+                        `<a class="swiper-wrapper" style="flex:1;" onclick="getTicketDetail('` + teamData.sessionId + `')" href='#'  id="create-btn" >
+                                                       <div class="swiper-slide">
+                                                       <div class="card profile-project-card shadow-none profile-project-success mb-0" >
+                                                       <div class="card-body p-4" >
+                                                       <div class="d-flex" >
+                                                       <div class="flex-grow-1 text-muted overflow-hidden" >
+                                                       <p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Seans Tarihi:  <span class="fw-semibold text-dark">`+ new Date(teamData.eventDate).toLocaleDateString('tr-TR') + `</span></p>
+                                                       <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Planned Time:  <span class="fw-semibold text-dark">`+ teamData.plannedTime + `</span></p>-->
+                                                       <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Actual Time:  <span class="fw-semibold text-dark">`+ teamData.actualTime + `</span></p>-->
+                                                       <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Session Availability:  <span class="fw-semibold text-dark">`+ teamData.sessionCapacity + `</span></p>--></div>
+                                                       <div class="flex-shrink-0 ms-2" >
+                                                       <div class="badge badge-soft-success fs-10">Open to Sale
+                                                       </div>
+                                                       </div>
+                                                       </div>
+                                                       </div>
+                                                       </div>
+                                                       </div>
+                                                       </a>`;
+                }
+                else {
+                    document.querySelector("#session-list").innerHTML +=
+                        `<a class="swiper-wrapper" style="flex:1;" onclick="noTicket()">
+                                                       <div class="swiper-slide">
+                                                               <div class="card profile-project-card shadow-none profile-project-danger mb-0" >
+                                                               <div class="card-body p-4" >
+                                                                   <div class="d-flex" >
+                                                                       <div class="flex-grow-1 text-muted overflow-hidden" >
+                                                                                <p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Session Date:  <span class="fw-semibold text-dark">`+ new Date(teamData.eventDate).toLocaleDateString('tr-TR') + `</span></p>
+                                                                                <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Planned Time:  <span class="fw-semibold text-dark">`+ teamData.plannedTime + `</span></p>-->
+                                                                                <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Actual Time:  <span class="fw-semibold text-dark">`+ teamData.actualTime + `</span></p>-->
+                                                                                <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Session Availability:  <span class="fw-semibold text-dark">`+ teamData.sessionCapacity + `</span></p>-->
+                                                                       </div>
+                                                                  <div class="flex-shrink-0 ms-2" >
+                                                           <div class="badge badge-soft-danger fs-10">Cancelled</div></div></div></div></div></div></a>`;
+                }
+            });
+        }
+
+        function onFilter() {
+            let from = $("#dateFrom").val();
+            let to = $("#dateTo").val();
+            let eventId = $("#eventId").val();
+
+            let url = `/GetSessionsByEventId/` + eventId + `?`;
+            if (from) {
+                url += `from=${from}`;
+            }
+            if (to) {
+                url += `&to=${to}`;
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then((data) => {
+                    allmemberlist = data.data;
+                    loadSessionData(allmemberlist);
+                }).catch(err => console.error(err));
+        }
+
+        function getTicketDetail(sessionId) {
+            $.ajax({
+                type: "GET",
+                url: "/Reservation/CreateReservation/" + sessionId,
+                success: function (response) {
+                    $('#sessionId').val(sessionId);
+
+                    var sesssion = document.getElementById("sesssion-tab-pane");
+                    sesssion.classList.remove("active");
+                    sesssion.classList.remove("show");
+
+                    var sesssionButton = document.getElementById("sesssion-tab");
+                    sesssionButton.classList.remove("active");
+
+                    var detail = document.getElementById("detail-tab-pane");
+                    detail.classList.add("active");
+                    detail.classList.add("show");
+
+                    var detailButton = document.getElementById("detail-tab");
+                    detailButton.classList.add("active");
+
+                    $("#siteform").find(".form-body").html(response);
+
+                    SetDefaultCurrency();
+                    $("#Currency").change();
+
+                    GetReservationSubType();
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        }
+    </script>
+
+    <script>
+        function SetDefaultCurrency() {
+            let prices = [];
+            $('.ticket-type-price').each(function (i, obj) {
+
+                let typeId = $(this).attr("typeId");
+
+                prices.push({
+                    CurrencyType: parseInt($(this).attr("currencytype")),
+                    Price: parseFloat($(this).attr("price").replace(',', '.')),
+                    Count: parseInt($("#TicketType_" + typeId + "-field").val())
+
+                });
+            });
+
+            if (prices.length == 1) {
+                $("#Currency").val(prices[0].CurrencyType);
+            } else {
+                $("#Currency").val(3);
+            }
+        }
+
+        function UpdateTotal() {
+            console.log($("#Currency").val());
+            let currencyId = $("#Currency").val();
+            let prices = [];
+            $('.ticket-type-price').each(function (i, obj) {
+
+                let typeId = $(this).attr("typeId");
+
+                prices.push({
+                    CurrencyType: parseInt($(this).attr("currencytype")),
+                    Price: parseFloat($(this).attr("price").replace(',', '.')),
+                    Count: parseInt($("#TicketType_" + typeId + "-field").val())
+
+                });
+            });
+            let data = JSON.stringify(prices);
+            console.log("data:", data);
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: data,
+                url: "/Reservation/CalculateTotal?currencyId=" + currencyId,
+                success: function (response) {
+                    $('#total-field').val(response);
+                    console.log(response);
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        }
+
+        function numberOnly(id) {
+            var element = document.getElementById(id);
+            element.value = element.value.replace(/[^0-9]/gi, "");
+        }
+
+        function buttonPlus() {
+            var $n = $(".qty-btn-plus")
+                .parent(".qty-container")
+                .find(".input-qty");
+            $n.val(Number($n.val()) + 1);
+            UpdateTotal();
+        }
+
+        function buttonMinus() {
+
+            var $n = $(".qty-btn-minus")
+                .parent(".qty-container")
+                .find(".input-qty");
+            var amount = Number($n.val());
+            if (amount > 0) {
+                $n.val(amount - 1);
+            }
+            UpdateTotal();
+        }
+
+        function noTicket() {
+            swal.fire({
+                icon: 'error',
+                title: 'No Available Ticket',
+                text: 'There is no ticket avaliable for this session.'
+            });
+        }
+
+        function personInfo(evt, ticketType) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            var asd = document.getElementById(ticketType);
+            asd.style.display = "block"
+            evt.currentTarget.className += " active";
+        }
+
+        $('#siteform').validate({
+            errorPlacement: function (err, element) {
+                err.appendTo($('#errorDiv'));
+            },
+            messages: {
+                ReservationTypeId: {
+                    required: "Rezervasyon Tipi Seçimi Zorunludur.",
+                },
+                ReservationSubTypeId: {
+                    required: "Rezervasyon Alt Tipi Seçimi Zorunludur.",
+                },
+                Name: {
+                    required: "Name is Required.",
+                },
+                Nationality: {
+                    required: "Uyruk Seçimi Zorunludur.",
+                },
+                Surname: {
+                    required: "Surname is Required.",
+                },
+                Email: {
+                    required: "Email is Required.",
+                },
+                Phone: {
+                    required: "Phone is Required.",
+                }
+            }
+        });
+
+        function GetReservationSubType() {
+            $.ajax({
+                type: "GET",
+                url: "/Reservation/GetReservationSubType/" + $("#ReservationTypeId").val(),
+                success: function (response) {
+                    DisableDropDown("#ReservationSubTypeId");
+                    PopulateDropDown("#ReservationSubTypeId", response);
+                    $('#ReservationSubTypeId').val("4");
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        }
+
+        function changeGuide() {
+            var checked = document.getElementById("Guide").checked;
+            if (checked == true) {
+                document.getElementById("guideContainer").style.display = "block";
+            }
+            else {
+                document.getElementById("guideContainer").style.display = "none";
+            }
+        }
+
+        function PopulateDropDown(dropDownId, list) {
+            if (list != null && list.length > 0) {
+                $(dropDownId).removeAttr("disabled");
+                $.each(list, function () {
+                    $(dropDownId).append($("<option></option>").val(this['reservationSubTypeId']).html(this['name']));
+                });
+            }
+        }
+
+        function DisableDropDown(dropDownId) {
+            $(dropDownId).attr("disabled", "disabled");
+            $(dropDownId).empty();
+            //$(dropDownId).empty().append('<option disabled="disabled" selected="selected" value="-1">Please Select Reservation Sub Type</option>');
+        }
+
+        jQuery.fn.serializeObject = function () {
+            var results = {},
+                arr = this.serializeArray();
+
+            var totalTicket = 0;
+            for (var i = 0, len = arr.length; i < len; i++) {
+                obj = arr[i];
+                //Check if results have a property with given name
+                if (results.hasOwnProperty(obj.name)) {
+                    //Check if given object is an array
+                    if (!results[obj.name].push) {
+                        results[obj.name] = [results[obj.name]];
+                    }
+                    results[obj.name].push(obj.value || '');
+                } else {
+                    if (obj.name == "AgencyId" || obj.name == "ReservationId" || obj.name == "SeasonalPriceId" || obj.name == "SessionId" || obj.name == "GuideId" || obj.name == "Name" || obj.name == "Surname" || obj.name == "Email" || obj.name == "AgencyReferenceNumber" || obj.name == "Note") {
+                        results[obj.name] = obj.value || '';
+                    } else if (obj.name.indexOf("TicketType") >= 0) {
+                        results[obj.name] = parseInt(obj.value);
+                        var ticketTypeNo = parseInt(obj.value);
+                        totalTicket = totalTicket + ticketTypeNo;
+                    }
+                    else if (obj.name == "Phone") {
+                        results[obj.name] = ($("#CountryCode").val() + obj.value) || '';
+                    }
+                    else {
+                        results[obj.name] = parseInt(obj.value);
+                    }
+
+                    results["NumberOfTickets"] = totalTicket;
+
+                }
+            }
+            if ($('#Guide').is(':checked')) {
+                results["Guide"] = true
+            }
+            else {
+                results["Guide"] = false
+            }
+            //if ($('#TourLeader').is(':checked')) {
+            //    results["TourLeader"] = true
+            //}
+            //else {
+            //    results["TourLeader"] = false
+            //}
+            if (totalTicket === 0) {
+                swal.fire({
+                    icon: 'error',
+                    title: 'No tickets selected',
+                    text: 'Please select at least one ticket to continue.'
+                });
+                return false;
+            }
+            else {
+                return results;
+            }
+
+        }
+
+        jQuery.fn.serializeCompleteObject = function () {
+            var results = {},
+                arr = this.serializeArray();
+
+            for (var i = 0, len = arr.length; i < len; i++) {
+                obj = arr[i];
+                //Check if results have a property with given name
+                if (obj.name == "ReservationDetailId" || obj.name == "ReservationId" || obj.name == "Name" || obj.name == "Surname" || obj.name == "Email" || obj.name == "Note") {
+                    results[obj.name] = obj.value || '';
+                } else if (obj.name == "NationalIdNumber2" || obj.name == "VisitorName2" || obj.name == "VisitorSurname2" || obj.name == "NationalIdNumber3" || obj.name == "VisitorName3" || obj.name == "VisitorSurname3") {
+                    if (results.hasOwnProperty(obj.name)) {
+                        if (!results[obj.name].push) {
+                            results[obj.name] = [results[obj.name]];
+                        }
+                        results[obj.name].push(obj.value || '');
+                    } else {
+                        results[obj.name] = [obj.value];
+                    }
+                }
+                else if (obj.name == "BirthYear2" || obj.name == "BirthYear3") {
+                    if (results.hasOwnProperty(obj.name)) {
+                        if (!results[obj.name].push) {
+                            results[obj.name] = [results[obj.name]];
+                        }
+                        results[obj.name].push(parseInt(obj.value));
+                    } else {
+                        results[obj.name] = [parseInt(obj.value)];
+                    }
+                } else if (obj.name == "Phone") {
+                    results[obj.name] = ($("#CountryCode").val() + obj.value) || '';
+                }
+                else {
+                    results[obj.name] = parseInt(obj.value);
+                }
+
+
+
+            }
+            return results;
+        }
+
+        var secoundsToCancel = 0;
+        var timerCancel = 0;
+        var cancelTimerIds = [];
+        function startCancelTimer() {
+            secoundsToCancel = 60 * 30;
+
+            timerCancel = secoundsToCancel * 1000;
+            cancelTimerIds.push(setInterval(function () {
+                secoundsToCancel--;
+                var min = Math.floor(secoundsToCancel / 60);
+                var sec = secoundsToCancel % 60;
+                $("#createTitle").html("Create Ticket(Canceled in: " + min + ":" + sec + ")");
+                timerCancel -= 1000;
+                if (timerCancel <= 0) {
+                    cancelReservation();
+                }
+            }, 1000));
+        }
+        function clearTimers() {
+            for (var i = 0; i < cancelTimerIds.length; i++) {
+                clearInterval(cancelTimerIds[i]);
+            }
+            secoundsToCancel = 0;
+            timerCancel = 0;
+            cancelTimerIds = [];
+        }
+        function cancelReservation() {
+            clearTimers();
+            localStorage.setItem("firstTime", true);
+            $('#showModalSummary').modal('toggle');
+            localStorage.removeItem("firstTime");
+        }
+
+        function savebutton() {
+
+            var isAgreementChecked = $('#agreement').is(':checked');
+        if (!isAgreementChecked) {
+            var toastEl = new bootstrap.Toast(document.getElementById('agreementToast'));
+            toastEl.show();
+            return; // işlemi durdur
+        }
+
+            if ($('#siteform').valid()) {
+                let formData = $("#siteform").serializeObject();
+                formData.TotalCurrencyType = parseInt($("#Currency").val());
+                var jsondata3 = JSON.stringify(formData);
+                console.log(jsondata3);
+                if (jsondata3 !== "false") {
+                    $.ajax({
+                        url: '/Reservation/CreateReservation',
+                        contentType: "application/json; charset=utf-8",
+                        data: jsondata3,
+                        type: 'POST',
+
+                        success: function (data) {
+                            console.log("reservationdata", data);
+                            if (data.success && data.data.paymentRedirectUrl != null) {
+                                window.location.href = data.data.paymentRedirectUrl;
+                            }
+                            else if (data.success && data.responseText == "preSale") {
+                                var win = window.open("/PrintReservation/" + data.data, '_blank');
+                                window.location.reload();
+                            }
+                            else if (data.success) {
+                                //var win = window.open("/Ticket/PrintReservation/" + data.data, '_blank');
+                                swal.fire({
+                                    title: "Success",
+                                    text: "Your reservation has been made.",
+                                    icon: "success",
+                                    showCancelButton: !0,
+                                    confirmButtonClass: "btn btn-primary w-xs me-2 mt-2",
+                                    cancelButtonClass: "btn btn-danger w-xs mt-2",
+                                    confirmButtonText: "My Reservations",
+                                    cancelButtonText: "Print Reservation",
+                                    buttonsStyling: !1,
+                                    showCloseButton: !0,
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }).then((result) => {
+                                    if (result.isConfirmed == true) {
+                                        try {
+                                            window.location.href = "../../Reservation/Index";
+                                        } catch (e) { }
+                                    } else {
+                                        var win = window.open("/PrintReservation/" + data.data, '_blank');
+                                        window.location.reload();
+                                    }
+
+                                });
+                            }
+                        },
+                        error: function (request, status, error) {
+                            if (request.status == 411) {
+                                console.log(status);
+
+                                swal.fire({
+                                    title: "No Availability",
+                                    text: "There is no availability!",
+                                    icon: "error",
+                                    showCancelButton: 0,
+                                    confirmButtonClass: "btn btn-primary w-xs me-2 mt-2",
+                                    cancelButtonClass: "btn btn-danger w-xs mt-2",
+                                    confirmButtonText: "Ok",
+                                    buttonsStyling: !1,
+                                    showCloseButton: !0
+                                });
+                            }
+                            else if (request.status == 500) {
+                                swal.fire({
+                                    title: "No Ticket Found",
+                                    text: "Please contact system administrator.",
+                                    icon: "error",
+                                    showCancelButton: 0,
+                                    confirmButtonClass: "btn btn-primary w-xs me-2 mt-2",
+                                    cancelButtonClass: "btn btn-danger w-xs mt-2",
+                                    confirmButtonText: "Ok",
+                                    buttonsStyling: !1,
+                                    showCloseButton: !0
+                                });
+                            }
+                            else {
+                                alert(request.responseText);
+                            }
+
+
+                        }
+                    });
+                }
+            } else {
+
+            }
+        }
+
+    </script>
+
+    <!-- Custom JS -->
+    <script src="../assets/js/custom.js"></script>
+}

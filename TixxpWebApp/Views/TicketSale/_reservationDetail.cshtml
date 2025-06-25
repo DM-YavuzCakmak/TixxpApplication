@@ -1,0 +1,192 @@
+﻿@{
+    Layout = null;
+
+    var ReservationTypes = new List<(int Id, string Name)> {
+        (1, "Online"), (2, "Fiziksel")
+    };
+
+    var Guides = new List<(string Id, string Name)> {
+        ("1", "Ahmet Yılmaz"), ("2", "Ayşe Demir")
+    };
+
+    var Nationalities = new List<(int Id, string Name)> {
+        (1, "Türkiye"), (2, "Almanya"), (3, "Fransa")
+    };
+
+    var PaymentTypes = new List<(int Id, string Name)> {
+        (1, "Kredi Kartı"), (2, "Nakit")
+    };
+
+    var TicketTypes = new List<(int Id, string Name, decimal Price, string Currency, int CurrencyType)> {
+        (1, "Yetişkin", 250, "₺", 3),
+        (2, "Çocuk", 100, "₺", 3)
+    };
+
+    var AgencyType = 4;
+    var ValidNumberOfDays = 15;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Bilet Satın Al</title>
+    <style>
+        .form-check-label a {
+            transition: 0.3s;
+        }
+
+            .form-check-label a:hover {
+                color: #a00080;
+                text-decoration: none;
+            }
+
+        .qty-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .qty-btn-minus,
+        .qty-btn-plus {
+            width: 32px;
+            height: 32px;
+        }
+
+        .input-qty {
+            text-align: center;
+            width: 60px;
+            margin: 0 8px;
+        }
+
+        .form-control {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="display: flex;">
+        <div style="margin-right:2%; width: 65%;">
+
+            <label>Rezervasyon Tipi</label>
+            <select class="form-control" id="ReservationTypeId">
+                @foreach (var item in ReservationTypes)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </select>
+
+            <label>Rezervasyon Alt Tipi</label>
+            <select class="form-control" disabled>
+                <option selected>Alt Tip seçilemez</option>
+            </select>
+
+            <div style="margin:10px 0;">
+                <label>Rehber Gerekli mi?</label>
+                <input type="checkbox" onchange="document.getElementById('guideContainer').style.display = this.checked ? 'block' : 'none';" />
+            </div>
+
+            <div id="guideContainer" style="display:none;">
+                <label>Rehber Seçiniz</label>
+                <select class="form-control">
+                    @foreach (var guide in Guides)
+                    {
+                        <option value="@guide.Id">@guide.Name</option>
+                    }
+                </select>
+            </div>
+
+            <label>Uyruk</label>
+            <select class="form-control">
+                @foreach (var item in Nationalities)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </select>
+
+            <label>Ödeme Tipi</label>
+            <select class="form-control">
+                @foreach (var item in PaymentTypes)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </select>
+
+            @foreach (var ticket in TicketTypes)
+            {
+                if (ticket.Id == 1) // Sadece Yetişkin için göster
+                {
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input class="form-control" value="@ticket.Name" disabled style="width: 30%;" />
+                        <input class="form-control" value="@($"{ticket.Price} {ticket.Currency}")" disabled style="width: 20%;" />
+                        <div class="qty-container">
+                            <button class="qty-btn-minus" onclick="changeQty(this, -1)">-</button>
+                            <input class="input-qty" value="1" min="0" max="1000" oninput="updateTotal()" />
+                            <button class="qty-btn-plus" onclick="changeQty(this, 1)">+</button>
+                        </div>
+                    </div>
+                }
+            }
+
+            <label>Döviz Tipi</label>
+            <select class="form-control" disabled>
+                <option selected>₺ Türk Lirası</option>
+            </select>
+
+            <label>Toplam Tutar</label>
+            <input class="form-control" id="total-field" value="250" disabled />
+        </div>
+
+        <div style="width:30%">
+            @if (AgencyType == 4 || AgencyType == 6 || AgencyType == 7)
+            {
+                <label>Adı</label>
+                <input class="form-control" placeholder="Adınız" />
+                <label>Soyadı</label>
+                <input class="form-control" placeholder="Soyadınız" />
+                <label>E-mail</label>
+                <input class="form-control" placeholder="Email" />
+                <label>Telefon</label>
+                <input class="form-control" placeholder="5xxxxxxxxx" maxlength="10" />
+            }
+
+            <label style="margin-top:20px;">Notlar</label>
+            <div class="form-control" style="font-weight: bold;">
+                Satın alınan biletler, başlangıç tarihinden itibaren @ValidNumberOfDays gün boyunca geçerlidir. İade yapılamaz.
+            </div>
+
+            <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" id="agreement">
+                <label class="form-check-label" for="agreement">
+                    <a href="https://demdeveloper.com/MesafeliSatisSozlesmeTr.docx" target="_blank" style="color:#7d0068; font-weight:bold; text-decoration:underline;">
+                        Mesafeli satış sözleşmesi
+                    </a>ni okudum, onaylıyorum.
+                </label>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button onclick="alert('İptal edildi')" class="btn btn-secondary">İptal</button>
+                <button onclick="alert('Satın alındı')" class="btn btn-primary">Bilet Satın Al</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changeQty(btn, delta) {
+            const input = btn.parentElement.querySelector('.input-qty');
+            let value = parseInt(input.value) || 0;
+            value = Math.max(0, value + delta);
+            input.value = value;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const input = document.querySelector('.input-qty');
+            const price = 250; // dummy fiyat
+            const total = parseInt(input.value || "0") * price;
+            document.getElementById("total-field").value = total + " ₺";
+        }
+    </script>
+
+</body>
+</html>
