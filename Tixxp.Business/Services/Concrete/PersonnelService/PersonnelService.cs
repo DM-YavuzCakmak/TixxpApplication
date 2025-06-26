@@ -50,7 +50,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
 
         // ✅ Kullanıcının rollerini çek
         var personnelRoles = _personnelRoleRepository
-            .GetListWithInclude(x => x.PersonnelId == user.Id, x => x.Role)
+            .GetListWithInclude(x => x.PersonnelId == user.Id && x.IsDeleted == false, x => x.Role)
             .Select(x => x.Role?.Name)
             .ToList();
 
