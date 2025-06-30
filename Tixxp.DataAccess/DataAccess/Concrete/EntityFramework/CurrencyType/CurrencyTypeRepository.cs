@@ -5,9 +5,9 @@ using Tixxp.Infrastructure.DataAccess.Context;
 
 namespace Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.CurrencyType;
 
-public class CurrencyTypeRepository : EfEntityRepositoryBase<CurrencyTypeEntity, CommonDbContext>, ICurrencyTypeRepository
+public class CurrencyTypeRepository : EfEntityRepositoryBase<CurrencyTypeEntity, TixappContext>, ICurrencyTypeRepository
 {
-    public CurrencyTypeRepository(CommonDbContext context) : base(context)
+    public CurrencyTypeRepository(TixappContext context) : base(context)
     {
     }
 }

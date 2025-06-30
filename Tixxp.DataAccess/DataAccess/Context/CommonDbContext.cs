@@ -20,13 +20,11 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PersonnelEntity>().ToTable("Personnel", "dbo");
-            modelBuilder.Entity<CurrencyTypeEntity>().ToTable("CurrencyType", "dbo");
             modelBuilder.Entity<RoleEntity>().ToTable("Role", "dbo");
             modelBuilder.Entity<RoleGroupEntity>().ToTable("RoleGroup", "dbo");
             modelBuilder.Entity<RoleGroupRoleEntity>().ToTable("RoleGroupRole", "dbo");
             modelBuilder.Entity<PersonnelRoleEntity>().ToTable("PersonnelRole", "dbo");
             modelBuilder.Entity<PersonnelRoleGroupEntity>().ToTable("PersonnelRoleGroup", "dbo");
-            modelBuilder.Entity<InvoiceTypeEntity>().ToTable("InvoiceType", "dbo");
             modelBuilder.Entity<AgencyEntity>().ToTable("Agency", "dbo");
             modelBuilder.Entity<CompanyEntity>().ToTable("Company", "dbo");
             base.OnModelCreating(modelBuilder);
@@ -37,8 +35,6 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<RoleGroupRoleEntity> RoleGroupRoles { get; set; }
         public DbSet<PersonnelRoleGroupEntity> PersonnelRoleGroups { get; set; }
         public DbSet<CompanyEntity> Companies { get; set; }
-        public DbSet<InvoiceTypeEntity> InvoiceTypes { get; set; }
-        public DbSet<CurrencyTypeEntity> CurrencyTypes { get; set; }
         public DbSet<RoleEntity> Roles { get; set; }
         public DbSet<PersonnelRoleEntity> PersonnelRoles { get; set; }
         public DbSet<AgencyEntity> Agencies { get; set; }

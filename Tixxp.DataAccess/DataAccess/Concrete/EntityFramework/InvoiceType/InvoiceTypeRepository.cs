@@ -6,9 +6,9 @@ using Tixxp.Infrastructure.DataAccess.Abstract.InvoiceType;
 using Tixxp.Infrastructure.DataAccess.Context;
 
 namespace Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.InvoiceType;
-public class InvoiceTypeRepository : EfEntityRepositoryBase<InvoiceTypeEntity, CommonDbContext>, IInvoiceTypeRepository
+public class InvoiceTypeRepository : EfEntityRepositoryBase<InvoiceTypeEntity, TixappContext>, IInvoiceTypeRepository
 {
-    public InvoiceTypeRepository(CommonDbContext context) : base(context)
+    public InvoiceTypeRepository(TixappContext context) : base(context)
     {
     }
 }

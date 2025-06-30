@@ -2,8 +2,10 @@
 using Tixxp.Entities.AgencyContract;
 using Tixxp.Entities.Bank;
 using Tixxp.Entities.Counter;
+using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.Events;
 using Tixxp.Entities.Guide;
+using Tixxp.Entities.InvoiceType;
 using Tixxp.Entities.PriceCategory;
 using Tixxp.Entities.Product;
 using Tixxp.Entities.ProductPrice;
@@ -29,6 +31,14 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CurrencyTypeEntity>(entity =>
+            {
+                entity.ToTable("CurrencyType", _schema);
+            });
+            modelBuilder.Entity<InvoiceTypeEntity>(entity =>
+            {
+                entity.ToTable("InvoiceType", _schema);
+            });
             modelBuilder.Entity<BankEntity>(entity =>
             {
                 entity.ToTable("Bank", _schema);
@@ -93,6 +103,8 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         }
 
         public DbSet<CounterEntity> Counters { get; set; }
+        public DbSet<CurrencyTypeEntity> CurrencyTypes { get; set; }
+        public DbSet<InvoiceTypeEntity> InvoiceTypes { get; set; }
         public DbSet<BankEntity> Banks { get; set; }
         public DbSet<GuideEntity> Guides { get; set; }
         public DbSet<EventEntity> Events { get; set; }
