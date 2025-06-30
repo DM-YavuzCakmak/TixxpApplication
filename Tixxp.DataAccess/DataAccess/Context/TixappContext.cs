@@ -29,6 +29,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<BankEntity>(entity =>
+            {
+                entity.ToTable("Bank", _schema);
+            });
             modelBuilder.Entity<CounterEntity>(entity =>
             {
                 entity.ToTable("Counter", _schema);
@@ -89,6 +93,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         }
 
         public DbSet<CounterEntity> Counters { get; set; }
+        public DbSet<BankEntity> Banks { get; set; }
         public DbSet<GuideEntity> Guides { get; set; }
         public DbSet<EventEntity> Events { get; set; }
         public DbSet<ProductSaleEntity> ProductSales { get; set; }

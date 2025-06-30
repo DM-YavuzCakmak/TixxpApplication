@@ -21,7 +21,6 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         {
             modelBuilder.Entity<PersonnelEntity>().ToTable("Personnel", "dbo");
             modelBuilder.Entity<CurrencyTypeEntity>().ToTable("CurrencyType", "dbo");
-            modelBuilder.Entity<BankEntity>().ToTable("Bank", "dbo");
             modelBuilder.Entity<RoleEntity>().ToTable("Role", "dbo");
             modelBuilder.Entity<RoleGroupEntity>().ToTable("RoleGroup", "dbo");
             modelBuilder.Entity<RoleGroupRoleEntity>().ToTable("RoleGroupRole", "dbo");
@@ -40,7 +39,6 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<MuseumEntity> Museums { get; set; }
         public DbSet<InvoiceTypeEntity> InvoiceTypes { get; set; }
         public DbSet<CurrencyTypeEntity> CurrencyTypes { get; set; }
-        public DbSet<BankEntity> Banks { get; set; }
         public DbSet<RoleEntity> Roles { get; set; }
         public DbSet<PersonnelRoleEntity> PersonnelRoles { get; set; }
         public DbSet<AgencyEntity> Agencies { get; set; }
