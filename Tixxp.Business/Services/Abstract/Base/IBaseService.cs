@@ -10,6 +10,7 @@ namespace Tixxp.Business.Services.Abstract.Base
         IDataResult<List<T>> GetAll();
         IDataResult<T> GetFirstOrDefault(Expression<Func<T, bool>> filter);
         IResult Add(T entity);
+        IResult AddRange(List<T> entities);
         IResult Update(T entity);
         IResult Delete(T entity);
         IDataResult<T> AddAndReturn(T entity);

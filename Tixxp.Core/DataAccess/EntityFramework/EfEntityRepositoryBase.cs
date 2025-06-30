@@ -23,6 +23,19 @@ public class EfEntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEnti
         _context.SaveChanges();
     }
 
+    public void AddRange(IEnumerable<TEntity> entities)
+    {
+        var now = DateTime.Now;
+        foreach (var entity in entities)
+        {
+            entity.Created_Date = now;
+            entity.IsDeleted = false;
+        }
+
+        _context.Set<TEntity>().AddRange(entities);
+        _context.SaveChanges();
+    }
+
     public void Delete(TEntity entity)
     {
         entity.IsDeleted = true;

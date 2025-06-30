@@ -97,6 +97,36 @@
                                 </a>
                             </li>
                         }
+                        @if (User.IsInRole("TIXXP_ROLE_VIEW") || User.IsInRole("TIXXP_ROLE_GROUP_VIEW") || User.IsInRole("TIXXP_ROLE_GROUP_ROLE_VIEW"))
+                        {
+                            <li class="slide has-sub">
+                                <a href="#" class="side-menu__item">
+                                    <i class="fa fa-lock"></i>
+                                    <span class="side-menu__label ms-2">Role Management</span>
+                                    <i class="fe fe-chevron-right side-menu__angle"></i>
+                                </a>
+                                <ul class="slide-menu child1">
+                                    @if (User.IsInRole("TIXXP_ROLE_VIEW"))
+                                    {
+                                        <li class="slide">
+                                            <a href="/Role/Index" class="side-menu__item">Role</a>
+                                        </li>
+                                    }
+                                    @if (User.IsInRole("TIXXP_ROLE_GROUP_VIEW"))
+                                    {
+                                        <li class="slide">
+                                            <a href="/RoleGroup/Index" class="side-menu__item">Role Group</a>
+                                        </li>
+                                    }
+                                    @if (User.IsInRole("TIXXP_ROLE_GROUP_ROLE_VIEW"))
+                                    {
+                                        <li class="slide">
+                                            <a href="/RoleGroupRole/Index" class="side-menu__item text-wrap">Role Group<br />Role Mapping</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
                         @if (User.IsInRole("TIXXP_MUSEUM"))
                         {
                             <li class="slide"><a href="/Museum/Index" class="side-menu__item"><i class="fa fa-university"></i><span class="side-menu__label ms-2">Museum</span></a></li>

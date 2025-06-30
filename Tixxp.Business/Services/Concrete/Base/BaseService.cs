@@ -37,6 +37,12 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity, new()
         return new SuccessResult("Kayıt eklendi.");
     }
 
+    public IResult AddRange(List<T> entities)
+    {
+        _repository.AddRange(entities);
+        return new SuccessResult("Kayıtlar başarıyla eklendi.");
+    }
+
     public IResult Update(T entity)
     {
         _repository.Update(entity);

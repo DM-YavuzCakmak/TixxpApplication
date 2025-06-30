@@ -1,0 +1,165 @@
+﻿@using Tixxp.Entities.Role
+@model List<RoleEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Role List";
+}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Role List</h1>
+            @if (User.IsInRole("TIXXP_ROLE_ADD"))
+            {
+                <button class="btn btn-primary btn-sm" onclick="openEditRoleModal(0)">+ New Role</button>
+            }
+        </div>
+
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                @if (User.IsInRole("TIXXP_ROLE_EDIT") || User.IsInRole("TIXXP_ROLE_DELETE"))
+                                {
+                                    <th>İşlem</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Name</td>
+                                        @if (User.IsInRole("TIXXP_ROLE_EDIT") || User.IsInRole("TIXXP_ROLE_DELETE"))
+                                        {
+                                            <td>
+                                                <div class="hstack gap-2">
+                                                    @if (User.IsInRole("TIXXP_ROLE_EDIT"))
+                                                    {
+                                                        <a class="btn btn-sm btn-light" onclick="openEditRoleModal(@item.Id)">
+                                                            <i class="ri-edit-line"></i>
+                                                        </a>
+                                                    }
+                                                    @if (User.IsInRole("TIXXP_ROLE_DELETE"))
+                                                    {
+                                                        <a class="btn btn-sm btn-light" onclick="confirmDeleteRole(@item.Id)">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="2" class="text-center">Kayıt bulunamadı.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Edit Role</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRoleForm">
+                    <input type="hidden" id="roleId" name="Id" />
+                    <div class="mb-3">
+                        <label>Role Name</label>
+                        <input type="text" class="form-control" id="roleName" name="Name" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openEditRoleModal(id) {
+            const modal = $('#editRoleModal');
+            const form = $('#editRoleForm');
+
+            if (id === 0) {
+                form[0].reset();
+                $('#roleId').val(0);
+                modal.find('.modal-title').text('Add Role');
+                modal.modal('show');
+                return;
+            }
+
+            $.get('/Role/GetById', { id: id }, function (data) {
+                $('#roleId').val(data.id);
+                $('#roleName').val(data.name);
+                modal.find('.modal-title').text('Edit Role');
+                modal.modal('show');
+            }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
+        }
+
+        $('#editRoleForm').submit(function (e) {
+            e.preventDefault();
+
+            const id = Number($('#roleId').val());
+            const data = {
+                Id: id,
+                Name: $('#roleName').val()
+            };
+
+            const url = id === 0 ? '/Role/Create' : '/Role/Update';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire("Başarılı", res.message, "success").then(() => location.reload());
+                    } else {
+                        Swal.fire("Hata", res.message, "error");
+                    }
+                },
+                error: () => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error")
+            });
+        });
+
+        function confirmDeleteRole(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu Role'u silmek üzeresiniz.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $.post('/Role/Delete', { id: id }, function (res) {
+                        if (res.success) {
+                            Swal.fire("Silindi", res.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Hata", res.message, "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

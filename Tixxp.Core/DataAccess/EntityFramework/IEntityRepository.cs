@@ -11,6 +11,7 @@ public interface IEntityRepository<T> where T : class, IEntity, new()
     IList<T> GetListWithInclude(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
     T? GetFirstOrDefault(Expression<Func<T, bool>> filter);
     void Add(T entity);
+    void AddRange(IEnumerable<T> entities);
     void Update(T entity);
     void Delete(T entity);
     T AddAndReturn(T entity);
