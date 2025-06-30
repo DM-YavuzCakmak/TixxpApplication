@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
 
-namespace Tixxp.Entities.Museum;
+namespace Tixxp.Entities.Company;
 
-[Table("Museum")]
-public class MuseumEntity : BaseEntity
+[Table("Company")]
+public class CompanyEntity : BaseEntity
 {
     [Column("Name")]
     public string Name { get; set; }

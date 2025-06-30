@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tixxp.Business.Services.Abstract.SeasonalPrice;
-using Tixxp.Business.Services.Abstract.Museum;
 using Tixxp.Entities.SeasonalPrice;
 using System;
+using Tixxp.Business.Services.Abstract.Company;
 
 namespace Tixxp.WebApp.Controllers
 {
     public class SeasonalPriceController : Controller
     {
         private readonly ISeasonalPriceService _seasonalPriceService;
-        private readonly IMuseumService _museumService;
+        private readonly ICompanyService _companyService;
 
-        public SeasonalPriceController(ISeasonalPriceService seasonalPriceService, IMuseumService museumService)
+        public SeasonalPriceController(ISeasonalPriceService seasonalPriceService, ICompanyService companyService)
         {
             _seasonalPriceService = seasonalPriceService;
-            _museumService = museumService;
+            _companyService = companyService;
         }
 
         public IActionResult Index()
@@ -24,10 +24,10 @@ namespace Tixxp.WebApp.Controllers
             {
                 foreach (var seasonalPriceEntity in seasonalPriceEntities)
                 {
-                    seasonalPriceEntity.Museum = _museumService.GetFirstOrDefault(m => m.Id == seasonalPriceEntity.MuseumId && !m.IsDeleted).Data;
+                    seasonalPriceEntity.Company = _companyService.GetFirstOrDefault(m => m.Id == seasonalPriceEntity.MuseumId && !m.IsDeleted).Data;
                 }
             }
-            ViewBag.Museums = _museumService.GetList(x => !x.IsDeleted).Data;
+            ViewBag.Museums = _companyService.GetList(x => !x.IsDeleted).Data;
             return View(seasonalPriceEntities);
         }
 

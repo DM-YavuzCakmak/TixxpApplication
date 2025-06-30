@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Tixxp.Business.Services.Abstract.Museum;
-using Tixxp.Entities.Museum;
 using System;
+using Tixxp.Business.Services.Abstract.Company;
+using Tixxp.Entities.Company;
 
 namespace Tixxp.WebApp.Controllers
 {
-    public class MuseumController : Controller
+    public class CompanyController : Controller
     {
-        private readonly IMuseumService _museumService;
+        private readonly ICompanyService _museumService;
 
-        public MuseumController(IMuseumService museumService)
+        public CompanyController(ICompanyService museumService)
         {
             _museumService = museumService;
         }
@@ -36,7 +36,7 @@ namespace Tixxp.WebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] MuseumEntity model)
+        public IActionResult Create([FromBody] CompanyEntity model)
         {
             model.CreatedBy = 6;
             model.Created_Date = DateTime.Now;
@@ -46,7 +46,7 @@ namespace Tixxp.WebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update([FromBody] MuseumEntity model)
+        public IActionResult Update([FromBody] CompanyEntity model)
         {
             var existing = _museumService.GetFirstOrDefault(x => x.Id == model.Id && !x.IsDeleted);
             if (!existing.Success)

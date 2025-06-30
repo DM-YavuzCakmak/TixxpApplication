@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
-using Tixxp.Entities.Museum;
+using Tixxp.Entities.Company;
 namespace Tixxp.Entities.SeasonalPrice;
 
 [Table("SeasonalPrice")]
@@ -18,7 +18,6 @@ public class SeasonalPriceEntity : BaseEntity
     [Column("EndDate")]
     public DateTime EndDate { get; set; }
 
-
     [NotMapped]
-    public virtual MuseumEntity Museum { get; set; }
+    public virtual  CompanyEntity Company { get; set; }
 }

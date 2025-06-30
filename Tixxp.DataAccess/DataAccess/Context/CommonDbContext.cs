@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tixxp.Entities.Agency;
 using Tixxp.Entities.Bank;
+using Tixxp.Entities.Company;
 using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.InvoiceType;
-using Tixxp.Entities.Museum;
 using Tixxp.Entities.Personnel;
 using Tixxp.Entities.PersonnelRole;
 using Tixxp.Entities.PersonnelRoleGroup;
@@ -28,7 +28,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
             modelBuilder.Entity<PersonnelRoleGroupEntity>().ToTable("PersonnelRoleGroup", "dbo");
             modelBuilder.Entity<InvoiceTypeEntity>().ToTable("InvoiceType", "dbo");
             modelBuilder.Entity<AgencyEntity>().ToTable("Agency", "dbo");
-            modelBuilder.Entity<MuseumEntity>().ToTable("Museum", "dbo");
+            modelBuilder.Entity<CompanyEntity>().ToTable("Company", "dbo");
             base.OnModelCreating(modelBuilder);
         }
 
@@ -36,7 +36,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<RoleGroupEntity> RoleGroups { get; set; }
         public DbSet<RoleGroupRoleEntity> RoleGroupRoles { get; set; }
         public DbSet<PersonnelRoleGroupEntity> PersonnelRoleGroups { get; set; }
-        public DbSet<MuseumEntity> Museums { get; set; }
+        public DbSet<CompanyEntity> Companies { get; set; }
         public DbSet<InvoiceTypeEntity> InvoiceTypes { get; set; }
         public DbSet<CurrencyTypeEntity> CurrencyTypes { get; set; }
         public DbSet<RoleEntity> Roles { get; set; }

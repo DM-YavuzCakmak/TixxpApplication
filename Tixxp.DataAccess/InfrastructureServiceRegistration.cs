@@ -7,12 +7,12 @@ using Tixxp.Core.Utilities.Filters.SchemaProvider.Concrete;
 using Tixxp.Infrastructure.DataAccess.Abstract.Agency;
 using Tixxp.Infrastructure.DataAccess.Abstract.AgencyContract;
 using Tixxp.Infrastructure.DataAccess.Abstract.Bank;
+using Tixxp.Infrastructure.DataAccess.Abstract.Company;
 using Tixxp.Infrastructure.DataAccess.Abstract.Counter;
 using Tixxp.Infrastructure.DataAccess.Abstract.CurrencyType;
 using Tixxp.Infrastructure.DataAccess.Abstract.Event;
 using Tixxp.Infrastructure.DataAccess.Abstract.Guide;
 using Tixxp.Infrastructure.DataAccess.Abstract.InvoiceType;
-using Tixxp.Infrastructure.DataAccess.Abstract.Museum;
 using Tixxp.Infrastructure.DataAccess.Abstract.Personnel;
 using Tixxp.Infrastructure.DataAccess.Abstract.PersonnelRole;
 using Tixxp.Infrastructure.DataAccess.Abstract.PersonnelRoleGroup;
@@ -97,7 +97,7 @@ namespace Tixxp.Infrastructure
             services.AddScoped<IInvoiceTypeRepository, InvoiceTypeRepository>();
             services.AddScoped<IAgencyRepository, AgencyRepository>();
             services.AddScoped<IPriceCategoryRepository, PriceCategoryRepository>();
-            services.AddScoped<IMuseumRepository, MuseumRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<ISeasonalPriceRepository, SeasonalPriceRepository>();
 
 

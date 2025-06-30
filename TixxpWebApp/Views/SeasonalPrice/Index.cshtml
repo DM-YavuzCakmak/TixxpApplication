@@ -1,11 +1,11 @@
-﻿@using Tixxp.Entities.SeasonalPrice
-@using Tixxp.Entities.Museum
+﻿@using Tixxp.Entities.Company
+@using Tixxp.Entities.SeasonalPrice
 @model List<SeasonalPriceEntity>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Sezonluk Fiyat Listesi";
-    var museums = ViewBag.Museums as List<MuseumEntity>;
+    var museums = ViewBag.Museums as List<CompanyEntity>;
 }
 
 <div class="main-content app-content">
@@ -40,7 +40,7 @@
                                 foreach (var item in Model)
                                 {
                                     <tr>
-                                        <td>@item.Museum?.Name</td>
+                                        <td>@item.Company?.Name</td>
                                         <td>@item.SeasonName</td>
                                         <td>@item.StartDate.ToString("dd.MM.yyyy")</td>
                                         <td>@item.EndDate.ToString("dd.MM.yyyy")</td>
