@@ -5,7 +5,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleInvoiceInfo;
 
 namespace Tixxp.Business.Services.Concrete.ProductSaleInvoiceInfo;
 
-internal class ProductSaleInvoiceInfoService : BaseService<ProductSaleInvoiceInfoEntity>, IProductSaleInvoiceInfoService
+public class ProductSaleInvoiceInfoService : BaseService<ProductSaleInvoiceInfoEntity>, IProductSaleInvoiceInfoService
 {
     private readonly IProductSaleInvoiceInfoRepository _productSaleInvoiceInfoRepository;
     public ProductSaleInvoiceInfoService(IProductSaleInvoiceInfoRepository productSaleInvoiceInfoRepository)

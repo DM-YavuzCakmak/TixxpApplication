@@ -32,7 +32,7 @@ namespace Tixxp.WebApp.Controllers
                                                                               select new ProductWithPriceViewModel
                                                                               {
                                                                                   ProductId = product.Id,
-                                                                                  Name = product.Name,
+                                                                                  //Name = product.Name,
                                                                                   Code = product.Code,
                                                                                   CurrencyTypeId = price.CurrencyTypeId,
                                                                                   CurrencyTypeSymbol = "",

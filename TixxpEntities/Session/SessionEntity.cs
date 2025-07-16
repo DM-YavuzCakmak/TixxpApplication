@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
 using Tixxp.Entities.Events;
+using Tixxp.Entities.PriceCategory;
 using Tixxp.Entities.Product;
 
 namespace Tixxp.Entities.Session
@@ -10,6 +11,9 @@ namespace Tixxp.Entities.Session
     {
         [Column("EventId")]
         public long EventId { get; set; }
+
+        [Column("PriceCategoryId")]
+        public long PriceCategoryId { get; set; }
 
         [Column("EventDate")]
         public DateTime EventDate { get; set; }
@@ -35,6 +39,9 @@ namespace Tixxp.Entities.Session
         [Column("ShowEntryEndAfterEventTimeInMinutes")]
         public int ShowEntryEndAfterEventTimeInMinutes { get; set; }
 
+
+        [ForeignKey(nameof(PriceCategoryId))]
+        public virtual PriceCategoryEntity PriceCategory { get; set; }
 
         [ForeignKey(nameof(EventId))]
         public virtual EventEntity Event { get; set; }

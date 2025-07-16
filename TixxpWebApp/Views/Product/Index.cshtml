@@ -1,4 +1,4 @@
-﻿@model List<Tixxp.Entities.Product.ProductEntity>
+﻿@model List<Tixxp.WebApp.Models.Product.ProductWithTranslationViewModel>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,7 +25,7 @@
                             <table class="table table-bordered text-nowrap w-100">
                                 <thead>
                                     <tr>
-                                        <th>Ürün Adı</th>
+                                        <th>Ürün Adları (Tüm Diller)</th>
                                         <th>Kodu</th>
                                         @if (User.IsInRole("TIXXP_PRODUCT_EDIT") || User.IsInRole("TIXXP_PRODUCT_DELETE"))
                                         {
@@ -36,11 +36,18 @@
                                 <tbody>
                                     @if (Model != null && Model.Any())
                                     {
-                                        foreach (var product in Model)
+                                        foreach (var item in Model)
                                         {
                                             <tr>
-                                                <td>@product.Name</td>
-                                                <td>@product.Code</td>
+                                                <td>
+                                                    @foreach (var t in item.Translations)
+                                                    {
+                                                        <div>
+                                                            <strong>@t.Language?.Code.ToUpperInvariant():</strong> @t.Name
+                                                        </div>
+                                                    }
+                                                </td>
+                                                <td>@item.Product.Code</td>
                                                 @if (User.IsInRole("TIXXP_PRODUCT_EDIT") || User.IsInRole("TIXXP_PRODUCT_DELETE"))
                                                 {
                                                     <td>
@@ -48,14 +55,14 @@
                                                             @if (User.IsInRole("TIXXP_PRODUCT_EDIT"))
                                                             {
                                                                 <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                                   onclick="openEditModal(@product.Id)">
+                                                                   onclick="openEditModal(@item.Product.Id)">
                                                                     <i class="ri-edit-line"></i>
                                                                 </a>
                                                             }
                                                             @if (User.IsInRole("TIXXP_PRODUCT_DELETE"))
                                                             {
                                                                 <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                                   onclick="confirmDelete(@product.Id)">
+                                                                   onclick="confirmDelete(@item.Product.Id)">
                                                                     <i class="ri-delete-bin-line"></i>
                                                                 </a>
                                                             }
@@ -79,89 +86,110 @@
     </div>
 </div>
 
-
-<!-- Ürün Modal -->
-<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
+<!-- Edit / Add Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Ürün Bilgisi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editProductForm">
-                    <input type="hidden" id="editId" name="Id" />
+            <form id="productForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Ürün Bilgileri</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="ProductId" />
 
                     <div class="mb-3">
                         <label class="form-label">Ürün Adı</label>
-                        <input type="text" class="form-control" id="editName" name="Name" required />
+                        <input type="text" class="form-control" name="Name" id="ProductName" required />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Kodu</label>
-                        <input type="text" class="form-control" id="editCode" name="Code" required />
+                        <label class="form-label">Ürün Kodu</label>
+                        <input type="text" class="form-control" name="Code" id="ProductCode" required />
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
-                </form>
-            </div>
+                    <div id="translationInputs">
+                        <!-- Diller dinamik olarak JS ile eklenebilir -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
+
+
+
 @section Scripts {
     <script>
         function openEditModal(id) {
-            if (id === 0) {
-                $('#editId').val('');
-                $('#editName').val('');
-                $('#editCode').val('');
-                $('#editProductModal').modal('show');
-                return;
-            }
+            // Temizle
+            $('#productForm')[0].reset();
+            $('#ProductId').val(0);
+            $('#translationInputs').html('');
 
-            $.get('/Product/GetById', { id: id }, function (data) {
-                $('#editId').val(data.id);
-                $('#editName').val(data.name);
-                $('#editCode').val(data.code);
-                $('#editProductModal').modal('show');
-            }).fail(function () {
-                Swal.fire({ icon: 'error', title: 'Hata', text: 'Ürün verisi alınamadı.' });
+            if (id === 0) {
+                $('#productModalLabel').text('Yeni Ürün Ekle');
+                $('#productModal').modal('show');
+                // Dil inputlarını oluştur
+                addTranslationInputs();
+            } else {
+                $('#productModalLabel').text('Ürünü Düzenle');
+
+                $.get(`/Product/GetById/${id}`, function (data) {
+                    $('#ProductId').val(data.Product.Id);
+                    $('#ProductCode').val(data.Product.Code);
+
+                    $('#translationInputs').html('');
+                    data.Translations.forEach(function (t) {
+                        $('#translationInputs').append(`
+                            <div class="mb-2">
+                              <label>${t.Language.Code.toUpperCase()}</label>
+                              <input type="text" class="form-control" name="Translations[${t.Language.Code}]" value="${t.Name}" />
+                            </div>
+                        `);
+                    });
+
+                    $('#productModal').modal('show');
+                });
+            }
+        }
+
+        function addTranslationInputs() {
+            const languages = ['tr', 'en', 'de']; // ihtiyaca göre çoğalt
+            languages.forEach(lang => {
+                $('#translationInputs').append(`
+                    <div class="mb-2">
+                        <label>${lang.toUpperCase()}</label>
+                        <input type="text" class="form-control" name="Translations[${lang}]" />
+                    </div>
+                `);
             });
         }
 
-        $('#editProductForm').submit(function (e) {
+        $('#productForm').on('submit', function (e) {
             e.preventDefault();
             const formData = $(this).serialize();
 
-            $.post('/Product/Save', formData, function (response) {
-                if (response.success) {
-                    Swal.fire({ icon: 'success', title: 'Başarılı', text: response.message }).then(() => location.reload());
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
-                }
+            $.post('/Product/Save', formData, function () {
+                location.reload(); // Başarılıysa sayfayı yenile
+            }).fail(function (xhr) {
+                alert('Hata oluştu: ' + xhr.responseText);
             });
         });
 
         function confirmDelete(id) {
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu ürünü silmek üzeresiniz.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Vazgeç'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('/Product/Delete', { id: id }, function (response) {
-                        if (response.success) {
-                            Swal.fire({ icon: 'success', title: 'Silindi', text: response.message }).then(() => location.reload());
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
-                        }
-                    });
-                }
-            });
+            if (confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
+                $.post(`/Product/Delete/${id}`, function () {
+                    location.reload();
+                }).fail(function (xhr) {
+                    alert('Silme işlemi başarısız: ' + xhr.responseText);
+                });
+            }
         }
     </script>
 }

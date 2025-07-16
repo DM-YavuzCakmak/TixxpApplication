@@ -1,4 +1,5 @@
 ﻿@using Tixxp.Core.Utilities.Helper
+@using Tixxp.Entities.PriceCategory
 @using Tixxp.Entities.Session
 @using Tixxp.Entities.Events
 @model List<SessionEntity>
@@ -7,6 +8,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Seans Listesi";
     var events = ViewBag.Events as List<EventEntity>;
+    var priceCategories = ViewBag.PriceCategories as List<PriceCategoryEntity>;
 }
 
 <div class="main-content app-content">
@@ -23,6 +25,7 @@
                         <thead>
                             <tr>
                                 <th>Etkinlik</th>
+                                <th>Fiyat Kategorisi</th>
                                 <th>Tarih</th>
                                 <th>Planlanan Saat</th>
                                 <th>Kapasite</th>
@@ -41,6 +44,7 @@
                                 {
                                     <tr>
                                         <td>@item.Event?.Name</td>
+                                        <td>@item.PriceCategory?.Name</td>
                                         <td>@item.EventDate.ToString("dd.MM.yyyy")</td>
                                         <td>@item.PlannedTime.ToString(@"hh\:mm")</td>
                                         <td>@item.SessionCapacity</td>
@@ -93,6 +97,16 @@
                                 @foreach (var ev in events)
                                 {
                                     <option value="@ev.Id">@ev.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Fiyat Kategorisi</label>
+                            <select class="form-select" id="priceCategoryId" name="PriceCategoryId" required>
+                                <option value="">Seçiniz</option>
+                                @foreach (var priceCategory in priceCategories)
+                                {
+                                    <option value="@priceCategory.Id">@priceCategory.Name</option>
                                 }
                             </select>
                         </div>
@@ -161,6 +175,7 @@
             $.get('/Session/GetById', { id: id }, function (data) {
                 $('#sessionId').val(data.id);
                 $('#eventId').val(data.eventId);
+                $('#priceCategoryId').val(data.priceCategoryId);
                 $('#eventDate').val(data.eventDate);
                 $('#plannedTime').val(data.plannedTime);
                 $('#sessionCapacity').val(data.sessionCapacity);
@@ -181,6 +196,7 @@
             const data = {
                 Id: id,
                 EventId: $('#eventId').val(),
+                PriceCategoryId: $('#priceCategoryId').val(),
                 EventDate: $('#eventDate').val(),
                 PlannedTime: $('#plannedTime').val() + ':00',
                 SessionCapacity: $('#sessionCapacity').val(),

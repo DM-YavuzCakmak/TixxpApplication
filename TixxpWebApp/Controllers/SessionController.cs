@@ -4,6 +4,7 @@ using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Entities.Session;
 using System;
 using System.Linq;
+using Tixxp.Business.Services.Abstract.PriceCategory;
 
 namespace Tixxp.WebApp.Controllers
 {
@@ -11,17 +12,22 @@ namespace Tixxp.WebApp.Controllers
     {
         private readonly ISessionService _sessionService;
         private readonly IEventService _eventService;
+        private readonly IPriceCategoryService _priceCategoryService;
 
-        public SessionController(ISessionService sessionService, IEventService eventService)
+        public SessionController(ISessionService sessionService, IEventService eventService, IPriceCategoryService priceCategoryService)
         {
             _sessionService = sessionService;
             _eventService = eventService;
+            _priceCategoryService = priceCategoryService;
         }
 
         public IActionResult Index()
         {
-            var sessions = _sessionService.GetListWithInclude(x => !x.IsDeleted, x => x.Event).Data;
+            var sessions = _sessionService.GetListWithInclude(x => !x.IsDeleted, 
+                                                             e => e.Event, 
+                                                             p => p.PriceCategory).Data;
             ViewBag.Events = _eventService.GetList(x => !x.IsDeleted).Data;
+            ViewBag.PriceCategories = _priceCategoryService.GetList(x => !x.IsDeleted).Data;
             return View(sessions);
         }
 
@@ -37,6 +43,7 @@ namespace Tixxp.WebApp.Controllers
                 id = result.Data.Id,
                 eventId = result.Data.EventId,
                 eventDate = result.Data.EventDate.ToString("yyyy-MM-dd"),
+                priceCategoryId = result.Data.PriceCategoryId,
                 plannedTime = result.Data.PlannedTime.ToString("HH:mm"),
                 sessionCapacity = result.Data.SessionCapacity,
                 availableOnB2C = result.Data.AvailableOnB2C,

@@ -36,7 +36,6 @@
                             @foreach (var price in Model)
                             {
                                 <tr>
-                                    <td>@price.Product?.Name</td>
                                     <td>@price.CurrencyType?.Name</td>
                                     <td>@price.Price ₺</td>
                                     <td>@price.VatRate</td>
@@ -84,7 +83,7 @@
                         <select class="form-select" name="ProductId" required>
                             @foreach (var product in productsWithoutPrice)
                             {
-                                <option value="@product.Id">@product.Name</option>
+                                // <option value="@product.Id">@product.Name</option>
                             }
                         </select>
                     </div>

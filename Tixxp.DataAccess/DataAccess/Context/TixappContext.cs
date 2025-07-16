@@ -4,14 +4,17 @@ using Tixxp.Entities.Bank;
 using Tixxp.Entities.Counter;
 using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.Events;
+using Tixxp.Entities.EventTicketPrice;
 using Tixxp.Entities.Guide;
 using Tixxp.Entities.InvoiceType;
+using Tixxp.Entities.Language;
 using Tixxp.Entities.PriceCategory;
 using Tixxp.Entities.Product;
 using Tixxp.Entities.ProductPrice;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.Entities.ProductSaleInvoiceInfo;
+using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.SeasonalPrice;
 using Tixxp.Entities.Session;
 using Tixxp.Entities.TicketSubType;
@@ -31,6 +34,18 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ProductTranslationEntity>(entity =>
+            {
+                entity.ToTable("ProductTranslation", _schema);
+            });
+            modelBuilder.Entity<LanguageEntity>(entity =>
+            {
+                entity.ToTable("Language", _schema);
+            });
+            modelBuilder.Entity<EventTicketPriceEntity>(entity =>
+            {
+                entity.ToTable("EventTicketPrice", _schema);
+            });
             modelBuilder.Entity<CurrencyTypeEntity>(entity =>
             {
                 entity.ToTable("CurrencyType", _schema);
@@ -103,6 +118,9 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         }
 
         public DbSet<CounterEntity> Counters { get; set; }
+        public DbSet<LanguageEntity> Languages { get; set; }
+        public DbSet<ProductTranslationEntity> ProductTranslations { get; set; }
+        public DbSet<EventTicketPriceEntity> EventTicketPrices { get; set; }
         public DbSet<CurrencyTypeEntity> CurrencyTypes { get; set; }
         public DbSet<InvoiceTypeEntity> InvoiceTypes { get; set; }
         public DbSet<BankEntity> Banks { get; set; }

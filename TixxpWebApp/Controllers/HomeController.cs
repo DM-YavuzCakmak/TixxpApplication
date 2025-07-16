@@ -152,7 +152,7 @@ namespace Tixxp.WebApp.Controllers
                     var linePrice = (price?.Price ?? 240) * d.Quantity;
                     totalPrice += linePrice;
 
-                    detailHtml += $"<div><strong>{product?.Name}</strong> x {d.Quantity}</div>";
+                    //detailHtml += $"<div><strong>{product?.Name}</strong> x {d.Quantity}</div>";
                 }
 
                 return new

@@ -30,12 +30,12 @@ namespace Tixxp.WebApp.Controllers
                 .GroupBy(x => new
                 {
                     Date = x.Created_Date.ToString("yyyy-MM-dd"),
-                    ProductName = x.Product.Name
+                    //ProductName = x.Product.Name
                 })
                 .Select(g => new ProductSaleStackedReportDto
                 {
                     Date = g.Key.Date,
-                    ProductName = g.Key.ProductName,
+                    //ProductName = g.Key.ProductName,
                     Quantity = g.Sum(x => x.Quantity)
                 }).ToList();
 
@@ -44,12 +44,12 @@ namespace Tixxp.WebApp.Controllers
                 .GroupBy(x => new
                 {
                     Date = x.Created_Date.ToString("yyyy-MM"),
-                    ProductName = x.Product.Name
+                    //ProductName = x.Product.Name
                 })
                 .Select(g => new ProductSaleStackedReportDto
                 {
                     Date = g.Key.Date,
-                    ProductName = g.Key.ProductName,
+                    //ProductName = g.Key.ProductName,
                     Quantity = g.Sum(x => x.Quantity)
                 }).ToList();
 

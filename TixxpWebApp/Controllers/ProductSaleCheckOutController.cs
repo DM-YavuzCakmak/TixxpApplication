@@ -69,7 +69,7 @@ namespace Tixxp.WebApp.Controllers
 
                     summaries.Add(new ProductSaleSummaryDto
                     {
-                        ProductName = detail.Product?.Name,
+                        //ProductName = detail.Product?.Name,
                         ProductImageUrl = detail.Product?.ImageFilePath,
                         Quantity = detail.Quantity,
                         Price = price
