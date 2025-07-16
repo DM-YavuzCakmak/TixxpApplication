@@ -7,6 +7,7 @@ using Tixxp.Business.Services.Abstract.Company;
 using Tixxp.Business.Services.Abstract.Counter;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
+using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Business.Services.Abstract.Guide;
 using Tixxp.Business.Services.Abstract.InvoiceType;
 using Tixxp.Business.Services.Abstract.Language;
@@ -35,6 +36,7 @@ using Tixxp.Business.Services.Concrete.Company;
 using Tixxp.Business.Services.Concrete.Counter;
 using Tixxp.Business.Services.Concrete.CurrencyType;
 using Tixxp.Business.Services.Concrete.Event;
+using Tixxp.Business.Services.Concrete.EventTicketPrice;
 using Tixxp.Business.Services.Concrete.Guide;
 using Tixxp.Business.Services.Concrete.InvoiceType;
 using Tixxp.Business.Services.Concrete.Language;
@@ -84,6 +86,7 @@ namespace Tixxp.Business
             services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ISeasonalPriceService, SeasonalPriceService>();
+            services.AddScoped<IEventTicketPriceService, EventTicketPriceService>();
 
             services.AddScoped<ICounterService, CounterService>();
             services.AddScoped<IProductService, ProductService>();

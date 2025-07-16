@@ -1,0 +1,214 @@
+﻿@using Tixxp.Entities.EventTicketPrice
+@using Tixxp.Entities.Events
+@using Tixxp.Entities.TicketType
+@using Tixxp.Entities.PriceCategory
+@using Tixxp.Entities.CurrencyType
+@model List<EventTicketPriceEntity>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Etkinlik Bilet Fiyatları";
+    var events = ViewBag.Events as List<EventEntity>;
+    var ticketTypes = ViewBag.TicketTypes as List<TicketTypeEntity>;
+    var priceCategories = ViewBag.PriceCategories as List<PriceCategoryEntity>;
+    var currencyTypes = ViewBag.CurrencyTypes as List<CurrencyTypeEntity>;
+}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+        <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Etkinlik Bilet Fiyatları</h1>
+            <button class="btn btn-primary btn-sm" onclick="openEditEventTicketPriceModal(0)">+ Yeni Fiyat</button>
+        </div>
+
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Etkinlik</th>
+                                <th>Bilet Tipi</th>
+                                <th>Fiyat Kategorisi</th>
+                                <th>Fiyat</th>
+                                <th>Para Birimi</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Event?.Name</td>
+                                        <td>@item.TicketType?.Name</td>
+                                        <td>@item.PriceCategory?.Name</td>
+                                        <td>@item.Price.ToString("N2")</td>
+                                        <td>@item.CurrencyType?.Symbol</td>
+                                        <td>
+                                            <div class="hstack gap-2">
+                                                <a class="btn btn-sm btn-light" onclick="openEditEventTicketPriceModal(@item.Id)">
+                                                    <i class="ri-edit-line"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-light" onclick="confirmDeleteEventTicketPrice(@item.Id)">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="6" class="text-center">Kayıt bulunamadı.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editEventTicketPriceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Etkinlik Bilet Fiyatı</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEventTicketPriceForm">
+                    <input type="hidden" id="eventTicketPriceId" name="Id" />
+                    <div class="mb-3">
+                        <label>Etkinlik</label>
+                        <select class="form-select" id="eventId" required>
+                            <option value="">Seçiniz</option>
+                            @foreach (var ev in events)
+                            {
+                                <option value="@ev.Id">@ev.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Bilet Tipi</label>
+                        <select class="form-select" id="ticketTypeId" required>
+                            <option value="">Seçiniz</option>
+                            @foreach (var t in ticketTypes)
+                            {
+                                <option value="@t.Id">@t.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Fiyat Kategorisi</label>
+                        <select class="form-select" id="priceCategoryId" required>
+                            <option value="">Seçiniz</option>
+                            @foreach (var p in priceCategories)
+                            {
+                                <option value="@p.Id">@p.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Para Birimi</label>
+                        <select class="form-select" id="currencyTypeId" required>
+                            <option value="">Seçiniz</option>
+                            @foreach (var c in currencyTypes)
+                            {
+                                <option value="@c.Id">@c.Symbol</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Fiyat</label>
+                        <input type="number" class="form-control" id="price" step="0.01" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openEditEventTicketPriceModal(id) {
+            const modal = $('#editEventTicketPriceModal');
+            const form = $('#editEventTicketPriceForm');
+
+            if (id === 0) {
+                form[0].reset();
+                $('#eventTicketPriceId').val(0);
+                modal.find('.modal-title').text("Yeni Etkinlik Bilet Fiyatı");
+                modal.modal('show');
+                return;
+            }
+
+            $.get('/EventTicketPrice/GetById', { id: id }, function (data) {
+                $('#eventTicketPriceId').val(data.id);
+                $('#eventId').val(data.eventId);
+                $('#ticketTypeId').val(data.ticketTypeId);
+                $('#priceCategoryId').val(data.priceCategoryId);
+                $('#currencyTypeId').val(data.currencyTypeId);
+                $('#price').val(data.price);
+                modal.find('.modal-title').text("Fiyatı Düzenle");
+                modal.modal('show');
+            }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
+        }
+
+        $('#editEventTicketPriceForm').submit(function (e) {
+            e.preventDefault();
+            const id = Number($('#eventTicketPriceId').val());
+
+            const data = {
+                Id: id,
+                EventId: $('#eventId').val(),
+                TicketTypeId: $('#ticketTypeId').val(),
+                PriceCategoryId: $('#priceCategoryId').val(),
+                CurrencyTypeId: $('#currencyTypeId').val(),
+                Price: parseFloat($('#price').val())
+            };
+
+            const url = id === 0 ? '/EventTicketPrice/Create' : '/EventTicketPrice/Update';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire("Başarılı", res.message, "success").then(() => location.reload());
+                    } else {
+                        Swal.fire("Hata", res.message, "error");
+                    }
+                },
+                error: () => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error")
+            });
+        });
+
+        function confirmDeleteEventTicketPrice(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu fiyat bilgisini silmek üzeresiniz.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $.post('/EventTicketPrice/Delete', { id: id }, function (res) {
+                        if (res.success) {
+                            Swal.fire("Silindi", res.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Hata", res.message, "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}
