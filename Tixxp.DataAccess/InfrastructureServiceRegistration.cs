@@ -25,6 +25,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductTranslation;
+using Tixxp.Infrastructure.DataAccess.Abstract.Reservation;
 using Tixxp.Infrastructure.DataAccess.Abstract.Role;
 using Tixxp.Infrastructure.DataAccess.Abstract.RoleGroup;
 using Tixxp.Infrastructure.DataAccess.Abstract.RoleGroupRole;
@@ -53,6 +54,7 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSale;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSaleDetail;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductTranslation;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Reservation;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Role;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroup;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroupRole;
@@ -90,8 +92,6 @@ namespace Tixxp.Infrastructure
 
                 return new TixappContext(optionsBuilder.Options, "dbo");
             });
-
-            // Ortak veritabanı (TixxpCommon) kullanan repositoryler
             services.AddScoped<IPersonnelRepository, PersonnelRepository>();
             services.AddScoped<IProductTranslationRepository, ProductTranslationRepository>();
             services.AddScoped<ILanguageRepository, LanguageRepository>();
@@ -109,9 +109,8 @@ namespace Tixxp.Infrastructure
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<ISeasonalPriceRepository, SeasonalPriceRepository>();
 
-
-            // Dinamik veritabanı kullanan repositoryler
             services.AddScoped<ICounterRepository, CounterRepository>();
+            services.AddScoped<IReservationRepository, ReservationRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
             services.AddScoped<IProductSaleDetailRepository, ProductSaleDetailRepository>();
