@@ -88,7 +88,19 @@
                         <i class="fe fe-chevron-right side-menu__angle"></i>
                     </a>
                     <ul class="slide-menu child1">
-                        @if (User.IsInRole("TIXXP_SEASONAL_PRICE"))
+                        <li class="slide">
+                            <a href="/Reservation/CancelReservation" class="side-menu__item">
+                                <i class="bi bi-tags-fill"></i>
+                                <span class="side-menu__label ms-2">Rezervasyon Status Update</span>
+                            </a>
+                        </li>
+                        <li class="slide">
+                            <a href="/EventTicketPrice/Index" class="side-menu__item">
+                                <i class="bi bi-tags-fill"></i>
+                                <span class="side-menu__label ms-2">Event Ticket Price</span>
+                            </a>
+                        </li>
+                     @*    @if (User.IsInRole("TIXXP_SEASONAL_PRICE"))
                         {
                             <li class="slide">
                                 <a href="/SeasonalPrice/Index" class="side-menu__item">
@@ -96,7 +108,7 @@
                                     <span class="side-menu__label ms-2">Seasonal Price</span>
                                 </a>
                             </li>
-                        }
+                        } *@
                         @if (User.IsInRole("TIXXP_ROLE_VIEW") || User.IsInRole("TIXXP_ROLE_GROUP_VIEW") || User.IsInRole("TIXXP_ROLE_GROUP_ROLE_VIEW"))
                         {
                             <li class="slide has-sub">

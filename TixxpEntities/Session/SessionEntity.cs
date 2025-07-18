@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
 using Tixxp.Entities.Events;
-using Tixxp.Entities.PriceCategory;
-using Tixxp.Entities.Product;
+using Tixxp.Entities.SessionEventTicketPrice;
+using System.Collections.Generic;
+using System;
 
 namespace Tixxp.Entities.Session
 {
@@ -11,9 +12,6 @@ namespace Tixxp.Entities.Session
     {
         [Column("EventId")]
         public long EventId { get; set; }
-
-        [Column("PriceCategoryId")]
-        public long PriceCategoryId { get; set; }
 
         [Column("EventDate")]
         public DateTime EventDate { get; set; }
@@ -39,11 +37,16 @@ namespace Tixxp.Entities.Session
         [Column("ShowEntryEndAfterEventTimeInMinutes")]
         public int ShowEntryEndAfterEventTimeInMinutes { get; set; }
 
+        [Column("IsDaily")]
+        public bool IsDaily { get; set; }
 
-        [ForeignKey(nameof(PriceCategoryId))]
-        public virtual PriceCategoryEntity PriceCategory { get; set; }
+        [Column("IsHourly")]
+        public bool IsHourly { get; set; }
 
         [ForeignKey(nameof(EventId))]
         public virtual EventEntity Event { get; set; }
+
+        [NotMapped]
+        public virtual ICollection<SessionEventTicketPriceEntity> SessionEventTicketPrices { get; set; }
     }
 }

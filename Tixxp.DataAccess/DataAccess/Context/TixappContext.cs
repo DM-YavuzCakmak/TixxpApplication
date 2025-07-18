@@ -18,6 +18,7 @@ using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
 using Tixxp.Entities.SeasonalPrice;
 using Tixxp.Entities.Session;
+using Tixxp.Entities.SessionEventTicketPrice;
 using Tixxp.Entities.TicketSubType;
 using Tixxp.Entities.TicketType;
 
@@ -35,6 +36,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SessionEventTicketPriceEntity>(entity =>
+            {
+                entity.ToTable("SessionEventTicketPrice", _schema);
+            });
             modelBuilder.Entity<ReservationEntity>(entity =>
             {
                 entity.ToTable("Reservation", _schema);

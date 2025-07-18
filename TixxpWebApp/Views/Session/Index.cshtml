@@ -2,6 +2,7 @@
 @using Tixxp.Entities.PriceCategory
 @using Tixxp.Entities.Session
 @using Tixxp.Entities.Events
+@using Tixxp.Entities.EventTicketPrice
 @model List<SessionEntity>
 
 @{
@@ -9,6 +10,8 @@
     ViewBag.Title = "Seans Listesi";
     var events = ViewBag.Events as List<EventEntity>;
     var priceCategories = ViewBag.PriceCategories as List<PriceCategoryEntity>;
+    var eventTicketPrices = ViewBag.EventTicketPrices as List<EventTicketPriceEntity>;
+
 }
 
 <div class="main-content app-content">
@@ -42,9 +45,16 @@
                             {
                                 foreach (var item in Model)
                                 {
+                                    var categoryNames = item.SessionEventTicketPrices?
+                                    .Where(x => x.EventTicketPrice != null && !x.EventTicketPrice.IsDeleted)
+                                    .Select(x => priceCategories.FirstOrDefault(p => p.Id == x.EventTicketPrice.PriceCategoryId)?.Name)
+                                    .Where(name => !string.IsNullOrEmpty(name))
+                                    .Distinct()
+                                    .ToList();
+
                                     <tr>
                                         <td>@item.Event?.Name</td>
-                                        <td>@item.PriceCategory?.Name</td>
+                                        <td>@string.Join(", ", categoryNames ?? new List<string>())</td>
                                         <td>@item.EventDate.ToString("dd.MM.yyyy")</td>
                                         <td>@item.PlannedTime.ToString(@"hh\:mm")</td>
                                         <td>@item.SessionCapacity</td>
@@ -68,7 +78,7 @@
                             }
                             else
                             {
-                                <tr><td colspan="10" class="text-center">Kayıt bulunamadı.</td></tr>
+                                <tr><td colspan="11" class="text-center">Kayıt bulunamadı.</td></tr>
                             }
                         </tbody>
                     </table>
@@ -101,12 +111,12 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label>Fiyat Kategorisi</label>
-                            <select class="form-select" id="priceCategoryId" name="PriceCategoryId" required>
-                                <option value="">Seçiniz</option>
-                                @foreach (var priceCategory in priceCategories)
+                            <label>Fiyatlandırmalar (EventTicketPrice)</label>
+                            <select class="form-select" id="eventTicketPriceIds" multiple>
+                                @foreach (var price in eventTicketPrices)
                                 {
-                                    <option value="@priceCategory.Id">@priceCategory.Name</option>
+                                    var priceCategoryName = priceCategories.FirstOrDefault(p => p.Id == price.PriceCategoryId)?.Name ?? "";
+                                    <option value="@price.Id">@($"{priceCategoryName} - {price.Price:0.00}")</option>
                                 }
                             </select>
                         </div>
@@ -164,9 +174,11 @@
         function openEditSessionModal(id) {
             const modal = $('#editSessionModal');
             const form = $('#editSessionForm');
+
             if (id === 0) {
                 form[0].reset();
                 $('#sessionId').val(0);
+                $('#eventTicketPriceIds').val([]).change();
                 modal.find('.modal-title').text('Seans Ekle');
                 modal.modal('show');
                 return;
@@ -175,7 +187,6 @@
             $.get('/Session/GetById', { id: id }, function (data) {
                 $('#sessionId').val(data.id);
                 $('#eventId').val(data.eventId);
-                $('#priceCategoryId').val(data.priceCategoryId);
                 $('#eventDate').val(data.eventDate);
                 $('#plannedTime').val(data.plannedTime);
                 $('#sessionCapacity').val(data.sessionCapacity);
@@ -184,6 +195,10 @@
                 $('#isCancelled').val(data.isCancelled.toString());
                 $('#showStart').val(data.showEntryStartBefore);
                 $('#showEnd').val(data.showEntryEndAfter);
+
+                // Çoklu seçim alanı: EventTicketPrice
+                $('#eventTicketPriceIds').val(data.eventTicketPriceIds).change();
+
                 modal.find('.modal-title').text('Seans Düzenle');
                 modal.modal('show');
             }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
@@ -193,10 +208,11 @@
             e.preventDefault();
 
             const id = Number($('#sessionId').val());
+            const selectedPrices = $('#eventTicketPriceIds').val() || [];
+
             const data = {
                 Id: id,
                 EventId: $('#eventId').val(),
-                PriceCategoryId: $('#priceCategoryId').val(),
                 EventDate: $('#eventDate').val(),
                 PlannedTime: $('#plannedTime').val() + ':00',
                 SessionCapacity: $('#sessionCapacity').val(),
@@ -204,7 +220,10 @@
                 AvailableOnB2B: $('#availableOnB2B').val() === 'true',
                 IsCancelled: $('#isCancelled').val() === 'true',
                 ShowEntryStartBeforeEventTimeInMinutes: $('#showStart').val(),
-                ShowEntryEndAfterEventTimeInMinutes: $('#showEnd').val()
+                ShowEntryEndAfterEventTimeInMinutes: $('#showEnd').val(),
+                SessionEventTicketPrices: selectedPrices.map(pid => ({
+                    EventTicketPriceId: parseInt(pid)
+                }))
             };
 
             const url = id === 0 ? '/Session/Create' : '/Session/Update';

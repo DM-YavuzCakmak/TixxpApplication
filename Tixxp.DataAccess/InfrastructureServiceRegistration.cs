@@ -31,6 +31,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.RoleGroup;
 using Tixxp.Infrastructure.DataAccess.Abstract.RoleGroupRole;
 using Tixxp.Infrastructure.DataAccess.Abstract.SeasonalPrice;
 using Tixxp.Infrastructure.DataAccess.Abstract.Session;
+using Tixxp.Infrastructure.DataAccess.Abstract.SessionEventTicketPrice;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Agency;
@@ -60,6 +61,7 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroup;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroupRole;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SeasonalPrice;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Session;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionEventTicketPrice;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketType;
 using Tixxp.Infrastructure.DataAccess.Context;
@@ -108,6 +110,7 @@ namespace Tixxp.Infrastructure
             services.AddScoped<IPriceCategoryRepository, PriceCategoryRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<ISeasonalPriceRepository, SeasonalPriceRepository>();
+            services.AddScoped<ISessionEventTicketPriceRepository, SessionEventTicketPriceRepository>();
 
             services.AddScoped<ICounterRepository, CounterRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();

@@ -368,6 +368,7 @@
                                                        <div class="d-flex" >
                                                        <div class="flex-grow-1 text-muted overflow-hidden" >
                                                        <p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Seans Tarihi:  <span class="fw-semibold text-dark">`+ new Date(teamData.eventDate).toLocaleDateString('tr-TR') + `</span></p>
+                                                       ${teamData.isHourly ? `<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Saat: <span class="fw-semibold text-dark">` + teamData.plannedTime + `</span></p>` : ''}
                                                        <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Planned Time:  <span class="fw-semibold text-dark">`+ teamData.plannedTime + `</span></p>-->
                                                        <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Actual Time:  <span class="fw-semibold text-dark">`+ teamData.actualTime + `</span></p>-->
                                                        <!--<p style="margin-bottom: 10px !important;" class="text-muted text-truncate mb-0">Session Availability:  <span class="fw-semibold text-dark">`+ teamData.sessionCapacity + `</span></p>--></div>

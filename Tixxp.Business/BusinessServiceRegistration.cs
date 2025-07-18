@@ -27,6 +27,7 @@ using Tixxp.Business.Services.Abstract.RoleGroupRole;
 using Tixxp.Business.Services.Abstract.RoleService;
 using Tixxp.Business.Services.Abstract.SeasonalPrice;
 using Tixxp.Business.Services.Abstract.Session;
+using Tixxp.Business.Services.Abstract.SessionEventTicketPrice;
 using Tixxp.Business.Services.Abstract.TicketSubType;
 using Tixxp.Business.Services.Abstract.TicketType;
 using Tixxp.Business.Services.Concrete.Agency;
@@ -57,6 +58,7 @@ using Tixxp.Business.Services.Concrete.RoleGroupRole;
 using Tixxp.Business.Services.Concrete.RoleService;
 using Tixxp.Business.Services.Concrete.SeasonalPrice;
 using Tixxp.Business.Services.Concrete.Session;
+using Tixxp.Business.Services.Concrete.SessionEventTicketPrice;
 using Tixxp.Business.Services.Concrete.TicketSubType;
 using Tixxp.Business.Services.Concrete.TicketType;
 
@@ -90,6 +92,7 @@ namespace Tixxp.Business
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ISeasonalPriceService, SeasonalPriceService>();
             services.AddScoped<IEventTicketPriceService, EventTicketPriceService>();
+            services.AddScoped<ISessionEventTicketPriceService, SessionEventTicketPriceService>();
 
             services.AddScoped<ICounterService, CounterService>();
             services.AddScoped<IProductService, ProductService>();
