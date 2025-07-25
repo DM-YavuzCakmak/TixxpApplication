@@ -13,7 +13,7 @@
                         <i class="bi bi-person fs-24"></i>
                     </div>
                     <div>
-                        <h6 class="mb-0 fs-15 fw-semibold text-dark">
+                        <h6 class="mb-3 fs-15 fw-semibold text-dark">
                             @User.FindFirst("FirstName")?.Value @User.FindFirst("LastName")?.Value
                         </h6>
                     </div>
@@ -80,7 +80,6 @@
                     </li>
                 }
 
-                @* Tanımlamalar *@
                 <li class="slide has-sub">
                     <a href="javascript:void(0);" class="side-menu__item">
                         <i class="bx bx-cog side-menu__icon"></i>
@@ -118,12 +117,12 @@
                                     <i class="fe fe-chevron-right side-menu__angle"></i>
                                 </a>
                                 <ul class="slide-menu child1">
-                                    @if (User.IsInRole("TIXXP_ROLE_VIEW"))
+                                    @* @if (User.IsInRole("TIXXP_ROLE_VIEW"))
                                     {
                                         <li class="slide">
                                             <a href="/Role/Index" class="side-menu__item">Role</a>
                                         </li>
-                                    }
+                                    } *@
                                     @if (User.IsInRole("TIXXP_ROLE_GROUP_VIEW"))
                                     {
                                         <li class="slide">

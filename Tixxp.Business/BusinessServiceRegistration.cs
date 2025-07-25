@@ -28,6 +28,7 @@ using Tixxp.Business.Services.Abstract.RoleService;
 using Tixxp.Business.Services.Abstract.SeasonalPrice;
 using Tixxp.Business.Services.Abstract.Session;
 using Tixxp.Business.Services.Abstract.SessionEventTicketPrice;
+using Tixxp.Business.Services.Abstract.Template;
 using Tixxp.Business.Services.Abstract.TicketSubType;
 using Tixxp.Business.Services.Abstract.TicketType;
 using Tixxp.Business.Services.Concrete.Agency;
@@ -59,6 +60,7 @@ using Tixxp.Business.Services.Concrete.RoleService;
 using Tixxp.Business.Services.Concrete.SeasonalPrice;
 using Tixxp.Business.Services.Concrete.Session;
 using Tixxp.Business.Services.Concrete.SessionEventTicketPrice;
+using Tixxp.Business.Services.Concrete.Template;
 using Tixxp.Business.Services.Concrete.TicketSubType;
 using Tixxp.Business.Services.Concrete.TicketType;
 
@@ -102,6 +104,7 @@ namespace Tixxp.Business
             services.AddScoped<IProductSaleInvoiceInfoService, ProductSaleInvoiceInfoService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IGuideService, GuideService>();
+            services.AddScoped<ITemplateService, TemplateService>();
             return services;
         }
     }

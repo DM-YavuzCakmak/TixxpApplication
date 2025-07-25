@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tixxp.Business.Services.Abstract.RoleGroup;
+using Tixxp.Business.Services.Abstract.Template;
 using Tixxp.Entities.RoleGroup;
 
 namespace Tixxp.WebApp.Controllers
@@ -7,14 +8,19 @@ namespace Tixxp.WebApp.Controllers
     public class RoleGroupController : Controller
     {
         private readonly IRoleGroupService _roleGroupService;
+        private readonly ITemplateService _templateService;
 
-        public RoleGroupController(IRoleGroupService roleGroupService)
+        public RoleGroupController(IRoleGroupService roleGroupService, ITemplateService templateService)
         {
             _roleGroupService = roleGroupService;
+            _templateService = templateService;
         }
 
         public IActionResult Index()
         {
+            ViewBag.RoleGroupTemplates = _templateService.GetTemplateList(); 
+            ViewBag.AllRoles = _templateService.GetAllRoles();
+
             var result = _roleGroupService.GetList(x => !x.IsDeleted);
             return View(result.Data);
         }
@@ -57,6 +63,48 @@ namespace Tixxp.WebApp.Controllers
 
             var result = _roleGroupService.Update(existing.Data);
             return Json(new { success = result.Success, message = result.Message });
+        }
+
+        [HttpGet]
+        public IActionResult GetRoles(int templateId)
+        {
+            if (templateId <= 0)
+                return BadRequest("Geçersiz template ID.");
+
+            var roles = _templateService.GetRolesByTemplateId(templateId);
+            var result = roles.Select(r => new
+            {
+                id = r.Id,
+                name = r.Name
+            });
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public IActionResult GetAvailableRoleGroupName(string baseName)
+        {
+            if (string.IsNullOrWhiteSpace(baseName))
+                return BadRequest("Geçersiz isim.");
+
+            var existingNames = _roleGroupService
+                .GetList(x => !x.IsDeleted)
+                .Data
+                .Select(x => x.Name)
+                .ToList();
+
+            if (!existingNames.Contains(baseName))
+                return Json(baseName);
+
+            int counter = 1;
+            string newName;
+            do
+            {
+                newName = $"{baseName} {counter}";
+                counter++;
+            } while (existingNames.Contains(newName));
+
+            return Json(newName);
         }
 
         [HttpPost]

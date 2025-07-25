@@ -41,7 +41,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     // 🔥 Buraya ekliyoruz
     options.RequestCultureProviders = new List<IRequestCultureProvider>
     {
-        new QueryStringRequestCultureProvider(), // ?culture=tr-TR&ui-culture=tr-TR
+        new QueryStringRequestCultureProvider(), 
         new CookieRequestCultureProvider(),
         new AcceptLanguageHeaderRequestCultureProvider()
     };
@@ -82,6 +82,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 var app = builder.Build();
 var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
 app.UseRequestLocalization(localizationOptions);
+app.Use(async (context, next) =>
+{
+    var request = context.Request;
+    var culture = context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name;
+
+    if (request.Method == "GET" && !request.Query.ContainsKey("culture") && culture != null)
+    {
+        var query = request.QueryString.HasValue ? request.QueryString.Value + "&" : "?";
+        var newUrl = $"{request.Path}{query}culture={culture}&ui-culture={culture}";
+        context.Response.Redirect(newUrl);
+        return;
+    }
+
+    await next();
+}); ;
 
 // Middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();

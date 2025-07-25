@@ -1,4 +1,6 @@
-﻿@using Tixxp.Entities.RoleGroup
+﻿@using Tixxp.Business.DataTransferObjects.Template
+@using Tixxp.Entities.Role
+@using Tixxp.Entities.RoleGroup
 @model List<RoleGroupEntity>
 
 @{
@@ -12,7 +14,12 @@
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Role Group List</h1>
             @if (User.IsInRole("TIXXP_ROLE_GROUP_ADD"))
             {
-                <button class="btn btn-primary btn-sm" onclick="openEditRoleGroupModal(0)">+ New Role Group</button>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-primary btn-sm" onclick="openEditRoleGroupModal(0)">+ New Role Group</button>
+                    <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="right" title="Role Group Oluşturma Bilgisi" data-bs-content="İstersen boş bir Role Group oluşturup içine roller ekleyebilirsin. Ya da hazır bir şablon seçerek otomatik olarak rollerin gelmesini sağlayabilirsin.">
+                        <i class="bi bi-question-circle-fill text-info" style="cursor: pointer;"></i>
+                    </span>
+                </div>
             }
         </div>
 
@@ -60,7 +67,9 @@
                             }
                             else
                             {
-                                <tr><td colspan="2" class="text-center">Kayıt bulunamadı.</td></tr>
+                                <tr>
+                                    <td colspan="2" class="text-center">Kayıt bulunamadı.</td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -72,7 +81,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="editRoleGroupModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light">
                 <h5 class="modal-title">Edit Role Group</h5>
@@ -85,7 +94,35 @@
                         <label>Role Group Name</label>
                         <input type="text" class="form-control" id="roleGroupName" name="Name" required />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Save</button>
+
+                    <div class="mb-3">
+                        <label>Hazır Şablon Seç (Opsiyonel)</label>
+                        <select id="templateSelect" class="form-select">
+                            <option value="">Şablon Seçin</option>
+                            @foreach (var template in ViewBag.RoleGroupTemplates as List<RoleGroupTemplateDto>)
+                            {
+                                <option value="@template.Id">@template.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Mevcut Roller</h6>
+                            <ul id="availableRoles" class="list-group connectedSortable" style="min-height:200px;">
+                                @foreach (var role in ViewBag.AllRoles as List<RoleEntity>)
+                                {
+                                    <li class="list-group-item" data-id="@role.Id">@role.Name</li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Gruba Eklenecek Roller</h6>
+                            <ul id="selectedRoles" class="list-group connectedSortable bg-light" style="min-height:200px;"></ul>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mt-4">Kaydet</button>
                 </form>
             </div>
         </div>
@@ -93,34 +130,82 @@
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
     <script>
+        $(function () {
+            $(".connectedSortable").sortable({
+                connectWith: ".connectedSortable",
+                placeholder: "ui-state-highlight"
+            }).disableSelection();
+
+            // Bootstrap popover aktif et
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+        });
+
         function openEditRoleGroupModal(id) {
             const modal = $('#editRoleGroupModal');
             const form = $('#editRoleGroupForm');
 
+            form[0].reset();
+            $('#selectedRoles').empty();
+
             if (id === 0) {
-                form[0].reset();
                 $('#roleGroupId').val(0);
-                modal.find('.modal-title').text('Add Role Group');
+                modal.find('.modal-title').text('Yeni Role Group');
                 modal.modal('show');
                 return;
             }
 
-            $.get('/RoleGroup/GetById', { id: id }, function (data) {
+            $.get('/RoleGroup/GetByIdWithRoles', { id: id }, function (data) {
                 $('#roleGroupId').val(data.id);
                 $('#roleGroupName').val(data.name);
-                modal.find('.modal-title').text('Edit Role Group');
+
+                let selected = "";
+                data.roles.forEach(role => {
+                    selected += `<li class="list-group-item" data-id="${role.id}">${role.name}</li>`;
+                });
+                $('#selectedRoles').html(selected);
+                modal.find('.modal-title').text('Role Group Güncelle');
                 modal.modal('show');
             }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
         }
+
+        $('#templateSelect').change(function () {
+            const id = $(this).val();
+            if (!id) return;
+
+            $.get('/RoleGroup/GetAvailableRoleGroupName', { baseName: $("#templateSelect option:selected").text() }, function (name) {
+                $('#roleGroupName').val(name);
+            });
+
+            $.get('/RoleGroup/GetRoles', { templateId: id }, function (roles) {
+                let existingIds = $('#selectedRoles li').map(function () {
+                    return $(this).data('id');
+                }).get();
+
+                roles.forEach(r => {
+                    if (!existingIds.includes(r.id)) {
+                        $('#selectedRoles').append(`<li class="list-group-item" data-id="${r.id}">${r.name}</li>`);
+                    }
+                });
+            });
+        });
 
         $('#editRoleGroupForm').submit(function (e) {
             e.preventDefault();
 
             const id = Number($('#roleGroupId').val());
+            const roleIds = $('#selectedRoles li').map(function () {
+                return $(this).data('id');
+            }).get();
+
             const data = {
                 Id: id,
-                Name: $('#roleGroupName').val()
+                Name: $('#roleGroupName').val(),
+                RoleIds: roleIds
             };
 
             const url = id === 0 ? '/RoleGroup/Create' : '/RoleGroup/Update';
@@ -144,7 +229,7 @@
         function confirmDeleteRoleGroup(id) {
             Swal.fire({
                 title: 'Emin misiniz?',
-                text: "Bu Role Group silmek üzeresiniz.",
+                text: "Bu Role Group silinecek.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Evet, sil!',

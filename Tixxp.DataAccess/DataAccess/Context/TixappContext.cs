@@ -8,6 +8,8 @@ using Tixxp.Entities.EventTicketPrice;
 using Tixxp.Entities.Guide;
 using Tixxp.Entities.InvoiceType;
 using Tixxp.Entities.Language;
+using Tixxp.Entities.PersonnelRole;
+using Tixxp.Entities.PersonnelRoleGroup;
 using Tixxp.Entities.PriceCategory;
 using Tixxp.Entities.Product;
 using Tixxp.Entities.ProductPrice;
@@ -16,11 +18,15 @@ using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.Entities.ProductSaleInvoiceInfo;
 using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
+using Tixxp.Entities.RoleGroup;
+using Tixxp.Entities.RoleGroupRole;
 using Tixxp.Entities.SeasonalPrice;
 using Tixxp.Entities.Session;
 using Tixxp.Entities.SessionEventTicketPrice;
 using Tixxp.Entities.TicketSubType;
 using Tixxp.Entities.TicketType;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PersonnelRole;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroupRole;
 
 namespace Tixxp.Infrastructure.DataAccess.Context
 {
@@ -36,6 +42,18 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<PersonnelRoleGroupEntity>(entity =>
+            {
+                entity.ToTable("PersonnelRoleGroup", _schema);
+            });
+            modelBuilder.Entity<RoleGroupRoleEntity>(entity =>
+            {
+                entity.ToTable("RoleGroupRole", _schema);
+            });
+            modelBuilder.Entity<RoleGroupEntity>(entity =>
+            {
+                entity.ToTable("RoleGroup", _schema);
+            });
             modelBuilder.Entity<SessionEventTicketPriceEntity>(entity =>
             {
                 entity.ToTable("SessionEventTicketPrice", _schema);
@@ -130,6 +148,8 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<CounterEntity> Counters { get; set; }
         public DbSet<LanguageEntity> Languages { get; set; }
         public DbSet<ProductTranslationEntity> ProductTranslations { get; set; }
+        public DbSet<RoleGroupRoleEntity> RoleGroupRoles { get; set; }
+        public DbSet<RoleGroupEntity> RoleGroups { get; set; }
         public DbSet<EventTicketPriceEntity> EventTicketPrices { get; set; }
         public DbSet<CurrencyTypeEntity> CurrencyTypes { get; set; }
         public DbSet<InvoiceTypeEntity> InvoiceTypes { get; set; }

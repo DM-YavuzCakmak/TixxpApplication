@@ -5,9 +5,9 @@ using Tixxp.Infrastructure.DataAccess.Context;
 
 namespace Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroupRole;
 
-public class RoleGroupRoleRepository : EfEntityRepositoryBase<RoleGroupRoleEntity, CommonDbContext>, IRoleGroupRoleRepository
+public class RoleGroupRoleRepository : EfEntityRepositoryBase<RoleGroupRoleEntity, TixappContext>, IRoleGroupRoleRepository
 {
-    public RoleGroupRoleRepository(CommonDbContext context) : base(context)
+    public RoleGroupRoleRepository(TixappContext context) : base(context)
     {
     }
 }

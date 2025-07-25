@@ -1,36 +1,39 @@
-﻿using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Win32;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Tixxp.Business.DataTransferObjects.Personnel.Login;
+using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Concrete.Base;
+using Tixxp.Business.Services.Concrete.PersonnelRoleService;
 using Tixxp.Core.Utilities.Constants.SchemaConstant;
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Core.Utilities.Results.Concrete;
 using Tixxp.Entities.Personnel;
 using Tixxp.Infrastructure.DataAccess.Abstract.Personnel;
-using Tixxp.Infrastructure.DataAccess.Abstract.PersonnelRole;
+using Tixxp.Infrastructure.DataAccess.Abstract.Role;
 
 namespace Tixxp.Business.Services.Concrete.PersonnelService;
 
 public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
 {
     private readonly IPersonnelRepository _personnelRepository;
-    private readonly IPersonnelRoleRepository _personnelRoleRepository;
+    private readonly IPersonnelRoleService _personnelRoleService;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-
-    public PersonnelService(IPersonnelRepository personnelRepository, IPersonnelRoleRepository personnelRoleRepository, IHttpContextAccessor httpContextAccessor)
+    public PersonnelService(
+        IPersonnelRepository personnelRepository,
+        IHttpContextAccessor httpContextAccessor,
+        IPersonnelRoleService personnelRoleService)
         : base(personnelRepository)
     {
         _personnelRepository = personnelRepository;
-        _personnelRoleRepository = personnelRoleRepository;
         _httpContextAccessor = httpContextAccessor;
+        _personnelRoleService = personnelRoleService;
     }
 
     public async Task<IDataResult<LoginResponseDto>> Login(LoginRequestDto loginRequestDto)
@@ -48,13 +51,25 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         if (user.Password != computedHash)
             return new ErrorDataResult<LoginResponseDto>("Şifre hatalı.");
 
-        // ✅ Kullanıcının rollerini çek
-        var personnelRoles = _personnelRoleRepository
-            .GetListWithInclude(x => x.PersonnelId == user.Id && x.IsDeleted == false, x => x.Role)
-            .Select(x => x.Role?.Name)
-            .ToList();
+        var claims = GenerateBaseClaims(user);
 
-        // ✅ Claims oluştur
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        await _httpContextAccessor.HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            new AuthenticationProperties { IsPersistent = false });
+
+        return new SuccessDataResult<LoginResponseDto>(new LoginResponseDto
+        {
+            Success = true,
+            Message = "Giriş başarılı."
+        }, "Giriş başarılı.");
+    }
+
+    private List<Claim> GenerateBaseClaims(PersonnelEntity user)
+    {
         var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -65,57 +80,40 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         new Claim("CompanyIdentifier", user.CompanyIdentifier ?? SchemaConstant.Default)
     };
 
-        if (personnelRoles.Any())
+        var personnelRolesResult = _personnelRoleService
+           .GetListWithInclude(x => x.PersonnelId == user.Id && !x.IsDeleted, query => query.Role );
+
+        var personnelRoles = personnelRolesResult?.Data?.ToList() ?? new();
+
+        foreach (var role in personnelRoles.Select(x => x.Role).Where(r => r != null))
         {
-            foreach (var role in personnelRoles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.Add(new Claim(ClaimTypes.Role, role.Name));
         }
 
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-
-        // ✅ Cookie ile oturum başlat
-        await _httpContextAccessor.HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal,
-            new AuthenticationProperties
-            {
-                IsPersistent = false
-            });
-
-        var loginResponseDto = new LoginResponseDto
-        {
-            Success = true,
-            Message = "Giriş başarılı."
-        };
-
-        return new SuccessDataResult<LoginResponseDto>(loginResponseDto, "Giriş başarılı.");
+        return claims;
     }
 
 
-    #region Test
+    #region Register & Hash
+
     public IResult Register(LoginRequestDto loginRequestDto)
     {
-        var existing = _personnelRepository.Get(x => x.Email == loginRequestDto.Email && x.IsActive);
-        if (existing != null)
+        var existingUser = _personnelRepository.Get(x => x.Email == loginRequestDto.Email && x.IsActive);
+        if (existingUser != null)
             return new ErrorResult("Bu e-posta adresi zaten kayıtlı.");
 
-        // Salt üret
         var saltBytes = GenerateSalt();
         var saltBase64 = Convert.ToBase64String(saltBytes);
+        var hashedPassword = GenerateSha256Hash(saltBytes, loginRequestDto.Password);
 
-        var hash = GenerateSha256Hash(saltBytes, loginRequestDto.Password);
-
-        var personnel = new PersonnelEntity
+        var newPersonnel = new PersonnelEntity
         {
             FirstName = loginRequestDto.Email,
             LastName = loginRequestDto.Email,
             Email = loginRequestDto.Email,
             UserName = loginRequestDto.Email,
-            Password = hash,   // <- Girişte karşılaştırılacak asıl hash burasıdır
-            Salt = saltBase64, // <- Giriş sırasında tekrar hashlemek için gerekecek
+            Password = hashedPassword,
+            Salt = saltBase64,
             IsActive = true,
             IsDeleted = false,
             LoginType = 1,
@@ -123,8 +121,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
             Created_Date = DateTime.Now
         };
 
-        _personnelRepository.Add(personnel);
-
+        _personnelRepository.Add(newPersonnel);
         return new SuccessResult("Kayıt başarılı.");
     }
 
@@ -145,5 +142,6 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         var hashBytes = sha256.ComputeHash(combinedBytes);
         return Convert.ToBase64String(hashBytes);
     }
+
     #endregion
 }
