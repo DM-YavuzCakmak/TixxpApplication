@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using System.Security.Claims;
+using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Abstract.Product;
 using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
+using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Abstract.RoleService;
 using Tixxp.Entities.Personnel;
 
@@ -22,6 +25,8 @@ public class HomeController : Controller
     private readonly IProductSaleService _productSaleService;
     private readonly IProductPriceService _productPriceService;
     private readonly IProductSaleDetailService _productSaleDetailService;
+    private readonly IProductTranslationService _productTranslationService;
+    private readonly ILanguageService _languageService;
 
     public HomeController(
         IPersonnelService personnelService,
@@ -30,7 +35,9 @@ public class HomeController : Controller
         IProductService productService,
         IProductPriceService productPriceService,
         IPersonnelRoleService personnelRoleService,
-        IRoleService roleService)
+        IRoleService roleService,
+        IProductTranslationService productTranslationService,
+        ILanguageService languageService)
     {
         _personnelService = personnelService;
         _productSaleService = productSaleService;
@@ -39,6 +46,8 @@ public class HomeController : Controller
         _productPriceService = productPriceService;
         _personnelRoleService = personnelRoleService;
         _roleService = roleService;
+        _productTranslationService = productTranslationService;
+        _languageService = languageService;
     }
 
     public async Task<IActionResult> Index()
@@ -52,16 +61,20 @@ public class HomeController : Controller
         long personnelId = Convert.ToInt64(personnelIdClaim.Value);
         string companyIdentifier = companyIdentifierClaim.Value;
 
+        // Aktif dilin ID'si alınır
+        var cultureCode = CultureInfo.CurrentUICulture.Name;
+        var languageResult = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+        long? languageId = languageResult.Success ? languageResult.Data?.Id : null;
+
         var personnelResult = _personnelService.GetById(personnelId);
         if (!personnelResult.Success || personnelResult.Data == null)
             return RedirectToAction("Login", "Authorization");
 
         ViewBag.CurrentUser = personnelResult.Data;
 
-
         var personnelList = _personnelService
-                .GetList(x => x.CompanyIdentifier == companyIdentifier && x.Id != personnelId && !x.IsDeleted)
-                .Data?.ToList() ?? new();
+            .GetList(x => x.CompanyIdentifier == companyIdentifier && x.Id != personnelId && !x.IsDeleted)
+            .Data?.ToList() ?? new();
         ViewBag.PersonnelList = personnelList;
 
         #region Gişe Satışları
@@ -74,7 +87,6 @@ public class HomeController : Controller
                 CounterName = g.Key,
                 TotalSales = g.Count()
             }).ToList();
-
         ViewBag.CounterSales = salesGroupedByCounter;
         #endregion
 
@@ -109,7 +121,6 @@ public class HomeController : Controller
             x.TotalSales,
             Percent = maxSales > 0 ? (int)Math.Round((double)x.TotalSales / maxSales * 100) : 0
         }).ToList();
-
         ViewBag.DailySellers = dailySellers;
         #endregion
 
@@ -117,9 +128,13 @@ public class HomeController : Controller
         var salesList = _productSaleService.GetList(x => x.Status == 1).Data;
         var saleIds = salesList.Select(x => x.Id).ToList();
         var saleDetails = _productSaleDetailService.GetList(x => saleIds.Contains(x.ProductSaleId)).Data;
+
         var productIds = saleDetails.Select(x => x.ProductId).Distinct().ToList();
+        var productTranslations = _productTranslationService
+            .GetList(x => productIds.Contains(x.ProductId) && x.LanguageId == languageId).Data;
         var products = _productService.GetList(x => productIds.Contains(x.Id)).Data;
         var prices = _productPriceService.GetList(x => productIds.Contains(x.ProductId)).Data;
+
         var salePersonnelIds = salesList.Select(x => x.CreatedBy).Distinct().ToList();
         var salePersonnel = _personnelService.GetList(x => salePersonnelIds.Contains(x.Id)).Data;
 
@@ -134,10 +149,14 @@ public class HomeController : Controller
             foreach (var d in detailItems)
             {
                 var product = products.FirstOrDefault(p => p.Id == d.ProductId);
+                var translation = productTranslations.FirstOrDefault(t => t.ProductId == d.ProductId);
+                var productName = translation?.Name ?? product?.Code;
+
                 var price = prices.FirstOrDefault(pr => pr.ProductId == d.ProductId);
                 var linePrice = (price?.Price ?? 240) * d.Quantity;
                 totalPrice += linePrice;
-                // detailHtml += $"<div><strong>{product?.Name}</strong> x {d.Quantity}</div>";
+
+                detailHtml += $"<div><strong>{productName}</strong> x {d.Quantity}</div>";
             }
 
             return new
