@@ -18,6 +18,7 @@ public class RoleGroupRoleEntity : BaseEntity
     [ForeignKey(nameof(RoleGroupId))]
     public virtual RoleGroupEntity RoleGroup { get; set; }
 
-    [ForeignKey(nameof(RoleId))]
+    [NotMapped]
     public virtual RoleEntity Role { get; set; }
+
 }

@@ -28,11 +28,38 @@ namespace Tixxp.WebApp.Controllers
 
         public IActionResult Index()
         {
-            List<RoleGroupRoleEntity> roleGroupRoleEntities = _roleGroupRoleService
-                .GetListWithInclude(x => !x.IsDeleted, a => a.RoleGroup, b => b.Role)
-                .Data;
+            // 1. RoleGroupRole listesi
+            var roleGroupRoles = _roleGroupRoleService
+                .GetList(x => !x.IsDeleted).Data ?? new List<RoleGroupRoleEntity>();
 
-            return View(roleGroupRoleEntities);
+            // 2. Role'leri çek
+            var roleIds = roleGroupRoles
+                .Where(x => x.RoleId != null)
+                .Select(x => x.RoleId)
+                .Distinct()
+                .ToList();
+
+            var roles = _roleService
+                .GetList(x => roleIds.Contains(x.Id)).Data ?? new List<RoleEntity>();
+
+            // 3. RoleGroup'ları çek
+            var roleGroupIds = roleGroupRoles
+                .Where(x => x.RoleGroupId != null)
+                .Select(x => x.RoleGroupId)
+                .Distinct()
+                .ToList();
+
+            var roleGroups = _roleGroupService
+                .GetList(x => roleGroupIds.Contains(x.Id)).Data ?? new List<RoleGroupEntity>();
+
+            // 4. Eşlemeleri yap
+            foreach (var item in roleGroupRoles)
+            {
+                item.Role = roles.FirstOrDefault(r => r.Id == item.RoleId);
+                item.RoleGroup = roleGroups.FirstOrDefault(g => g.Id == item.RoleGroupId);
+            }
+
+            return View(roleGroupRoles);
         }
 
         [HttpGet]
