@@ -177,10 +177,10 @@ chart.render();
 // for saless Statistics
 var options = {
 	series: [{
-		name: "Price",
+		name: "Number Of Ticket",
 		data: [20, 58, 38, 72, 55, 63, 43, 76, 55, 80, 40, 80]
 	}, {
-		name: "Volume",
+		name: "Amount",
 		data: [65, 45, 75, 38, 85, 35, 62, 40, 40, 64, 50, 89]
 	}],
 	chart: {
@@ -262,7 +262,7 @@ function salesStatistics() {
 // Leads By Source Chart
 var options = {
     series: [{
-        name: 'Sessions',
+        name: 'Number Of Reservation',
         data: [450, 780, 550, 940, 1100, 1200, 1380,500,730, 800, 1000,402,500]
     }],
     chart: {

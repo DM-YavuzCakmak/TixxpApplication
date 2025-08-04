@@ -138,8 +138,8 @@
   <data name="home.INDEX.ORDER.NO" xml:space="preserve">
     <value>Order No</value>
   </data>
-  <data name="home.INDEX.ORDERS" xml:space="preserve">
-    <value>Orders</value>
+  <data name="home.INDEX.MONTHLY.OF.RESERVATION" xml:space="preserve">
+    <value>Number of Monthly Reservations</value>
   </data>
   <data name="home.INDEX.PAYMENT.PLACE" xml:space="preserve">
     <value>Payment Place</value>
@@ -167,5 +167,20 @@
   </data>
   <data name="home.INDEX.USERS" xml:space="preserve">
     <value>Users</value>
+  </data>
+  <data name="home.INDEX.DAILY.NUMBER.RESERVATION" xml:space="preserve">
+    <value>Number of Daily Reservations</value>
+  </data>
+  <data name="home.INDEX.MONTHLY.OF.TICKETS" xml:space="preserve">
+    <value>Number of Monthly Tickets</value>
+  </data>
+  <data name="home.INDEX.DAILY.OF.TICKETS" xml:space="preserve">
+    <value>Number of Daily Tickets</value>
+  </data>
+  <data name="home.INDEX.SALES.GROWTH" xml:space="preserve">
+    <value>Sales Growth</value>
+  </data>
+  <data name="home.INDEX.ORDERS.STATISTICS" xml:space="preserve">
+    <value>Order Statistics</value>
   </data>
 </root>

@@ -138,8 +138,8 @@
   <data name="home.INDEX.ORDER.NO" xml:space="preserve">
     <value>Sipariş No</value>
   </data>
-  <data name="home.INDEX.ORDERS" xml:space="preserve">
-    <value>Siparişler</value>
+  <data name="home.INDEX.MONTHLY.OF.RESERVATION" xml:space="preserve">
+    <value>Aylık Rezervasyon Sayısı</value>
   </data>
   <data name="home.INDEX.PAYMENT.PLACE" xml:space="preserve">
     <value>Ödeme Yeri</value>
@@ -167,5 +167,20 @@
   </data>
   <data name="home.INDEX.USERS" xml:space="preserve">
     <value>Kullanıcılar</value>
+  </data>
+  <data name="home.INDEX.DAILY.NUMBER.RESERVATION" xml:space="preserve">
+    <value>Günlük Rezervasyon Sayısı</value>
+  </data>
+  <data name="home.INDEX.MONTHLY.OF.TICKETS" xml:space="preserve">
+    <value>Aylık Bilet Sayısı</value>
+  </data>
+  <data name="home.INDEX.DAILY.OF.TICKETS" xml:space="preserve">
+    <value>Günlük Bilet Sayısı</value>
+  </data>
+  <data name="home.INDEX.SALES.GROWTH" xml:space="preserve">
+    <value>Satış Hacmi</value>
+  </data>
+  <data name="home.INDEX.ORDERS.STATISTICS" xml:space="preserve">
+    <value>Sipariş İstatistikleri</value>
   </data>
 </root>
