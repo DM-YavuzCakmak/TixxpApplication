@@ -148,7 +148,7 @@
     <value>Ürün Satışları</value>
   </data>
   <data name="home.INDEX.PRODUCT_DETAIL" xml:space="preserve">
-    <value>Ürün Detayı</value>
+    <value>Detay</value>
   </data>
   <data name="home.INDEX.SALES" xml:space="preserve">
     <value>Satışlar</value>
@@ -182,5 +182,14 @@
   </data>
   <data name="home.INDEX.ORDERS.STATISTICS" xml:space="preserve">
     <value>Sipariş İstatistikleri</value>
+  </data>
+  <data name="home.INDEX.MONTHLY_PRODUCT_SELLERS" xml:space="preserve">
+    <value>Aylık Ürün Satışı Yapanlar</value>
+  </data>
+  <data name="home.INDEX.DAILY_RESERVATION_SELLERS" xml:space="preserve">
+    <value>Günlük Rezervasyon Satışı Yapanlar</value>
+  </data>
+  <data name="home.INDEX.MONTHLY_RESERVATION_SELLERS" xml:space="preserve">
+    <value>Aylık Rezervasyon Satışı Yapanlar</value>
   </data>
 </root>

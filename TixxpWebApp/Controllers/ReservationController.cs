@@ -93,7 +93,5 @@ namespace Tixxp.WebApp.Controllers
             var updateResult = _reservationService.Update(result.Data);
             return Json(new { success = updateResult.Success, message = updateResult.Message });
         }
-
-
     }
 }

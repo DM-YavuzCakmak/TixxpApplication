@@ -6,7 +6,7 @@ var options = {
         type: "radialBar",
     },
 
-    series: [68],
+    series: [11],
     colors: ["#b50d05"],
     plotOptions: {
         radialBar: {
@@ -50,7 +50,7 @@ var options = {
         type: "radialBar",
     },
 
-    series: [68],
+    series: [11],
     colors: ["#0a7326"],
     plotOptions: {
         radialBar: {
@@ -94,7 +94,7 @@ var options = {
         type: "radialBar",
     },
 
-    series: [68],
+    series: [11],
     colors: ["#da4a25"],
     plotOptions: {
         radialBar: {
@@ -138,7 +138,7 @@ var options = {
         type: "radialBar",
     },
 
-    series: [68],
+    series: [11],
     colors: ["#3578d5"],
     plotOptions: {
         radialBar: {

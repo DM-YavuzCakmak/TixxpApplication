@@ -148,7 +148,7 @@
     <value>Product Sales</value>
   </data>
   <data name="home.INDEX.PRODUCT_DETAIL" xml:space="preserve">
-    <value>Product Detail</value>
+    <value>Detail</value>
   </data>
   <data name="home.INDEX.SALES" xml:space="preserve">
     <value>Sales</value>
@@ -182,5 +182,14 @@
   </data>
   <data name="home.INDEX.ORDERS.STATISTICS" xml:space="preserve">
     <value>Order Statistics</value>
+  </data>
+  <data name="home.INDEX.MONTHLY_PRODUCT_SELLERS" xml:space="preserve">
+    <value>Monthly Product Sellers</value>
+  </data>
+  <data name="home.INDEX.DAILY_RESERVATION_SELLERS" xml:space="preserve">
+    <value>Daily Reservation Sellers</value>
+  </data>
+  <data name="home.INDEX.MONTHLY_RESERVATION_SELLERS" xml:space="preserve">
+    <value>Monthly Reservation Sellers</value>
   </data>
 </root>
