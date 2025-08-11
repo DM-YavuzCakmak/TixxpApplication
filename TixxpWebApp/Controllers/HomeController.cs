@@ -169,7 +169,77 @@ public class HomeController : Controller
         #endregion
 
 
+        #region Günlük Rezervasyon Yapan Personeller
+        var todayReservations = _reservationService.GetList(x => x.StatusId == 1 && x.Created_Date.Date == today).Data;
+        var todayReservationPersonnelIds = todayReservations.Where(x => x.CreatedBy != null).Select(x => x.CreatedBy).Distinct().ToList();
+        var todayReservationPersonnelList = _personnelService.GetList(x => todayReservationPersonnelIds.Contains(x.Id)).Data;
 
+        var groupedDailyRes = todayReservations.GroupBy(r => r.CreatedBy).Select(g =>
+        {
+            var personnel = todayReservationPersonnelList.FirstOrDefault(p => p.Id == g.Key);
+            return new
+            {
+                Id = g.Key,
+                FirstName = personnel?.FirstName ?? "Bilinmiyor",
+                LastName = personnel?.LastName ?? "",
+                ProfilePhotoPath = personnel?.ProfilePhotoPath ?? "/assets/images/faces/default.jpg",
+                Date = today,
+                TotalSales = g.Count()
+            };
+        }).ToList();
+
+        var maxDailyRes = groupedDailyRes.Any() ? groupedDailyRes.Max(x => x.TotalSales) : 0;
+        var dailyReservationSellers = groupedDailyRes.Select(x => new
+        {
+            x.Id,
+            x.FirstName,
+            x.LastName,
+            x.ProfilePhotoPath,
+            x.Date,
+            x.TotalSales,
+            Percent = maxDailyRes > 0 ? (int)Math.Round((double)x.TotalSales / maxDailyRes * 100) : 0
+        }).ToList();
+
+        ViewBag.DailyReservationSellers = dailyReservationSellers;
+        #endregion
+
+        #region Aylık Rezervasyon Yapan Personeller
+        var monthlyReservations = _reservationService
+            .GetList(x => x.StatusId == 1 &&
+                          x.Created_Date.Year == now.Year &&
+                          x.Created_Date.Month == now.Month).Data;
+
+        var monthlyReservationPersonnelIds = monthlyReservations.Where(x => x.CreatedBy != null).Select(x => x.CreatedBy).Distinct().ToList();
+        var monthlyReservationPersonnelList = _personnelService.GetList(x => monthlyReservationPersonnelIds.Contains(x.Id)).Data;
+
+        var groupedMonthlyRes = monthlyReservations.GroupBy(r => r.CreatedBy).Select(g =>
+        {
+            var personnel = monthlyReservationPersonnelList.FirstOrDefault(p => p.Id == g.Key);
+            return new
+            {
+                Id = g.Key,
+                FirstName = personnel?.FirstName ?? "Bilinmiyor",
+                LastName = personnel?.LastName ?? "",
+                ProfilePhotoPath = personnel?.ProfilePhotoPath ?? "/assets/images/faces/default.jpg",
+                Date = now,
+                TotalSales = g.Count()
+            };
+        }).ToList();
+
+        var maxMonthlyRes = groupedMonthlyRes.Any() ? groupedMonthlyRes.Max(x => x.TotalSales) : 0;
+        var monthlyReservationSellers = groupedMonthlyRes.Select(x => new
+        {
+            x.Id,
+            x.FirstName,
+            x.LastName,
+            x.ProfilePhotoPath,
+            x.Date,
+            x.TotalSales,
+            Percent = maxMonthlyRes > 0 ? (int)Math.Round((double)x.TotalSales / maxMonthlyRes * 100) : 0
+        }).ToList();
+
+        ViewBag.MonthlyReservationSellers = monthlyReservationSellers;
+        #endregion
 
 
         #region İstatistikler için tarih verileri

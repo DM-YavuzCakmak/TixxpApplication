@@ -33,11 +33,8 @@
                         <ul class="slide-menu child1">
                             @if (User.IsInRole("TIXXP_PRODUCT_SALE"))
                             {
-                                <li class="slide has-sub">
-                                    <a href="#" class="side-menu__item"> Product Sale<i class="fe fe-chevron-right side-menu__angle"></i></a>
-                                    <ul class="slide-menu child2">
-                                        <li class="slide"><a href="/ProductSale/Index" class="side-menu__item">Counter Sale</a></li>
-                                    </ul>
+                                <li class="slide">
+                                    <a href="/ProductSale/Index" class="side-menu__item">Product Sale</a>
                                 </li>
                             }
                             @if (User.IsInRole("TIXXP_TICKET_SALE_BOOTH") || User.IsInRole("TIXXP_TICKET_SALE_WEB"))
