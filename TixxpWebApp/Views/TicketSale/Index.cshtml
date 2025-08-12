@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer;
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -7,7 +9,7 @@
 
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Buy Ticket</h1>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["ticketSale.INDEX.SELL_TICKET"]</h1>
         </div>
 
         <div class="card custom-card">
@@ -15,16 +17,16 @@
                 <!-- Tabs -->
                 <ul class="nav nav-tabs tab-style-2 border-bottom" id="tabNavigation" role="tablist">
                     <li class="nav-item">
-                        <button class="nav-link active" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-pane" type="button" role="tab">Event</button>
+                        <button class="nav-link active" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.EVENT"]</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="date-tab" data-bs-toggle="tab" data-bs-target="#date-pane" type="button" role="tab">Date</button>
+                        <button class="nav-link" id="date-tab" data-bs-toggle="tab" data-bs-target="#date-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.DATE"]</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail-pane" type="button" role="tab">Details</button>
+                        <button class="nav-link" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.DETAILS"]</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="confirmation-tab" data-bs-toggle="tab" data-bs-target="#confirmation-pane" type="button" role="tab">Confirmation</button>
+                        <button class="nav-link" id="confirmation-tab" data-bs-toggle="tab" data-bs-target="#confirmation-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.CONFIRMATION"]</button>
                     </li>
                 </ul>
 
@@ -202,8 +204,7 @@ Purchased tickets are valid for 15 days from the event start date. No refunds.
             qty = Math.max(0, qty + amount);
             qtyInput.value = qty;
             updatePrice();
-        }
-        // Dummy event and session data
+        }   
         const dummyEvents = [
             { id: "1", name: "Kariye Camii", startTime: "10:00", endTime: "18:00", imagePath: "images/product/chora.jpeg" },
         ];
@@ -229,7 +230,7 @@ Purchased tickets are valid for 15 days from the event start date. No refunds.
                             <img src="/assets/${event.imagePath}" class="card-img-top" style="height: 200px; object-fit: cover;">
                             <div class="card-body text-center">
                                 <h5>${event.name}</h5>
-                                <p>Start: ${event.startTime} - End: ${event.endTime}</p>
+                                <p>@Localizer["ticketSale.INDEX.START"]: ${event.startTime} - @Localizer["ticketSale.INDEX.END"]: ${event.endTime}</p>
                                 <button class="btn btn-primary" onclick="goToDateTab()">View Dates</button>
                             </div>
                         </div>
