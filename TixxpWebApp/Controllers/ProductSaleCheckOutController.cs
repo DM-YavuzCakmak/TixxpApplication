@@ -1,124 +1,140 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Tixxp.Business.Services.Abstract.InvoiceType;
+using System.Globalization;
+using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
-using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
+using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Extension;
-using Tixxp.Entities.InvoiceType;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
-using Tixxp.Entities.ProductSaleInvoiceInfo;
 using Tixxp.WebApp.Models.ProductSaleCheckOut;
 
 namespace Tixxp.WebApp.Controllers
 {
     public class ProductSaleCheckOutController : Controller
     {
-        private readonly IInvoiceTypeService _invoiceTypeService;
         private readonly IProductSaleService _productSaleService;
+        private readonly IProductTranslationService _productTranslationService;
+        private readonly ILanguageService _languageService;
         private readonly IProductPriceService _productPriceService;
         private readonly IProductSaleDetailService _productSaleDetailService;
-        private readonly IProductSaleInvoiceInfoService _productSaleInvoiceInfoService;
+        private readonly IStringLocalizer<ProductSaleCheckOutController> _stringLocalizer;
 
         private const long DefaultCounterId = 1;
 
-        private readonly IStringLocalizer<ProductSaleCheckOutController> _stringLocalizer;
-
         public ProductSaleCheckOutController(
-            IInvoiceTypeService invoiceTypeService,
             IProductSaleService productSaleService,
             IProductSaleDetailService productSaleDetailService,
-            IProductSaleInvoiceInfoService productSaleInvoiceInfoService,
             IProductPriceService productPriceService,
-            IStringLocalizer<ProductSaleCheckOutController> stringLocalizer)
+            IStringLocalizer<ProductSaleCheckOutController> stringLocalizer,
+            IProductTranslationService productTranslationService,
+            ILanguageService languageService)
         {
-            _invoiceTypeService = invoiceTypeService;
             _productSaleService = productSaleService;
             _productSaleDetailService = productSaleDetailService;
-            _productSaleInvoiceInfoService = productSaleInvoiceInfoService;
             _productPriceService = productPriceService;
             _stringLocalizer = stringLocalizer;
+            _productTranslationService = productTranslationService;
+            _languageService = languageService;
         }
+
 
         public IActionResult Index(long productSaleId)
         {
-            var invoiceTypesResult = _invoiceTypeService.GetAll();
-            ViewBag.InvoiceTypes = invoiceTypesResult.Success
-                ? invoiceTypesResult.Data
-                : new List<InvoiceTypeEntity>();
+            if (productSaleId <= 0)
+                return RedirectToAction("Index", "ProductSale");
 
+            ViewBag.ProductSaleId = productSaleId;
             return View();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOrderSummary(long productSaleId)
+        public IActionResult GetOrderSummary(long productSaleId)
         {
-            var summaries = new List<ProductSaleSummaryDto>();
+            if (productSaleId <= 0)
+                return Ok(Enumerable.Empty<ProductSaleSummaryDto>());
 
+            // Geçerli dil bilgisi
+            var cultureCode = CultureInfo.CurrentUICulture.Name;
+            var languageResult = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+            var languageId = languageResult.Success ? languageResult.Data?.Id : null;
+
+            // Satış detaylarını (ürün dahil) tek seferde al
             var saleDetailsResult = _productSaleDetailService
-                .GetListWithInclude(x => x.ProductSaleId == productSaleId, x => x.Product);
+                .GetListWithInclude(x => x.ProductSaleId == productSaleId, x => x.Product, a => a.CurrencyType);
 
-            if (saleDetailsResult.Success)
+            if (!saleDetailsResult.Success || saleDetailsResult.Data == null || saleDetailsResult.Data.Count == 0)
+                return Ok(Enumerable.Empty<ProductSaleSummaryDto>());
+
+            var details = saleDetailsResult.Data;
+
+            // Tekil ürün Id listesi
+            var productIds = details
+                .Where(d => d.ProductId > 0)
+                .Select(d => d.ProductId)
+                .Distinct()
+                .ToList();
+
+            // Toplu çeviri (varsa)
+            var translationByProductId = new Dictionary<long, string>();
+            if (languageId.HasValue)
             {
-                foreach (var detail in saleDetailsResult.Data)
-                {
-                    var priceResult = _productPriceService.GetById(detail.ProductId);
-                    var price = priceResult.Success ? priceResult.Data?.Price ?? 0 : 0;
+                var translationsResult = _productTranslationService.GetList(
+                    t => productIds.Contains(t.ProductId) && t.LanguageId == languageId.Value);
 
-                    summaries.Add(new ProductSaleSummaryDto
+                if (translationsResult.Success && translationsResult.Data != null)
+                {
+                    foreach (var t in translationsResult.Data)
                     {
-                        //ProductName = detail.Product?.Name,
-                        ProductImageUrl = detail.Product?.ImageFilePath,
-                        Quantity = detail.Quantity,
-                        Price = price
-                    });
+                        if (!translationByProductId.ContainsKey(t.ProductId))
+                            translationByProductId[t.ProductId] = t.Name;
+                    }
                 }
+            }
+
+            var priceCache = new Dictionary<long, decimal>();
+            decimal GetPrice(long pid)
+            {
+                if (priceCache.TryGetValue(pid, out var cached)) return cached;
+
+                var priceResult = _productPriceService.GetById(pid);
+                var price = priceResult.Success ? (priceResult.Data?.Price ?? 0m) : 0m;
+
+                priceCache[pid] = price;
+                return price;
+            }
+
+            var summaries = new List<ProductSaleSummaryDto>(details.Count);
+            foreach (var detail in details)
+            {
+                var pid = detail.ProductId;
+                var name =
+                    (translationByProductId.TryGetValue(pid, out var translated) ? translated : null)
+                    ?? "Product";
+
+                summaries.Add(new ProductSaleSummaryDto
+                {
+                    ProductName = name,
+                    CurrencyTypeSymbol = detail.CurrencyType?.Symbol,
+                    ProductImageUrl = detail.Product?.ImageFilePath,
+                    Quantity = detail.Quantity,
+                    Price = GetPrice(pid)
+                });
             }
 
             return Ok(summaries);
         }
 
         [HttpPost]
-        public JsonResult AddInvoiceInfo([FromBody] ProductSaleInvoiceInfoModel model)
+        public JsonResult Submit([FromBody] List<ProductSaleCheckOutItem> items)
         {
-            if (model == null || model.ProductSaleId <= 0)
-            {
-                return Json(new { isSuccess = false, message = "Geçersiz veri." });
-            }
+            if (items == null || items.Count == 0)
+                return Json(new { isSuccess = false, message = _stringLocalizer["productSaleCheckOutController.PRODUCT_SELECTION"].ToString() });
 
-            var entity = new ProductSaleInvoiceInfoEntity
-            {
-                ProductSaleId = model.ProductSaleId,
-                InvoiceTypeId = model.InvoiceTypeId,
-                IdentityNumber = model.IdentityNumber,
-                CompanyName = model.CompanyName,
-                TaxNumber = model.TaxNumber,
-                TaxOffice = model.TaxOffice,
-                CountyId = model.CountyId,
-                CreatedBy = User.GetUserId().Value,
-                Created_Date = DateTime.Now,
-                IsDeleted = false
-            };
-
-            var result = _productSaleInvoiceInfoService.Add(entity);
-            return Json(new
-            {
-                isSuccess = result.Success,
-                message = result.Message
-            });
-        }
-
-        [HttpPost]
-        public JsonResult Submit([FromBody] List<ProductSaleCheckOutItem> productSaleCheckOutItems)
-        {
-            if (productSaleCheckOutItems == null || !productSaleCheckOutItems.Any())
-            {
-                return Json(new { isSuccess = false, message = "Ürün seçimi yapılmadı." });
-            }
-
-            var currencyTypeIds = productSaleCheckOutItems.Select(x => x.CurrencyTypeId).Distinct().ToList();
+            // Tüm kalemlerde aynı para birimi olmalı
+            var currencyTypeIds = items.Select(x => x.CurrencyTypeId).Distinct().ToList();
             if (currencyTypeIds.Count > 1)
             {
                 return Json(new
@@ -131,27 +147,33 @@ namespace Tixxp.WebApp.Controllers
             var productSale = new ProductSaleEntity
             {
                 CounterId = DefaultCounterId,
-                CreatedBy = User.GetUserId().Value
+                CreatedBy = User.GetUserId().GetValueOrDefault()
             };
 
             var saleResult = _productSaleService.AddAndReturn(productSale);
             if (!saleResult.Success || saleResult.Data == null)
-            {
-                return Json(new { isSuccess = false, message = "Satış oluşturulamadı." });
-            }
+                return Json(new { isSuccess = false, message = _stringLocalizer["productSaleCheckOutController.SALE_NOT_BE_CREATED"].ToString() });
 
-            foreach (var item in productSaleCheckOutItems)
+            var saleId = saleResult.Data.Id;
+
+            foreach (var item in items)
             {
                 var detail = new ProductSaleDetailEntity
                 {
-                    ProductSaleId = saleResult.Data.Id,
+                    ProductSaleId = saleId,
                     ProductId = item.ProductId,
+                    CurrencyTypeId = items.Select(x => x.CurrencyTypeId).FirstOrDefault(),
                     Quantity = item.Quantity
                 };
-                _productSaleDetailService.Add(detail);
+
+                var addDetailResult = _productSaleDetailService.Add(detail);
+                if (!addDetailResult.Success)
+                {
+                    return Json(new { isSuccess = false, message = _stringLocalizer["productSaleCheckOutController.COLUD_NOT_ADD_SALES_ITEM"].ToString() });
+                }
             }
 
-            return Json(new { isSuccess = true, productSaleId = saleResult.Data.Id });
+            return Json(new { isSuccess = true, productSaleId = saleId });
         }
     }
 }

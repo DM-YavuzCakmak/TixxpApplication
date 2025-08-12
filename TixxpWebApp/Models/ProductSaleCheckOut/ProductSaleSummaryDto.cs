@@ -7,5 +7,6 @@
         public decimal Price { get; set; } // Birim fiyat
         public decimal Total => Quantity * Price; // Toplam tutar
         public string ProductImageUrl { get; set; } 
+        public string CurrencyTypeSymbol { get; set; } 
     }
 }

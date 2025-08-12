@@ -117,7 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="productSaleCheckOutController.COLUD_NOT_ADD_SALES_ITEM" xml:space="preserve">
+    <value>Satış kalemi eklenemedi.</value>
+  </data>
   <data name="productSaleCheckOutController.CURRENCY.TYPE_VALIDATION" xml:space="preserve">
     <value>Lütfen yalnızca tek bir para birimi seçerek satış işlemini gerçekleştirin.</value>
+  </data>
+  <data name="productSaleCheckOutController.PRODUCT_SELECTION" xml:space="preserve">
+    <value>Ürün seçimi yapılmadı.</value>
+  </data>
+  <data name="productSaleCheckOutController.SALE_NOT_BE_CREATED" xml:space="preserve">
+    <value>Satış oluşturulamadı.</value>
   </data>
 </root>

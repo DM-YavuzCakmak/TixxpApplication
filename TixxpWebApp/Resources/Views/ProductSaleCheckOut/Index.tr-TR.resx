@@ -120,4 +120,38 @@
   <data name="productSaleCheckOut.INDEX.FATAL.ERROR" xml:space="preserve">
     <value>İşlem Başarısız</value>
   </data>
+  <data name="productSaleCheckOut.INDEX.PRODUCT.SALES" xml:space="preserve">
+    <value>Ürün Satışı</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.SALES" xml:space="preserve">
+    <value>Satış</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX_APPROVAL" xml:space="preserve">
+    <value>Onay</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_MAKE_PAYMENT" xml:space="preserve">
+    <value>Ödeme Yap</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_OK" xml:space="preserve">
+    <value>Tamam</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_ORDER_SUMMARY" xml:space="preserve">
+    <value>Sipariş Özeti</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS" xml:space="preserve">
+    <value>Ödeme Başarılı</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCIRIPTION" xml:space="preserve">
+    <value>Ödemeniz başarıyla alınmıştır.
+</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_RETURN_TO_SALE" xml:space="preserve">
+    <value>Satışa Dön</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_SUB_TOTAL" xml:space="preserve">
+    <value>Ara Toplam</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_TOTAL" xml:space="preserve">
+    <value>Toplam</value>
+  </data>
 </root>

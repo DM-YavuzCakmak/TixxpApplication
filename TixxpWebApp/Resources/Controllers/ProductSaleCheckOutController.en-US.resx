@@ -117,7 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="productSaleCheckOutController.COLUD_NOT_ADD_SALES_ITEM" xml:space="preserve">
+    <value>Could not add sales item.</value>
+  </data>
   <data name="productSaleCheckOutController.CURRENCY.TYPE_VALIDATION" xml:space="preserve">
     <value>Please select only one currency to sell.</value>
+  </data>
+  <data name="productSaleCheckOutController.PRODUCT_SELECTION" xml:space="preserve">
+    <value>No product selection was made.</value>
+  </data>
+  <data name="productSaleCheckOutController.SALE_NOT_BE_CREATED" xml:space="preserve">
+    <value>The sale could not be created.</value>
   </data>
 </root>
