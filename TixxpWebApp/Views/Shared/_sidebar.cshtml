@@ -39,14 +39,8 @@
                             }
                             @if (User.IsInRole("TIXXP_TICKET_SALE_BOOTH") || User.IsInRole("TIXXP_TICKET_SALE_WEB"))
                             {
-                                <li class="slide has-sub">
-                                    <a href="#" class="side-menu__item">Ticket Sale<i class="fe fe-chevron-right side-menu__angle"></i></a>
-                                    <ul class="slide-menu child2">
-                                        @if (User.IsInRole("TIXXP_TICKET_SALE_BOOTH"))
-                                        {
-                                            <li class="slide"><a href="/TicketSale/Index" class="side-menu__item">GİŞE Satışı</a></li>
-                                        }
-                                    </ul>
+                                <li class="slide">
+                                    <a href="/TicketSale/Index" class="side-menu__item">Ticket Sale</a>
                                 </li>
                             }
                         </ul>
@@ -129,7 +123,7 @@
                                 </ul>
                             </li>
                         }
-                       @*  @if (User.IsInRole("TIXXP_MUSEUM"))
+                        @*  @if (User.IsInRole("TIXXP_MUSEUM"))
                         {
                             <li class="slide"><a href="/Museum/Index" class="side-menu__item"><i class="fa fa-university"></i><span class="side-menu__label ms-2">Museum</span></a></li>
                         } *@
