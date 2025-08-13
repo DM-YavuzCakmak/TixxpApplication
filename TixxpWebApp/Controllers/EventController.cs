@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Core.Utilities.Results.Abstract;
@@ -12,10 +13,12 @@ namespace Tixxp.WebApp.Controllers;
 public class EventController : Controller
 {
     private readonly IEventService _eventService;
+    private readonly IStringLocalizer<EventController> _stringLocalizer;
 
-    public EventController(IEventService eventService)
+    public EventController(IEventService eventService, IStringLocalizer<EventController> stringLocalizer)
     {
         _eventService = eventService;
+        _stringLocalizer = stringLocalizer;
     }
 
     public IActionResult Index()
@@ -28,9 +31,10 @@ public class EventController : Controller
     [HttpGet]
     public IActionResult GetById(long id)
     {
+        
         var result = _eventService.GetById(id);
         if (!result.Success || result.Data == null)
-            return NotFound(new { success = false, message = "Etkinlik bulunamadı." });
+            return NotFound(new { success = false, message = _stringLocalizer["eventController.GET_BY_ID.EVENT_NOT_FOUND"].ToString()});
 
         return Ok(result.Data);
     }
@@ -39,7 +43,7 @@ public class EventController : Controller
     public IActionResult Create([FromBody] EventDto dto)
     {
         if (dto is null)
-            return BadRequest(new { success = false, message = "Geçersiz veri." });
+            return BadRequest(new { success = false, message = _stringLocalizer["eventController.CREATE.INVALID_DATA"].ToString() });
 
         var entity = new EventEntity
         {
@@ -52,23 +56,24 @@ public class EventController : Controller
             Created_Date = DateTime.UtcNow,
             IsDeleted = false
         };
+        
 
         var result = _eventService.Add(entity);
         if (!result.Success)
             return BadRequest(new { success = false, message = result.Message });
 
-        return Ok(new { success = true, message = "Etkinlik başarıyla eklendi." });
+        return Ok(new { success = true, message = _stringLocalizer["eventController.CREATE.EVENT_ADDED_SUCCESS"].ToString() });
     }
 
     [HttpPost]
     public IActionResult Update([FromBody] EventDto dto)
     {
         if (dto is null || dto.Id <= 0)
-            return BadRequest(new { success = false, message = "Geçersiz veri." });
+            return BadRequest(new { success = false, message = _stringLocalizer["eventController.CREATE.INVALID_DATA"].ToString() });
 
         var existing = _eventService.GetById(dto.Id);
         if (!existing.Success || existing.Data is null)
-            return NotFound(new { success = false, message = "Etkinlik bulunamadı." });
+            return NotFound(new { success = false, message = _stringLocalizer["eventController.GET_BY_ID.EVENT_NOT_FOUND"].ToString() });
 
         var entity = existing.Data;
         ApplyDto(entity, dto);
@@ -79,7 +84,7 @@ public class EventController : Controller
         if (!result.Success)
             return BadRequest(new { success = false, message = result.Message });
 
-        return Ok(new { success = true, message = "Etkinlik başarıyla güncellendi." });
+        return Ok(new { success = true, message = _stringLocalizer["eventController.UPDATE.EVENT_SUCCESS"].ToString() });
     }
 
     [HttpPost]
@@ -87,7 +92,7 @@ public class EventController : Controller
     {
         var existing = _eventService.GetById(id);
         if (!existing.Success || existing.Data is null)
-            return NotFound(new { success = false, message = "Etkinlik bulunamadı." });
+            return NotFound(new { success = false, message = _stringLocalizer["eventController.GET_BY_ID.EVENT_NOT_FOUND"].ToString() });
 
         var entity = existing.Data;
         entity.IsDeleted = true;
@@ -98,7 +103,7 @@ public class EventController : Controller
         if (!result.Success)
             return BadRequest(new { success = false, message = result.Message });
 
-        return Ok(new { success = true, message = "Etkinlik başarıyla silindi." });
+        return Ok(new { success = true, message = _stringLocalizer["eventController.DELETED.EVENT_SUCCESS"].ToString() });
     }
 
     #region Helpers
