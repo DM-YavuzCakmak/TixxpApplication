@@ -32,6 +32,10 @@ using Tixxp.Infrastructure.DataAccess.Abstract.RoleGroupRole;
 using Tixxp.Infrastructure.DataAccess.Abstract.SeasonalPrice;
 using Tixxp.Infrastructure.DataAccess.Abstract.Session;
 using Tixxp.Infrastructure.DataAccess.Abstract.SessionEventTicketPrice;
+using Tixxp.Infrastructure.DataAccess.Abstract.SessionStatus;
+using Tixxp.Infrastructure.DataAccess.Abstract.SessionStatusTranslation;
+using Tixxp.Infrastructure.DataAccess.Abstract.SessionType;
+using Tixxp.Infrastructure.DataAccess.Abstract.SessionTypeTranslation;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Agency;
@@ -62,71 +66,78 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroupRole;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SeasonalPrice;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Session;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionEventTicketPrice;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionStatus;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionStatusTranslation;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionType;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionTypeTranslation;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketType;
 using Tixxp.Infrastructure.DataAccess.Context;
 
-namespace Tixxp.Infrastructure
+namespace Tixxp.Infrastructure;
+
+public static class InfrastructureServiceRegistration
 {
-    public static class InfrastructureServiceRegistration
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+        // Ortak veritabanı (TixxpCommon) için context
+        services.AddDbContext<CommonDbContext>(options =>
         {
-            // Ortak veritabanı (TixxpCommon) için context
-            services.AddDbContext<CommonDbContext>(options =>
-            {
-                var conn = configuration.GetConnectionString("CommonConnection");
-                options.UseSqlServer(conn);
-            });
+            var conn = configuration.GetConnectionString("CommonConnection");
+            options.UseSqlServer(conn);
+        });
 
-            // Dinamik veritabanı (CompanyIdentifier ile değişen) için context
-            services.AddScoped<ISchemaProvider, SchemaProvider>();
+        // Dinamik veritabanı (CompanyIdentifier ile değişen) için context
+        services.AddScoped<ISchemaProvider, SchemaProvider>();
 
-            services.AddScoped<TixappContext>(serviceProvider =>
-            {
-                var schemaProvider = serviceProvider.GetRequiredService<ISchemaProvider>();
-                var schema = schemaProvider.GetSchema();
-                var connectionTemplate = configuration.GetConnectionString("DefaultConnection");
-                var connectionString = connectionTemplate.Replace("{InitialCatalog}", schema);
+        services.AddScoped<TixappContext>(serviceProvider =>
+        {
+            var schemaProvider = serviceProvider.GetRequiredService<ISchemaProvider>();
+            var schema = schemaProvider.GetSchema();
+            var connectionTemplate = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = connectionTemplate.Replace("{InitialCatalog}", schema);
 
-                var optionsBuilder = new DbContextOptionsBuilder<TixappContext>();
-                optionsBuilder.UseSqlServer(connectionString);
+            var optionsBuilder = new DbContextOptionsBuilder<TixappContext>();
+            optionsBuilder.UseSqlServer(connectionString);
 
-                return new TixappContext(optionsBuilder.Options, "dbo");
-            });
-            services.AddScoped<IPersonnelRepository, PersonnelRepository>();
-            services.AddScoped<IProductTranslationRepository, ProductTranslationRepository>();
-            services.AddScoped<ILanguageRepository, LanguageRepository>();
-            services.AddScoped<IEventTicketPriceRepository, EventTicketPriceRepository>();
-            services.AddScoped<IRoleRepository, RoleRepository>();
-            services.AddScoped<IRoleGroupRepository, RoleGroupRepository>();
-            services.AddScoped<IRoleGroupRoleRepository, RoleGroupRoleRepository>();
-            services.AddScoped<IPersonnelRoleRepository, PersonnelRoleRepository>();
-            services.AddScoped<IPersonnelRoleGroupRepository, PersonnelRoleGroupRepository>();
-            services.AddScoped<ICurrencyTypeRepository, CurrencyTypeRepository>();
-            services.AddScoped<IBankRepository, BankRepository>();
-            services.AddScoped<IInvoiceTypeRepository, InvoiceTypeRepository>();
-            services.AddScoped<IAgencyRepository, AgencyRepository>();
-            services.AddScoped<IPriceCategoryRepository, PriceCategoryRepository>();
-            services.AddScoped<ICompanyRepository, CompanyRepository>();
-            services.AddScoped<ISeasonalPriceRepository, SeasonalPriceRepository>();
-            services.AddScoped<ISessionEventTicketPriceRepository, SessionEventTicketPriceRepository>();
+            return new TixappContext(optionsBuilder.Options, "dbo");
+        });
+        services.AddScoped<IPersonnelRepository, PersonnelRepository>();
+        services.AddScoped<IProductTranslationRepository, ProductTranslationRepository>();
+        services.AddScoped<ILanguageRepository, LanguageRepository>();
+        services.AddScoped<IEventTicketPriceRepository, EventTicketPriceRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IRoleGroupRepository, RoleGroupRepository>();
+        services.AddScoped<IRoleGroupRoleRepository, RoleGroupRoleRepository>();
+        services.AddScoped<IPersonnelRoleRepository, PersonnelRoleRepository>();
+        services.AddScoped<IPersonnelRoleGroupRepository, PersonnelRoleGroupRepository>();
+        services.AddScoped<ICurrencyTypeRepository, CurrencyTypeRepository>();
+        services.AddScoped<IBankRepository, BankRepository>();
+        services.AddScoped<IInvoiceTypeRepository, InvoiceTypeRepository>();
+        services.AddScoped<IAgencyRepository, AgencyRepository>();
+        services.AddScoped<IPriceCategoryRepository, PriceCategoryRepository>();
+        services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<ISeasonalPriceRepository, SeasonalPriceRepository>();
+        services.AddScoped<ISessionEventTicketPriceRepository, SessionEventTicketPriceRepository>();
 
-            services.AddScoped<ICounterRepository, CounterRepository>();
-            services.AddScoped<IReservationRepository, ReservationRepository>();
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
-            services.AddScoped<IProductSaleDetailRepository, ProductSaleDetailRepository>();
-            services.AddScoped<IProductSaleRepository, ProductSaleRepository>();
-            services.AddScoped<IProductSaleInvoiceInfoRepository, ProductSaleInvoiceInfoRepository>();
-            services.AddScoped<IEventRepository, EventRepository>();
-            services.AddScoped<IGuideRepository, GuideRepository>();
-            services.AddScoped<IAgencyContractRepository, AgencyContractRepository>();
-            services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
-            services.AddScoped<ITicketSubTypeRepository, TicketSubTypeRepository>();
-            services.AddScoped<ISessionRepository, SessionRepository>();
+        services.AddScoped<ICounterRepository, CounterRepository>();
+        services.AddScoped<ISessionStatusRepository, SessionStatusRepository>();
+        services.AddScoped<ISessionTypeRepository, SessionTypeRepository>();
+        services.AddScoped<ISessionTypeTranslationRepository, SessionTypeTranslationRepository>();
+        services.AddScoped<ISessionStatusTranslationRepository, SessionStatusTranslationRepository>();
+        services.AddScoped<IReservationRepository, ReservationRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
+        services.AddScoped<IProductSaleDetailRepository, ProductSaleDetailRepository>();
+        services.AddScoped<IProductSaleRepository, ProductSaleRepository>();
+        services.AddScoped<IProductSaleInvoiceInfoRepository, ProductSaleInvoiceInfoRepository>();
+        services.AddScoped<IEventRepository, EventRepository>();
+        services.AddScoped<IGuideRepository, GuideRepository>();
+        services.AddScoped<IAgencyContractRepository, AgencyContractRepository>();
+        services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
+        services.AddScoped<ITicketSubTypeRepository, TicketSubTypeRepository>();
+        services.AddScoped<ISessionRepository, SessionRepository>();
 
-            return services;
-        }
+        return services;
     }
 }

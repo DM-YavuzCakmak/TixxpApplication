@@ -28,6 +28,9 @@ using Tixxp.Business.Services.Abstract.RoleService;
 using Tixxp.Business.Services.Abstract.SeasonalPrice;
 using Tixxp.Business.Services.Abstract.Session;
 using Tixxp.Business.Services.Abstract.SessionEventTicketPrice;
+using Tixxp.Business.Services.Abstract.SessionStatus;
+using Tixxp.Business.Services.Abstract.SessionStatusTranslation;
+using Tixxp.Business.Services.Abstract.SessionType;
 using Tixxp.Business.Services.Abstract.Template;
 using Tixxp.Business.Services.Abstract.TicketSubType;
 using Tixxp.Business.Services.Abstract.TicketType;
@@ -60,52 +63,57 @@ using Tixxp.Business.Services.Concrete.RoleService;
 using Tixxp.Business.Services.Concrete.SeasonalPrice;
 using Tixxp.Business.Services.Concrete.Session;
 using Tixxp.Business.Services.Concrete.SessionEventTicketPrice;
+using Tixxp.Business.Services.Concrete.SessionStatus;
+using Tixxp.Business.Services.Concrete.SessionStatusTranslation;
+using Tixxp.Business.Services.Concrete.SessionType;
 using Tixxp.Business.Services.Concrete.Template;
 using Tixxp.Business.Services.Concrete.TicketSubType;
 using Tixxp.Business.Services.Concrete.TicketType;
 
-namespace Tixxp.Business
+namespace Tixxp.Business;
+
+public static class BusinessServiceRegistration
 {
-    public static class BusinessServiceRegistration
+    public static IServiceCollection AddBusinessServices(this IServiceCollection services)
     {
-        public static IServiceCollection AddBusinessServices(this IServiceCollection services)
-        {
-            services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+        services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 
 
-            services.AddScoped<IPersonnelService, PersonnelService>();
-            services.AddScoped<ILanguageService, LanguageService>();
-            services.AddScoped<IProductTranslationService, ProductTranslationService>();
-            services.AddScoped<IRoleService, RoleService>();
-            services.AddScoped<IRoleGroupService, RoleGroupService>();
-            services.AddScoped<IRoleGroupRoleService, RoleGroupRoleService>();
-            services.AddScoped<IPersonnelRoleService, PersonnelRoleService>();
-            services.AddScoped<IReservationService, ReservationService>();
-            services.AddScoped<IPersonnelRoleGroupService, PersonnelRoleGroupService>();
-            services.AddScoped<IBankService, BankService>();
-            services.AddScoped<ICurrencyTypeService, CurrencyTypeService>();
-            services.AddScoped<IInvoiceTypeService, InvoiceTypeService>();
-            services.AddScoped<IAgencyService, AgencyService>();
-            services.AddScoped<IPriceCategoryService, PriceCategoryService>();
-            services.AddScoped<IAgencyContractService, AgencyContractService>();
-            services.AddScoped<ITicketTypeService, TicketTypeService>();
-            services.AddScoped<ITicketSubTypeService, TicketSubTypeService>();
-            services.AddScoped<ISessionService, SessionService>();
-            services.AddScoped<ICompanyService, CompanyService>();
-            services.AddScoped<ISeasonalPriceService, SeasonalPriceService>();
-            services.AddScoped<IEventTicketPriceService, EventTicketPriceService>();
-            services.AddScoped<ISessionEventTicketPriceService, SessionEventTicketPriceService>();
+        services.AddScoped<IPersonnelService, PersonnelService>();
+        services.AddScoped<ILanguageService, LanguageService>();
+        services.AddScoped<IProductTranslationService, ProductTranslationService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IRoleGroupService, RoleGroupService>();
+        services.AddScoped<IRoleGroupRoleService, RoleGroupRoleService>();
+        services.AddScoped<IPersonnelRoleService, PersonnelRoleService>();
+        services.AddScoped<IReservationService, ReservationService>();
+        services.AddScoped<IPersonnelRoleGroupService, PersonnelRoleGroupService>();
+        services.AddScoped<IBankService, BankService>();
+        services.AddScoped<ICurrencyTypeService, CurrencyTypeService>();
+        services.AddScoped<IInvoiceTypeService, InvoiceTypeService>();
+        services.AddScoped<IAgencyService, AgencyService>();
+        services.AddScoped<IPriceCategoryService, PriceCategoryService>();
+        services.AddScoped<IAgencyContractService, AgencyContractService>();
+        services.AddScoped<ITicketTypeService, TicketTypeService>();
+        services.AddScoped<ITicketSubTypeService, TicketSubTypeService>();
+        services.AddScoped<ISessionService, SessionService>();
+        services.AddScoped<ICompanyService, CompanyService>();
+        services.AddScoped<ISeasonalPriceService, SeasonalPriceService>();
+        services.AddScoped<IEventTicketPriceService, EventTicketPriceService>();
+        services.AddScoped<ISessionEventTicketPriceService, SessionEventTicketPriceService>();
 
-            services.AddScoped<ICounterService, CounterService>();
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IProductPriceService, ProductPriceService>();
-            services.AddScoped<IProductSaleDetailService, ProductSaleDetailService>();
-            services.AddScoped<IProductSaleService, ProductSaleService>();
-            services.AddScoped<IProductSaleInvoiceInfoService, ProductSaleInvoiceInfoService>();
-            services.AddScoped<IEventService, EventService>();
-            services.AddScoped<IGuideService, GuideService>();
-            services.AddScoped<ITemplateService, TemplateService>();
-            return services;
-        }
+        services.AddScoped<ICounterService, CounterService>();
+        services.AddScoped<ISessionStatusService, SessionStatusService>();
+        services.AddScoped<ISessionTypeService, SessionTypeService>();
+        services.AddScoped<ISessionStatusTranslationService, SessionStatusTranslationService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IProductPriceService, ProductPriceService>();
+        services.AddScoped<IProductSaleDetailService, ProductSaleDetailService>();
+        services.AddScoped<IProductSaleService, ProductSaleService>();
+        services.AddScoped<IProductSaleInvoiceInfoService, ProductSaleInvoiceInfoService>();
+        services.AddScoped<IEventService, EventService>();
+        services.AddScoped<IGuideService, GuideService>();
+        services.AddScoped<ITemplateService, TemplateService>();
+        return services;
     }
 }

@@ -23,10 +23,12 @@ using Tixxp.Entities.RoleGroupRole;
 using Tixxp.Entities.SeasonalPrice;
 using Tixxp.Entities.Session;
 using Tixxp.Entities.SessionEventTicketPrice;
+using Tixxp.Entities.SessionStatus;
+using Tixxp.Entities.SessionStatusTranslation;
+using Tixxp.Entities.SessionType;
+using Tixxp.Entities.SessionTypeTranslation;
 using Tixxp.Entities.TicketSubType;
 using Tixxp.Entities.TicketType;
-using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.PersonnelRole;
-using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.RoleGroupRole;
 
 namespace Tixxp.Infrastructure.DataAccess.Context
 {
@@ -42,6 +44,22 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SessionTypeTranslationEntity>(entity =>
+            {
+                entity.ToTable("SessionTypeTranslation", _schema);
+            });
+            modelBuilder.Entity<SessionTypeEntity>(entity =>
+            {
+                entity.ToTable("SessionType", _schema);
+            });
+            modelBuilder.Entity<SessionStatusTranslationEntity>(entity =>
+            {
+                entity.ToTable("SessionStatusTranslation", _schema);
+            });
+            modelBuilder.Entity<SessionStatusEntity>(entity =>
+            {
+                entity.ToTable("SessionStatus", _schema);
+            });
             modelBuilder.Entity<PersonnelRoleGroupEntity>(entity =>
             {
                 entity.ToTable("PersonnelRoleGroup", _schema);
@@ -146,6 +164,9 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         }
 
         public DbSet<CounterEntity> Counters { get; set; }
+        public DbSet<SessionStatusEntity> SessionStatuses { get; set; }
+        public DbSet<SessionTypeTranslationEntity> SessionTypeTranslations { get; set; }
+        public DbSet<SessionStatusTranslationEntity> SessionStatusTranslations { get; set; }
         public DbSet<LanguageEntity> Languages { get; set; }
         public DbSet<ProductTranslationEntity> ProductTranslations { get; set; }
         public DbSet<RoleGroupRoleEntity> RoleGroupRoles { get; set; }

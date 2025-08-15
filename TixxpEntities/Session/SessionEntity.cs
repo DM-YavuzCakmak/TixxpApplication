@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
 using Tixxp.Entities.Events;
 using Tixxp.Entities.SessionEventTicketPrice;
-using System.Collections.Generic;
-using System;
 
 namespace Tixxp.Entities.Session
 {
@@ -13,40 +13,35 @@ namespace Tixxp.Entities.Session
         [Column("EventId")]
         public long EventId { get; set; }
 
-        [Column("EventDate")]
-        public DateTime EventDate { get; set; }
+        [Column("TypeId")]
+        public long? TypeId { get; set; }
 
-        [Column("PlannedTime")]
-        public TimeSpan PlannedTime { get; set; }
+        [Column("StatusId")]
+        public long? StatusId { get; set; }
 
-        [Column("SessionCapacity")]
-        public int SessionCapacity { get; set; }
+        [Column("SessionDate")]
+        public DateTime? SessionDate { get; set; }
 
-        [Column("AvailableOnB2C")]
-        public bool AvailableOnB2C { get; set; }
+        [Column("StartTime")]
+        public TimeSpan StartTime { get; set; }
 
-        [Column("AvailableOnB2B")]
-        public bool AvailableOnB2B { get; set; }
+        [Column("EndTime")]
+        public TimeSpan? EndTime { get; set; } 
 
-        [Column("IsCancelled")]
-        public bool IsCancelled { get; set; }
+        [Column("Capacity")]
+        public int Capacity { get; set; }
 
-        [Column("ShowEntryStartBeforeEventTimeInMinutes")]
-        public int ShowEntryStartBeforeEventTimeInMinutes { get; set; }
+        [Column("IsAvailableOnB2C")]
+        public bool IsAvailableOnB2C { get; set; }
 
-        [Column("ShowEntryEndAfterEventTimeInMinutes")]
-        public int ShowEntryEndAfterEventTimeInMinutes { get; set; }
-
-        [Column("IsDaily")]
-        public bool IsDaily { get; set; }
-
-        [Column("IsHourly")]
-        public bool IsHourly { get; set; }
+        [Column("IsAvailableOnB2B")]
+        public bool IsAvailableOnB2B { get; set; }
 
         [ForeignKey(nameof(EventId))]
-        public virtual EventEntity Event { get; set; }
+        public virtual EventEntity? Event { get; set; }
 
         [NotMapped]
         public virtual ICollection<SessionEventTicketPriceEntity> SessionEventTicketPrices { get; set; }
+            = new List<SessionEventTicketPriceEntity>();
     }
 }

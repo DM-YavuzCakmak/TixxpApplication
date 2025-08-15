@@ -3,41 +3,90 @@
 @using Tixxp.Entities.Session
 @using Tixxp.Entities.Events
 @using Tixxp.Entities.EventTicketPrice
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @model List<SessionEntity>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Seans Listesi";
-    var events = ViewBag.Events as List<EventEntity>;
-    var priceCategories = ViewBag.PriceCategories as List<PriceCategoryEntity>;
-    var eventTicketPrices = ViewBag.EventTicketPrices as List<EventTicketPriceEntity>;
 
+    var events = ViewBag.Events as List<EventEntity> ?? new();
+    var priceCategories = ViewBag.PriceCategories as List<PriceCategoryEntity> ?? new();
+    var eventTicketPrices = ViewBag.EventTicketPrices as List<EventTicketPriceEntity> ?? new();
+    var sessionTicketPrices = ViewBag.SessionTicketPrices as List<Tixxp.Entities.SessionEventTicketPrice.SessionEventTicketPriceEntity> ?? new();
+
+    var statusNames = ViewBag.StatusNames as Dictionary<long, string> ?? new();
+    var typeNames = ViewBag.TypeNames as Dictionary<long, string> ?? new();
+
+    var sessionStatuses = ViewBag.SessionStatuses as IEnumerable<dynamic>;
+    var sessionTypes = ViewBag.SessionTypes as IEnumerable<dynamic>;
 }
+
+<style>
+    /* ---- Masaüstü & mobil uyum (mediasız) ---- */
+    /* Modal genişliği: 1100px'i geçme, ama ekranın %95'ini kaplayabilsin */
+    #bulkSessionModal .modal-dialog.modal-xl {
+        max-width: 1100px;
+        width: 95vw;
+    }
+
+    #editSessionModal .modal-dialog.modal-lg {
+        max-width: 900px;
+        width: 95vw;
+    }
+
+    /* Yüksek içerikte gövdeyi kaydır, header/footer sabit */
+    #bulkSessionModal .bulk-scroll-body,
+    #editSessionModal .bulk-scroll-body {
+        max-height: calc(100vh - 180px);
+        overflow: auto;
+    }
+
+    /* Chip alanları ve buton grupları taşmasın */
+    .chips-wrap, #bulkDateChips, #bulkTimeChips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    .btn-toolbar .btn, .btn-group .btn {
+        white-space: nowrap;
+    }
+
+    /* Hücreler taşmasın */
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
 
 <div class="main-content app-content">
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Seans Listesi</h1>
-            <button class="btn btn-primary btn-sm" onclick="openEditSessionModal(0)">+ Yeni Seans</button>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["session.INDEX.SESSION"]</h1>
+            <div class="hstack gap-2">
+                <button class="btn btn-primary btn-sm" onclick="openBulkModal()">+ @Localizer["session.INDEX.NEW_SESSION_BULK"]</button>
+                <button class="btn btn-primary btn-sm" onclick="openEditSessionModal(0)">+ @Localizer["session.INDEX.NEW_SESSİON"]</button>
+            </div>
         </div>
 
         <div class="card custom-card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-sm text-nowrap">
+                    <table class="table table-bordered table-sm text-nowrap align-middle">
                         <thead>
                             <tr>
-                                <th>Etkinlik</th>
-                                <th>Fiyat Kategorisi</th>
-                                <th>Tarih</th>
-                                <th>Planlanan Saat</th>
-                                <th>Kapasite</th>
+                                <th>@Localizer["session.INDEX.EVENT"]</th>
+                                <th>@Localizer["session.INDEX.TYPE"]</th>
+                                <th>@Localizer["session.INDEX.STATUS"]</th>
+                                <th>@Localizer["session.INDEX.DATE"]</th>
+                                <th>@Localizer["session.INDEX.START_TIME"]</th>
+                                <th>@Localizer["session.INDEX.END_TIME"]</th>
+                                <th>@Localizer["session.INDEX.CAPACITY"]</th>
                                 <th>B2C</th>
                                 <th>B2B</th>
-                                <th>İptal</th>
-                                <th>Giriş Başlangıç (dk)</th>
-                                <th>Giriş Bitiş (dk)</th>
-                                <th>İşlem</th>
+                                <th>@Localizer["session.INDEX.PRICE_CATEGORY"]</th>
+                                <th style="width:110px;">@Localizer["session.INDEX.ACTIONS"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -45,32 +94,63 @@
                             {
                                 foreach (var item in Model)
                                 {
-                                    var categoryNames = item.SessionEventTicketPrices?
-                                    .Where(x => x.EventTicketPrice != null && !x.EventTicketPrice.IsDeleted)
-                                    .Select(x => priceCategories.FirstOrDefault(p => p.Id == x.EventTicketPrice.PriceCategoryId)?.Name)
-                                    .Where(name => !string.IsNullOrEmpty(name))
+                                    var linkedEtpIds = sessionTicketPrices
+                                    .Where(stp => stp.SessionId == item.Id && !stp.IsDeleted)
+                                    .Select(stp => stp.EventTicketPriceId)
                                     .Distinct()
                                     .ToList();
 
+                                    var categoryNames = linkedEtpIds
+                                    .Select(etpId => eventTicketPrices.FirstOrDefault(etp => etp.Id == etpId))
+                                    .Where(etp => etp != null && !etp.IsDeleted)
+                                    .Select(etp => priceCategories.FirstOrDefault(pc => pc.Id == etp!.PriceCategoryId)?.Name)
+                                    .Where(n => !string.IsNullOrWhiteSpace(n))
+                                    .Distinct()
+                                    .ToList();
+
+                                    var eventName = events.FirstOrDefault(ev => ev.Id == item.EventId)?.Name ?? "-";
+                                    var typeText = (item.TypeId.HasValue && typeNames.TryGetValue(item.TypeId.Value, out var tn)) ? tn : "-";
+                                    var statusText = (item.StatusId.HasValue && statusNames.TryGetValue(item.StatusId.Value, out var sn)) ? sn : "-";
+
                                     <tr>
-                                        <td>@item.Event?.Name</td>
-                                        <td>@string.Join(", ", categoryNames ?? new List<string>())</td>
-                                        <td>@item.EventDate.ToString("dd.MM.yyyy")</td>
-                                        <td>@item.PlannedTime.ToString(@"hh\:mm")</td>
-                                        <td>@item.SessionCapacity</td>
-                                        <td>@(item.AvailableOnB2C ? "Açık" : "Kapalı")</td>
-                                        <td>@(item.AvailableOnB2B ? "Açık" : "Kapalı")</td>
-                                        <td>@(item.IsCancelled ? "Evet" : "Hayır")</td>
-                                        <td>@item.ShowEntryStartBeforeEventTimeInMinutes</td>
-                                        <td>@item.ShowEntryEndAfterEventTimeInMinutes</td>
+                                        <td>@eventName</td>
+                                        <td>@typeText</td>
+                                        <td>@statusText</td>
+                                        <td>@(item.SessionDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                                        <td>@item.StartTime.ToString(@"hh\:mm")</td>
+                                        <td>@(item.EndTime?.ToString(@"hh\:mm") ?? "-")</td>
+                                        <td>@item.Capacity</td>
+                                        <td>
+                                            @if (item.IsAvailableOnB2C)
+                                            {
+                                                <span class="badge bg-success">@Localizer["session.INDEX.OPEN"]</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="badge bg-secondary">@Localizer["session.INDEX.CLOSE"]</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsAvailableOnB2B)
+                                            {
+                                                <span class="badge bg-success">@Localizer["session.INDEX.OPEN"]</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="badge bg-secondary">@Localizer["session.INDEX.CLOSE"]</span>
+                                            }
+                                        </td>
+                                        <td>@(categoryNames.Any() ? string.Join(", ", categoryNames) : "-")</td>
                                         <td>
                                             <div class="hstack gap-2">
-                                                <a class="btn btn-sm btn-light" onclick="openEditSessionModal(@item.Id)">
+                                                <button type="button" class="btn btn-sm btn-light" title="@Localizer["session.INDEX.EDIT"]" onclick="openEditSessionModal(@item.Id)">
                                                     <i class="ri-edit-line"></i>
-                                                </a>
-                                                <a class="btn btn-sm btn-light" onclick="confirmDeleteSession(@item.Id)">
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-light" title="@Localizer["session.INDEX.DELETE"]" onclick="confirmDeleteSession(@item.Id)">
                                                     <i class="ri-delete-bin-line"></i>
-                                                </a>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -78,7 +158,7 @@
                             }
                             else
                             {
-                                <tr><td colspan="11" class="text-center">Kayıt bulunamadı.</td></tr>
+                                <tr><td colspan="11" class="text-center">@Localizer["session.INDEX.RECORD_NOT_FOUND"]</td></tr>
                             }
                         </tbody>
                     </table>
@@ -88,82 +168,255 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="editSessionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
+<!-- =================== BULK SESSION MODAL =================== -->
+<div class="modal fade" id="bulkSessionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="width:100%;">
             <div class="modal-header bg-light">
-                <h5 class="modal-title">Seans Düzenle</h5>
+                <h5 class="modal-title">@Localizer["session.INDEX.NEW_SESSION_BULK"]</h5>
                 <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="editSessionForm">
-                    <input type="hidden" id="sessionId" name="Id" />
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label>Etkinlik</label>
-                            <select class="form-select" id="eventId" name="EventId" required>
-                                <option value="">Seçiniz</option>
+
+            <div class="modal-body bulk-scroll-body">
+                <form id="bulkForm">
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <label class="form-label">@Localizer["session.INDEX.EVENT"]</label>
+                            <select class="form-select" id="bulkEventId" required>
+                                <option value="">@Localizer["session.INDEX.SELECT"]</option>
                                 @foreach (var ev in events)
                                 {
                                     <option value="@ev.Id">@ev.Name</option>
                                 }
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Fiyatlandırmalar (EventTicketPrice)</label>
+
+                        <div class="col-lg-3">
+                            <label class="form-label">@Localizer["session.INDEX.TYPE"]</label>
+                            <select class="form-select" id="bulkTypeId">
+                                <option value="">@Localizer["session.INDEX.SELECT"]</option>
+                                @if (sessionTypes != null)
+                                {
+                                    foreach (var t in sessionTypes)
+                                    {
+                                        <option value="@t.Id">@t.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-12"><hr class="my-2" /></div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">@Localizer["session.INDEX.START_DATE"]</label>
+                            <input type="date" class="form-control" id="bulkStartDate" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">@Localizer["session.INDEX.END_DATE"]</label>
+                            <input type="date" class="form-control" id="bulkEndDate" />
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <div class="btn-toolbar w-100 gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-secondary" onclick="addRange()">@Localizer["session.INDEX.ADD_RANGE"]</button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="presetNextDays(7)">+7</button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="presetNextDays(30)">+30</button>
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary" onclick="presetThisWeek()">@Localizer["session.INDEX.THIS_WEEK"]</button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="presetNextWeek()">@Localizer["session.INDEX.NEXT_WEEK"]</button>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="dowMon" checked><label class="form-check-label" for="dowMon">Pzt</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="dowTue" checked><label class="form-check-label" for="dowTue">Sal</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="dowWed" checked><label class="form-check-label" for="dowWed">Çar</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="dowThu" checked><label class="form-check-label" for="dowThu">Per</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="dowFri" checked><label class="form-check-label" for="dowFri">Cum</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="dowSat" checked><label class="form-check-label" for="dowSat">Cmt</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="dowSun" checked><label class="form-check-label" for="dowSun">Paz</label></div>
+
+                                <div class="vr"></div>
+
+                                <div class="hstack gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-sm btn-light" onclick="selectWeekdays(true)">@Localizer["session.INDEX.WEEKDAYS"]</button>
+                                    <button type="button" class="btn btn-sm btn-light" onclick="selectWeekends(true)">@Localizer["session.INDEX.WEEKENDS"]</button>
+                                    <button type="button" class="btn btn-sm btn-light" onclick="selectAllDows(true)">@Localizer["session.INDEX.ALL_DAYS"]</button>
+                                    @* <button type="button" class="btn btn-sm btn-light" onclick="selectAllDows(false)">@Localizer["session.INDEX.NONE"]</button> *@
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label mb-1">@Localizer["session.INDEX.DATES"]</label>
+                            <div id="bulkDateChips" class="chips-wrap"></div>
+                        </div>
+
+                        <div class="col-12"><hr class="my-2" /></div>
+
+                        <div class="col-lg-6">
+                            <label class="form-label">@Localizer["session.INDEX.START_TIMES"]</label>
+                            <div class="input-group mb-2">
+                                <input type="time" class="form-control" id="bulkTimeInput" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="addBulkTime()">@Localizer["session.INDEX.ADD"]</button>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTimesPreset('morning')">@Localizer["session.INDEX.PRESET_MORNING"]</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTimesPreset('noon')">@Localizer["session.INDEX.PRESET_NOON"]</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTimesPreset('evening')">@Localizer["session.INDEX.PRESET_EVENING"]</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearBulkTimes()">@Localizer["session.INDEX.CLEAR_TIMES"]</button>
+                            </div>
+                            <div id="bulkTimeChips" class="chips-wrap"></div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label class="form-label">@Localizer["session.INDEX.DEFAULT_END"]</label>
+                            <input type="time" class="form-control" id="bulkEndTime" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label class="form-label">@Localizer["session.INDEX.CAPACITY"]</label>
+                            <input type="number" class="form-control" id="bulkCapacity" min="0" value="0" />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">B2C</label>
+                            <select class="form-select" id="bulkB2C">
+                                <option value="true">@Localizer["session.INDEX.OPEN"]</option>
+                                <option value="false">@Localizer["session.INDEX.CLOSE"]</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">B2B</label>
+                            <select class="form-select" id="bulkB2B">
+                                <option value="true">@Localizer["session.INDEX.OPEN"]</option>
+                                <option value="false">@Localizer["session.INDEX.CLOSE"]</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">@Localizer["session.INDEX.PRICE_CATEGORY"]</label>
+                            <select class="form-select" id="bulkEtpIds">
+                                <option value="">@Localizer["session.INDEX.SELECT"]</option>
+                                @foreach (var etp in eventTicketPrices)
+                                {
+                                    var catName = priceCategories.FirstOrDefault(p => p.Id == etp.PriceCategoryId)?.Name ?? "";
+                                    <option value="@etp.Id" data-event-id="@etp.EventId">@catName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary w-100">@Localizer["session.INDEX.CREATE_BULK"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =================== TEKİL SESSION MODAL =================== -->
+<div class="modal fade" id="editSessionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="width:100%;">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">@Localizer["session.INDEX.SESSION"]</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body bulk-scroll-body">
+                <form id="editSessionForm">
+                    <input type="hidden" id="sessionId" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["session.INDEX.EVENT"]</label>
+                            <select class="form-select" id="eventId" required>
+                                <option value="">@Localizer["session.INDEX.SELECT"]</option>
+                                @foreach (var ev in events)
+                                {
+                                    <option value="@ev.Id">@ev.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">@Localizer["session.INDEX.TYPE"]</label>
+                            <select class="form-select" id="typeId">
+                                <option value="">@Localizer["session.INDEX.SELECT"]</option>
+                                @if (sessionTypes != null)
+                                {
+                                    foreach (var t in sessionTypes)
+                                    {
+                                        <option value="@t.Id">@t.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">@Localizer["session.INDEX.STATUS"]</label>
+                            <select class="form-select" id="statusId">
+                                <option value="">@Localizer["session.INDEX.SELECT"]</option>
+                                @if (sessionStatuses != null)
+                                {
+                                    foreach (var st in sessionStatuses)
+                                    {
+                                        <option value="@st.Id">@st.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">@Localizer["session.INDEX.DATE"]</label>
+                            <input type="date" class="form-control" id="sessionDate" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">@Localizer["session.INDEX.START_TIME"]</label>
+                            <input type="time" class="form-control" id="startTime" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">@Localizer["session.INDEX.END_TIME"]</label>
+                            <input type="time" class="form-control" id="endTime" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">@Localizer["session.INDEX.CAPACITY"]</label>
+                            <input type="number" class="form-control" id="capacity" min="0" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">B2C</label>
+                            <select class="form-select" id="availableOnB2C">
+                                <option value="true">@Localizer["session.INDEX.OPEN"]</option>
+                                <option value="false">@Localizer["session.INDEX.CLOSE"]</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">B2B</label>
+                            <select class="form-select" id="availableOnB2B">
+                                <option value="true">@Localizer["session.INDEX.OPEN"]</option>
+                                <option value="false">@Localizer["session.INDEX.CLOSE"]</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">@Localizer["session.INDEX.PRICE_CATEGORY"]</label>
                             <select class="form-select" id="eventTicketPriceIds" multiple>
                                 @foreach (var price in eventTicketPrices)
                                 {
                                     var priceCategoryName = priceCategories.FirstOrDefault(p => p.Id == price.PriceCategoryId)?.Name ?? "";
-                                    <option value="@price.Id">@($"{priceCategoryName} - {price.Price:0.00}")</option>
+                                    <option value="@price.Id">@priceCategoryName</option>
                                 }
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Tarih</label>
-                            <input type="date" class="form-control" id="eventDate" name="EventDate" required />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Planlanan Saat</label>
-                            <input type="time" class="form-control" id="plannedTime" name="PlannedTime" required />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Kapasite</label>
-                            <input type="number" class="form-control" id="sessionCapacity" name="SessionCapacity" required />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label>Giriş Başlangıç (dk)</label>
-                            <input type="number" class="form-control" id="showStart" name="ShowEntryStartBeforeEventTimeInMinutes" />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label>Giriş Bitiş (dk)</label>
-                            <input type="number" class="form-control" id="showEnd" name="ShowEntryEndAfterEventTimeInMinutes" />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label>B2C</label>
-                            <select class="form-select" id="availableOnB2C">
-                                <option value="true">Açık</option>
-                                <option value="false">Kapalı</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>B2B</label>
-                            <select class="form-select" id="availableOnB2B">
-                                <option value="true">Açık</option>
-                                <option value="false">Kapalı</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>İptal Durumu</label>
-                            <select class="form-select" id="isCancelled">
-                                <option value="false">Hayır</option>
-                                <option value="true">Evet</option>
-                            </select>
-                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary w-100">@Localizer["session.INDEX.SAVE"]</button>
+                    </div>
                 </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">@Localizer["session.INDEX.CANCEL"]</button>
             </div>
         </div>
     </div>
@@ -171,98 +424,296 @@
 
 @section Scripts {
     <script>
-        function openEditSessionModal(id) {
-            const modal = $('#editSessionModal');
-            const form = $('#editSessionForm');
+        // ---- Helpers ----
+        const toHms = v => !v ? null : (v.length === 5 ? v + ':00' : v);
 
-            if (id === 0) {
-                form[0].reset();
-                $('#sessionId').val(0);
-                $('#eventTicketPriceIds').val([]).change();
-                modal.find('.modal-title').text('Seans Ekle');
-                modal.modal('show');
-                return;
-            }
+        // ---- ETP filtreleme (tekli select) ----
+        function refreshBulkEtp() {
+          const evId = $('#bulkEventId').val();
+          const $sel = $('#bulkEtpIds');
 
-            $.get('/Session/GetById', { id: id }, function (data) {
-                $('#sessionId').val(data.id);
-                $('#eventId').val(data.eventId);
-                $('#eventDate').val(data.eventDate);
-                $('#plannedTime').val(data.plannedTime);
-                $('#sessionCapacity').val(data.sessionCapacity);
-                $('#availableOnB2C').val(data.availableOnB2C.toString());
-                $('#availableOnB2B').val(data.availableOnB2B.toString());
-                $('#isCancelled').val(data.isCancelled.toString());
-                $('#showStart').val(data.showEntryStartBefore);
-                $('#showEnd').val(data.showEntryEndAfter);
+          // Tüm option'ları sıfırla
+          $sel.find('option').each(function () {
+            $(this).prop('disabled', false).prop('hidden', false).removeAttr('style');
+          });
 
-                // Çoklu seçim alanı: EventTicketPrice
-                $('#eventTicketPriceIds').val(data.eventTicketPriceIds).change();
+          // Event seçili değilse hiçbir şey gizleme (hepsi görünsün)
+          if (!evId) {
+            $sel.val(''); // seçimi sıfırla
+            console.log('[bulkEtp] no event selected -> show all');
+            return;
+          }
 
-                modal.find('.modal-title').text('Seans Düzenle');
-                modal.modal('show');
-            }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
+          // Event seçiliyse yalnızca o EventId'ye ait ETP'leri etkin bırak
+          $sel.val(''); // seçimi sıfırla
+          $sel.find('option').each(function () {
+            const isPlaceholder = !$(this).val();
+            if (isPlaceholder) return; // "Select" opsiyonu
+            const belongs = String($(this).data('event-id')) === String(evId);
+            // Gizlemek + disable etmek (tarayıcı farklılıklarında en stabil sonuç)
+            $(this).prop('disabled', !belongs).prop('hidden', !belongs);
+          });
+
+          console.log('[bulkEtp] filtered for eventId =', evId);
         }
 
-        $('#editSessionForm').submit(function (e) {
-            e.preventDefault();
+        // ---- Tekil modal açma ----
+        function openEditSessionModal(id) {
+          const modal = $('#editSessionModal');
+          const form  = $('#editSessionForm');
 
-            const id = Number($('#sessionId').val());
-            const selectedPrices = $('#eventTicketPriceIds').val() || [];
+          if (id === 0) {
+            form[0].reset();
+            $('#sessionId').val(0);
+            $('#eventTicketPriceIds').val([]).change();
+            $('#typeId').val('');
+            $('#statusId').val('');
+            modal.find('.modal-title').text('@Localizer["session.INDEX.ADD_SESSION"].Value');
+            modal.modal('show');
+            return;
+          }
 
-            const data = {
-                Id: id,
-                EventId: $('#eventId').val(),
-                EventDate: $('#eventDate').val(),
-                PlannedTime: $('#plannedTime').val() + ':00',
-                SessionCapacity: $('#sessionCapacity').val(),
-                AvailableOnB2C: $('#availableOnB2C').val() === 'true',
-                AvailableOnB2B: $('#availableOnB2B').val() === 'true',
-                IsCancelled: $('#isCancelled').val() === 'true',
-                ShowEntryStartBeforeEventTimeInMinutes: $('#showStart').val(),
-                ShowEntryEndAfterEventTimeInMinutes: $('#showEnd').val(),
-                SessionEventTicketPrices: selectedPrices.map(pid => ({
-                    EventTicketPriceId: parseInt(pid)
-                }))
-            };
+          $.get('/Session/GetById', { id }, function (data) {
+            $('#sessionId').val(data.id);
+            $('#eventId').val(data.eventId);
+            $('#sessionDate').val(data.sessionDate);
+            $('#startTime').val(data.startTime);
+            $('#endTime').val(data.endTime || '');
+            $('#capacity').val(data.capacity);
+            $('#availableOnB2C').val(data.availableOnB2C.toString());
+            $('#availableOnB2B').val(data.availableOnB2B.toString());
+            $('#typeId').val(data.typeId || '');
+            $('#statusId').val(data.statusId || '');
+            $('#eventTicketPriceIds').val(data.eventTicketPriceIds).change();
 
-            const url = id === 0 ? '/Session/Create' : '/Session/Update';
+            modal.find('.modal-title').text('@Localizer["session.INDEX.EDIT_SESSION"].Value');
+            modal.modal('show');
+          }).fail(() => Swal.fire('@Localizer["session.INDEX.ERROR"].Value', '@Localizer["session.INDEX.DATA_FETCH_FAILED"].Value', 'error'));
+        }
 
-            $.ajax({
-                url: url,
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (res) {
-                    if (res.success) {
-                        Swal.fire("Başarılı", res.message, "success").then(() => location.reload());
-                    } else {
-                        Swal.fire("Hata", res.message, "error");
-                    }
-                },
-                error: () => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error")
-            });
+        // ---- Tekil submit ----
+        $('#editSessionForm').on('submit', function (e) {
+          e.preventDefault();
+          const id = Number($('#sessionId').val());
+          const selectedPrices = $('#eventTicketPriceIds').val() || [];
+
+          const payload = {
+            EventId: Number($('#eventId').val()),
+            TypeId: $('#typeId').val() ? Number($('#typeId').val()) : null,
+            StatusId: $('#statusId').val() ? Number($('#statusId').val()) : null,
+            SessionDate: $('#sessionDate').val(),
+            StartTime: toHms($('#startTime').val()),
+            EndTime: toHms($('#endTime').val()),
+            Capacity: Number($('#capacity').val()),
+            IsAvailableOnB2C: $('#availableOnB2C').val() === 'true',
+            IsAvailableOnB2B: $('#availableOnB2B').val() === 'true',
+            EventTicketPriceIds: (selectedPrices || []).map(Number)
+          };
+
+          const url = id === 0 ? '/Session/Create' : '/Session/Update';
+          if (id !== 0) payload.Id = id;
+
+          $.ajax({
+            url,
+            method: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(payload),
+            success: function (res) {
+              if (res.success) {
+                Swal.fire('@Localizer["session.INDEX.SUCCESS"].Value', res.message, 'success').then(() => location.reload());
+              } else {
+                Swal.fire('@Localizer["session.INDEX.ERROR"].Value', res.message, 'error');
+              }
+            },
+            error: (xhr) => {
+              console.error(xhr.responseText);
+              Swal.fire('@Localizer["session.INDEX.ERROR"].Value', '@Localizer["session.INDEX.SERVER_UNREACHABLE"].Value', 'error');
+            }
+          });
         });
 
-        function confirmDeleteSession(id) {
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu seansı silmek üzeresiniz.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Vazgeç'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    $.post('/Session/Delete', { id: id }, function (res) {
-                        if (res.success) {
-                            Swal.fire("Silindi", res.message, "success").then(() => location.reload());
-                        } else {
-                            Swal.fire("Hata", res.message, "error");
-                        }
-                    });
-                }
-            });
+        // ---- BULK alanları ----
+        let bulkDates = [];  // "yyyy-MM-dd"
+        let bulkTimes = [];  // "HH:mm"
+
+        function openBulkModal() {
+          const f = document.getElementById('bulkForm');
+          if (f) f.reset();
+          bulkDates = [];
+          bulkTimes = [];
+          renderDateChips();
+          renderTimeChips();
+
+          // Modal ilk açıldığında herkes görünsün (event yoksa filtreleme yok)
+          refreshBulkEtp();
+
+          $('#bulkSessionModal').modal('show');
+
+          // Debug: mevcut option'ları bir kez yaz
+          const opts = Array.from(document.querySelectorAll('#bulkEtpIds option'))
+            .map(o => ({ value: o.value, ev: o.getAttribute('data-event-id'), hidden: o.hidden, disabled: o.disabled, text: o.textContent.trim() }));
+          console.log('[bulkEtp] options snapshot on open:', opts);
         }
+
+        // Modal gösterildiğinde yeniden değerlendir (özellikle Bootstrap animasyonu sonrası)
+        $('#bulkSessionModal').on('shown.bs.modal', refreshBulkEtp);
+
+        // Event değişince filtrele
+        $('#bulkEventId').on('change', refreshBulkEtp);
+
+        function getDowFlags() {
+          return {
+            1: $('#dowMon').is(':checked'),
+            2: $('#dowTue').is(':checked'),
+            3: $('#dowWed').is(':checked'),
+            4: $('#dowThu').is(':checked'),
+            5: $('#dowFri').is(':checked'),
+            6: $('#dowSat').is(':checked'),
+            0: $('#dowSun').is(':checked')
+          };
+        }
+        function selectAllDows(v){ $('#dowMon,#dowTue,#dowWed,#dowThu,#dowFri,#dowSat,#dowSun').prop('checked', !!v); }
+        function selectWeekdays(v){ $('#dowMon,#dowTue,#dowWed,#dowThu,#dowFri').prop('checked', !!v); $('#dowSat,#dowSun').prop('checked', false); }
+        function selectWeekends(v){ $('#dowSat,#dowSun').prop('checked', !!v); $('#dowMon,#dowTue,#dowWed,#dowThu,#dowFri').prop('checked', false); }
+
+        function addRange() {
+          const s = $('#bulkStartDate').val(), e = $('#bulkEndDate').val();
+          if (!s || !e) { Swal.fire('Uyarı','Başlangıç ve bitiş tarihi seçiniz.','warning'); return; }
+          const start = new Date(s + 'T00:00:00'), end = new Date(e + 'T00:00:00');
+          if (isNaN(start) || isNaN(end) || start > end) { Swal.fire('Uyarı','Geçerli bir aralık giriniz.','warning'); return; }
+          const dows = getDowFlags();
+
+          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            const jsDow = d.getDay();
+            if (!dows[jsDow]) continue;
+            const yyyy = d.getFullYear(), mm = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
+            const iso = `${yyyy}-${mm}-${dd}`;
+            if (!bulkDates.includes(iso)) bulkDates.push(iso);
+          }
+          bulkDates.sort(); renderDateChips();
+        }
+        function presetNextDays(n){
+          const today=new Date(); today.setHours(0,0,0,0);
+          const end=new Date(today); end.setDate(end.getDate()+ (n-1));
+          $('#bulkStartDate').val(today.toISOString().slice(0,10));
+          $('#bulkEndDate').val(end.toISOString().slice(0,10));
+          addRange();
+        }
+        function presetThisWeek(){
+          const now=new Date(); now.setHours(0,0,0,0);
+          const day=now.getDay(); const diffToMon=(day===0?-6:1-day);
+          const start=new Date(now); start.setDate(now.getDate()+diffToMon);
+          const end=new Date(start); end.setDate(start.getDate()+6);
+          $('#bulkStartDate').val(start.toISOString().slice(0,10));
+          $('#bulkEndDate').val(end.toISOString().slice(0,10));
+          addRange();
+        }
+        function presetNextWeek(){
+          const now=new Date(); now.setHours(0,0,0,0);
+          const day=now.getDay(); const diffToMon=(day===0?-6:1-day);
+          const thisMon=new Date(now); thisMon.setDate(now.getDate()+diffToMon);
+          const nextMon=new Date(thisMon); nextMon.setDate(thisMon.getDate()+7);
+          const nextSun=new Date(nextMon); nextSun.setDate(nextMon.getDate()+6);
+          $('#bulkStartDate').val(nextMon.toISOString().slice(0,10));
+          $('#bulkEndDate').val(nextSun.toISOString().slice(0,10));
+          addRange();
+        }
+
+        function removeBulkDate(val){ bulkDates=bulkDates.filter(x=>x!==val); renderDateChips(); }
+        function renderDateChips(){
+          const box=$('#bulkDateChips'); box.empty();
+          bulkDates.forEach(d=>{
+            box.append(`<span class="badge bg-light text-dark border">${d}
+              <button type="button" class="btn btn-sm btn-link p-0 ms-1" onclick="removeBulkDate('${d}')">✕</button></span>`);
+          });
+        }
+
+        function addBulkTime(){
+          const t=$('#bulkTimeInput').val();
+          if(t && !bulkTimes.includes(t)){ bulkTimes.push(t); bulkTimes.sort(); renderTimeChips(); }
+          $('#bulkTimeInput').val('');
+        }
+        function addTimesPreset(kind){
+          let list=[];
+          if(kind==='morning') list=['09:00','10:00','11:00'];
+          else if(kind==='noon') list=['12:00','13:00','14:00'];
+          else if(kind==='evening') list=['18:00','19:00','20:00'];
+          list.forEach(t=>{ if(!bulkTimes.includes(t)) bulkTimes.push(t); });
+          bulkTimes.sort(); renderTimeChips();
+        }
+        function clearBulkTimes(){ bulkTimes=[]; renderTimeChips(); }
+        function removeBulkTime(val){ bulkTimes=bulkTimes.filter(x=>x!==val); renderTimeChips(); }
+        function renderTimeChips(){
+          const box=$('#bulkTimeChips'); box.empty();
+          bulkTimes.forEach(t=>{
+            box.append(`<span class="badge bg-light text-dark border">${t}
+              <button type="button" class="btn btn-sm btn-link p-0 ms-1" onclick="removeBulkTime('${t}')">✕</button></span>`);
+          });
+        }
+
+        // ---- Bulk submit ----
+        $('#bulkForm').on('submit', function(e){
+          e.preventDefault();
+          const eventId=Number($('#bulkEventId').val());
+          if(!eventId){ Swal.fire('Uyarı','Etkinlik seçiniz.','warning'); return; }
+          if(bulkDates.length===0){ Swal.fire('Uyarı','En az bir tarih ekleyin.','warning'); return; }
+          if(bulkTimes.length===0){ Swal.fire('Uyarı','En az bir başlangıç saati ekleyin.','warning'); return; }
+
+          const payload={
+            EventId: eventId,
+            TypeId:   $('#bulkTypeId').val()? Number($('#bulkTypeId').val()): null,
+            StatusId: $('#bulkStatusId').val()? Number($('#bulkStatusId').val()): null,
+            Dates: bulkDates,
+            StartTimes: bulkTimes.map(toHms),
+            EndTime: toHms($('#bulkEndTime').val()),
+            Capacity: Number($('#bulkCapacity').val() || 0),
+            IsAvailableOnB2C: $('#bulkB2C').val()==='true',
+            IsAvailableOnB2B: $('#bulkB2B').val()==='true',
+            EventTicketPriceIds: ($('#bulkEtpIds').val()? [Number($('#bulkEtpIds').val())] : [])
+          };
+
+          $.ajax({
+            url:'/Session/CreateBulk',
+            method:'POST',
+            contentType:'application/json; charset=utf-8',
+            data: JSON.stringify(payload),
+            success:function(res){
+              if(res.success){
+                Swal.fire('Başarılı', res.message, 'success').then(()=>location.reload());
+              }else{
+                Swal.fire('Hata', res.message || 'Kayıt oluşturulamadı.', 'error');
+              }
+            },
+            error:(xhr)=>{
+              console.error(xhr.responseText);
+              Swal.fire('Hata','Sunucuya ulaşılamadı.','error');
+            }
+          });
+        });
+
+        // ---- Silme ----
+        function confirmDeleteSession(id){
+          Swal.fire({
+            title:'@Localizer["session.INDEX.ARE_YOU_SURE"].Value',
+            text: '@Localizer["session.INDEX.DELETE_SESSION_DESCRIPTION"].Value',
+            icon:'warning', showCancelButton:true,
+            confirmButtonText:'@Localizer["session.INDEX.YES_DELETE"].Value',
+            cancelButtonText:'@Localizer["session.INDEX.CANCEL"].Value'
+          }).then(r=>{
+            if(r.isConfirmed){
+              $.post('/Session/Delete',{id}, function(res){
+                if(res.success){
+                  Swal.fire('@Localizer["session.INDEX.DELETED"].Value', res.message, 'success').then(()=>location.reload());
+                }else{
+                  Swal.fire('@Localizer["session.INDEX.ERROR"].Value', res.message, 'error');
+                }
+              });
+            }
+          });
+        }
+        window.confirmDeleteSession = confirmDeleteSession; // global erişim
+        window.openEditSessionModal = openEditSessionModal; // global erişim
+        window.openBulkModal = openBulkModal;               // global erişim
     </script>
 }
+
