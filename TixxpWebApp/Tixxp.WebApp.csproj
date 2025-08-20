@@ -15,6 +15,36 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\Views\TicketSale\_Confirmation.tr-TR.Designer.cs">
+      <DependentUpon>_Confirmation.tr-TR.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\Views\TicketSale\_Confirmation.en-US.Designer.cs">
+      <DependentUpon>_Confirmation.en-US.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\Views\TicketSale\_Confirmation.Designer.cs">
+      <DependentUpon>_Confirmation.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\Views\TicketSale\_Details.tr-TR.Designer.cs">
+      <DependentUpon>_Details.tr-TR.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\Views\TicketSale\_Details.en-US.Designer.cs">
+      <DependentUpon>_Details.en-US.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\Views\TicketSale\_Details.Designer.cs">
+      <DependentUpon>_Details.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="Resources\Views\TicketSale\Index.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -23,6 +53,30 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Views\TicketSale\_Confirmation.tr-TR.resx">
+      <LastGenOutput>_Confirmation.tr-TR.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\TicketSale\_Confirmation.en-US.resx">
+      <LastGenOutput>_Confirmation.en-US.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\TicketSale\_Confirmation.resx">
+      <LastGenOutput>_Confirmation.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\TicketSale\_Details.tr-TR.resx">
+      <LastGenOutput>_Details.tr-TR.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\TicketSale\_Details.en-US.resx">
+      <LastGenOutput>_Details.en-US.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\TicketSale\_Details.resx">
+      <LastGenOutput>_Details.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\TicketSale\Index.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Index.Designer.cs</LastGenOutput>

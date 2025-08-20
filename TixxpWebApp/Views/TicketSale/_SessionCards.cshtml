@@ -1,0 +1,198 @@
+﻿@model IEnumerable<GetSessionViewModel>
+@using System
+@using System.Linq
+@using Tixxp.Core.Utilities.Enums.SessionTypeEnum
+@using Tixxp.WebApp.Models.TicketSale.GetSession
+
+@functions {
+    string FormatTime(TimeSpan? t) => t.HasValue ? t.Value.ToString(@"hh\:mm") : "--:--";
+    bool IsDaily(GetSessionViewModel s) => s.SessionTypeId == (long)SessionTypeEnum.DAILY;
+    int CapacityOf(GetSessionViewModel s) => s.Capacity;
+}
+
+@if (Model == null || !Model.Any())
+{
+    <div class="col-12">
+        <div class="alert alert-warning mb-0">No sessions found for this event.</div>
+    </div>
+}
+else
+{
+    foreach (var day in Model
+           .OrderBy(m => m.SessionDate)
+           .GroupBy(m => m.SessionDate.GetValueOrDefault().Date))
+    {
+        <div class="col-12">
+            <h6 class="mt-2 mb-3">@day.Key.ToString("dddd, dd MMM yyyy")</h6>
+        </div>
+
+        var dailies = day.Where(IsDaily).OrderBy(x => x.StarTime).ToList();
+        var hourly = day.Where(x => !IsDaily(x)).OrderBy(x => x.StarTime).ToList();
+
+        @* DAILY GROUP *@
+        if (dailies.Any())
+        {
+            <div class="col-12">
+                <div class="group-title">Daily</div>
+            </div>
+
+            foreach (var s in dailies)
+            {
+                var cap = CapacityOf(s);
+                var isClosed = cap <= 0;
+
+                <div class="col-6 col-md-4 col-lg-3 mb-3">
+                    <div class="card card-compact session-card @(isClosed ? "border-danger" : "border-success")" role="button" tabindex="0">
+                        <div class="card-body p-3 d-flex flex-column">
+                            <input type="hidden" class="session-id" value="@s.SessionId" /> @* gizli *@
+
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="badge bg-info">Daily</span>
+                                <div class="d-flex gap-1">
+                                    <span class="badge @(s.IsAvailableOnB2C ? "bg-success" : "bg-secondary")" title="B2C">B2C</span>
+                                    <span class="badge @(s.IsAvaliableOnB2B ? "bg-success" : "bg-secondary")" title="B2B">B2B</span>
+                                </div>
+                            </div>
+
+                            <div class="small text-muted mb-2">All day access</div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="badge @(isClosed ? "bg-danger" : "bg-success")">
+                                    @(isClosed ? "Closed" : "Available")
+                                </span>
+                                <span class="badge bg-secondary" title="Capacity">Capacity @cap</span>
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-success btn-sm mt-2 js-select-session"
+                                    @(isClosed ? "disabled" : null)
+                                    data-session-id="@s.SessionId"
+                                    data-session-type-id="@s.SessionTypeId"
+                                    data-session-type-name="Daily"
+                                    data-session-date="@day.Key.ToString("yyyy-MM-dd")"
+                                    data-start="@FormatTime(s.StarTime)"
+                                    data-end="@FormatTime(s.EndTime)"
+                                    data-capacity="@cap"
+                                    data-b2c="@(s.IsAvailableOnB2C ? "1" : "0")"
+                                    data-b2b="@(s.IsAvaliableOnB2B ? "1" : "0")"
+                                    onclick="onSelectSession(this)">
+                                Select
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        @* HOURLY GROUP *@
+        if (hourly.Any())
+        {
+            <div class="col-12 mt-2">
+                <div class="group-title">Hourly</div>
+            </div>
+
+            foreach (var s in hourly)
+            {
+                var cap = CapacityOf(s);
+                var isClosed = cap <= 0;
+                var timeRange = $"{FormatTime(s.StarTime)} — {FormatTime(s.EndTime)}";
+
+                <div class="col-6 col-md-4 col-lg-3 mb-3">
+                    <div class="card card-compact session-card @(isClosed ? "border-danger" : "border-success")" role="button" tabindex="0">
+                        <div class="card-body p-3 d-flex flex-column">
+                            <input type="hidden" class="session-id" value="@s.SessionId" /> @* gizli *@
+
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="badge bg-primary">Hourly</span>
+                                <div class="d-flex gap-1">
+                                    <span class="badge @(s.IsAvailableOnB2C ? "bg-success" : "bg-secondary")" title="B2C">B2C</span>
+                                    <span class="badge @(s.IsAvaliableOnB2B ? "bg-success" : "bg-secondary")" title="B2B">B2B</span>
+                                </div>
+                            </div>
+
+                            <div class="fw-semibold small">@timeRange</div>
+                            <div class="small text-muted mb-2">Selected time slot</div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="badge @(isClosed ? "bg-danger" : "bg-success")">
+                                    @(isClosed ? "Closed" : "Available")
+                                </span>
+                                <span class="badge bg-secondary" title="Capacity">Capacity @cap</span>
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-success btn-sm mt-2 js-select-session"
+                                    @(isClosed ? "disabled" : null)
+                                    data-session-id="@s.SessionId"
+                                    data-session-type-id="@s.SessionTypeId"
+                                    data-session-type-name="Hourly"
+                                    data-session-date="@day.Key.ToString("yyyy-MM-dd")"
+                                    data-start="@FormatTime(s.StarTime)"
+                                    data-end="@FormatTime(s.EndTime)"
+                                    data-capacity="@cap"
+                                    data-b2c="@(s.IsAvailableOnB2C ? "1" : "0")"
+                                    data-b2b="@(s.IsAvaliableOnB2B ? "1" : "0")"
+                                    onclick="onSelectSession(this)">
+                                Select
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+}
+
+<style>
+    /* Kompakt kart + hover efekti */
+    .card-compact {
+        border-radius: .75rem;
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+
+        .card-compact .badge {
+            font-size: .72rem;
+        }
+
+    .session-card {
+        cursor: pointer;
+    }
+
+        .session-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+            border-color: var(--bs-primary) !important;
+        }
+
+    .group-title {
+        font-weight: 600;
+        font-size: .9rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6c757d;
+        margin-bottom: .5rem;
+    }
+</style>
+
+@section scripts {
+    <script>
+        // Kartların click eventleri
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.session-card').forEach(function(card){
+                card.addEventListener('click', function(e){
+                    const btn = card.querySelector('.js-select-session');
+                    if (!btn || btn.disabled) return;
+                    if (e.target && (e.target === btn || btn.contains(e.target))) return;
+                    btn.click();
+                });
+                card.addEventListener('keypress', function(e){
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        const btn = card.querySelector('.js-select-session');
+                        if (btn && !btn.disabled) btn.click();
+                    }
+                });
+            });
+        });
+    </script>
+}
+

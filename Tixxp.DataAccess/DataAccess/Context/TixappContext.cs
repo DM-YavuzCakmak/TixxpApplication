@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tixxp.Entities.AgencyContract;
 using Tixxp.Entities.Bank;
+using Tixxp.Entities.Channel;
 using Tixxp.Entities.Counter;
+using Tixxp.Entities.Currency;
 using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.Events;
 using Tixxp.Entities.EventTicketPrice;
@@ -18,6 +20,10 @@ using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.Entities.ProductSaleInvoiceInfo;
 using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
+using Tixxp.Entities.ReservationDetail;
+using Tixxp.Entities.ReservationSaleInvoiceInfo;
+using Tixxp.Entities.ReservationStatus;
+using Tixxp.Entities.ReservationStatusTranslation;
 using Tixxp.Entities.RoleGroup;
 using Tixxp.Entities.RoleGroupRole;
 using Tixxp.Entities.SeasonalPrice;
@@ -44,6 +50,30 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ReservationDetailEntity>(entity =>
+            {
+                entity.ToTable("ReservationDetail", _schema);
+            });
+            modelBuilder.Entity<ReservationSaleInvoiceInfoEntity>(entity =>
+            {
+                entity.ToTable("ReservationSaleInvoiceInfo", _schema);
+            });
+            modelBuilder.Entity<ReservationStatusTranslationEntity>(entity =>
+            {
+                entity.ToTable("ReservationStatusTranslation", _schema);
+            });
+            modelBuilder.Entity<ReservationStatusEntity>(entity =>
+            {
+                entity.ToTable("ReservationStatus", _schema);
+            });
+            modelBuilder.Entity<CurrencyEntity>(entity =>
+            {
+                entity.ToTable("Currency", _schema);
+            });
+            modelBuilder.Entity<ChannelEntity>(entity =>
+            {
+                entity.ToTable("Channel", _schema);
+            });
             modelBuilder.Entity<SessionTypeTranslationEntity>(entity =>
             {
                 entity.ToTable("SessionTypeTranslation", _schema);
@@ -164,7 +194,12 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         }
 
         public DbSet<CounterEntity> Counters { get; set; }
+        public DbSet<ChannelEntity> Channels { get; set; }
         public DbSet<SessionStatusEntity> SessionStatuses { get; set; }
+        public DbSet<ReservationSaleInvoiceInfoEntity> ReservationSaleInvoiceInfos { get; set; }
+        public DbSet<ReservationDetailEntity> ReservationDetails { get; set; }
+        public DbSet<ReservationStatusTranslationEntity> ReservationStatusTranslations { get; set; }
+        public DbSet<ReservationStatusEntity> ReservationStatuses { get; set; }
         public DbSet<SessionTypeTranslationEntity> SessionTypeTranslations { get; set; }
         public DbSet<SessionStatusTranslationEntity> SessionStatusTranslations { get; set; }
         public DbSet<LanguageEntity> Languages { get; set; }

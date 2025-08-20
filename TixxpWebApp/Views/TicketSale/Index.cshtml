@@ -1,182 +1,147 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer;
+﻿@model IEnumerable<Tixxp.Entities.Events.EventEntity>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var todayStr = DateTime.Today.ToString("yyyy-MM-dd");
 }
 
 <div class="main-content app-content">
     <div class="container-fluid">
-
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["ticketSale.INDEX.SELL_TICKET"]</h1>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">
+                @Localizer["ticketSale.INDEX.SELL_TICKET"]
+            </h1>
         </div>
 
         <div class="card custom-card">
             <div class="card-body p-0 product-checkout">
+
                 <!-- Tabs -->
                 <ul class="nav nav-tabs tab-style-2 border-bottom" id="tabNavigation" role="tablist">
                     <li class="nav-item">
-                        <button class="nav-link active" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.EVENT"]</button>
+                        <button class="nav-link active" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-pane" type="button" role="tab" aria-disabled="true">
+                            @Localizer["ticketSale.INDEX.EVENT"]
+                        </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="date-tab" data-bs-toggle="tab" data-bs-target="#date-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.DATE"]</button>
+                        <button class="nav-link disabled" id="date-tab" data-bs-toggle="tab" data-bs-target="#date-pane" type="button" role="tab" aria-disabled="true">
+                            @Localizer["ticketSale.INDEX.SESSION"]
+                        </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.DETAILS"]</button>
+                        <button class="nav-link disabled" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail-pane" type="button" role="tab" aria-disabled="true">
+                            @Localizer["ticketSale.INDEX.DETAILS"]
+                        </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="confirmation-tab" data-bs-toggle="tab" data-bs-target="#confirmation-pane" type="button" role="tab">@Localizer["ticketSale.INDEX.CONFIRMATION"]</button>
+                        <button class="nav-link disabled" id="confirmation-tab" data-bs-toggle="tab" data-bs-target="#confirmation-pane" type="button" role="tab" aria-disabled="true">
+                            @Localizer["ticketSale.INDEX.CONFIRMATION"]
+                        </button>
                     </li>
                 </ul>
 
                 <!-- Tab Contents -->
                 <div class="tab-content p-4">
-                    <!-- EVENT -->
-                    <div class="tab-pane fade show active" id="event-pane" role="tabpanel">
-                        <div class="row" id="event-list"></div>
+
+                    <!-- EVENT LIST -->
+                    <div class="tab-pane fade show active" id="event-pane" role="tabpanel" aria-labelledby="event-tab">
+                        <div class="row" id="event-list">
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var ev in Model)
+                                {
+                                    var img = !string.IsNullOrWhiteSpace(ev.ImagePath)
+                                    ? Url.Content("~/assets/" + ev.ImagePath.TrimStart('/'))
+                                    : Url.Content("~/assets/images/placeholder.jpg");
+
+                                    var opening = ev.OpeningTime?.ToString(@"hh\:mm") ?? "--:--";
+                                    var closing = ev.ClosingTime?.ToString(@"hh\:mm") ?? "--:--";
+
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card h-100">
+                                            <img src="@img" class="card-img-top" alt="@ev.Name"
+                                                 style="height:200px;object-fit:cover;"
+                                                 onerror="this.onerror=null;this.src='/assets/images/placeholder.jpg';" />
+                                            <div class="card-body text-center d-flex flex-column">
+                                                <h5 class="mb-2 text-truncate" title="@ev.Name">@ev.Name</h5>
+                                                <p class="text-muted mb-3">
+                                                    @Localizer["ticketSale.INDEX.OPENING"] @opening —
+                                                    @Localizer["ticketSale.INDEX.CLOSING"] @closing
+                                                </p>
+                                                <div class="mb-3">
+                                                    <span class="badge @(ev.IsAvailableOnB2C ? "bg-success" : "bg-secondary") me-1">B2C</span>
+                                                    <span class="badge @(ev.IsAvailableOnB2B ? "bg-success" : "bg-secondary")">B2B</span>
+                                                </div>
+
+                                                <button type="button"
+                                                        class="btn btn-primary mt-auto"
+                                                        data-event-id="@ev.Id"
+                                                        data-event-name="@ev.Name"
+                                                        onclick="loadSessionsAndGo(this)">
+                                                    @Localizer["ticketSale.INDEX.VIEW_SESSIONS"]
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12">
+                                    <div class="alert alert-warning mb-0">
+                                        @Localizer["ticketSale.INDEX.NO_EVENTS"]
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
 
-                    <!-- DATE -->
-                    <div class="tab-pane fade" id="date-pane" role="tabpanel">
+                    <!-- DATE / SESSIONS -->
+                    <div class="tab-pane fade" id="date-pane" role="tabpanel" aria-labelledby="date-tab">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="goBackTo('event')">
+                                    ← @Localizer["ticketSale.INDEX.BACK"]
+                                </button>
+                            </div>
+
+                            <!-- Tarih Filtresi -->
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="sessionDate" class="col-form-label col-form-label-sm">@Localizer["ticketSale.INDEX.DATE"]</label>
+                                <input type="date"
+                                       id="sessionDate"
+                                       class="form-control form-control-sm"
+                                       min="@todayStr"
+                                       value="@todayStr"
+                                       onchange="reloadSessionsForDate()" />
+                            </div>
+
+                            <div class="text-muted">
+                                <span id="selectedEventName"></span>
+                            </div>
+                        </div>
+
                         <div class="row" id="session-list"></div>
                     </div>
 
-                    <!-- DETAILS TAB -->
-                    <div class="tab-pane fade" id="detail-pane" role="tabpanel">
-                        <form id="dummy-form">
-                            <div class="row">
-                                <!-- LEFT SIDE -->
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label>Reservation Type</label>
-                                        <select class="form-select">
-                                            <option value="1">Individual</option>
-                                            <option value="2">Group</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Reservation Subtype</label>
-                                        <select class="form-select">
-                                            <option>Corporate</option>
-                                            <option>Historical & Cultural</option>
-                                            <option>Incentive</option>
-                                            <option>Private Group</option>
-                                            <option>Tour Series</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3 form-check">
-                                        <input type="checkbox" class="form-check-input" id="guideCheckbox" onchange="toggleGuideList()">
-                                        <label class="form-check-label" for="guideCheckbox">Guide Required?</label>
-                                    </div>
-
-                                    <div class="mb-3" id="guideContainer" style="display: none;">
-                                        <label>Select Guide</label>
-                                        <select class="form-select">
-                                            <option value="101">Ali Demir</option>
-                                            <option value="102">Ayşe Yılmaz</option>
-                                            <option value="103">John Smith</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label>Nationality</label>
-                                        <select class="form-select">
-                                            <option>Turkey</option>
-                                            <option>USA</option>
-                                            <option>Germany</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Payment Type</label>
-                                        <select class="form-select">
-                                            <option>Credit Card</option>
-                                            <option>Cash</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label>Ticket Type</label>
-                                        <select class="form-select" id="ticketTypeSelect" onchange="updatePrice()">
-                                            <option value="250">Full Ticket - Foreign</option>
-                                            <option value="100">Full Ticket - Local</option>
-                                            <option value="0">Free</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label>Quantity</label>
-                                        <div class="qty-container d-flex">
-                                            <button type="button" class="btn btn-outline-secondary" onclick="adjustQty(-1)">-</button>
-                                            <input type="text" class="form-control text-center mx-2" id="ticketQty" value="1" style="width: 60px;" readonly />
-                                            <button type="button" class="btn btn-outline-secondary" onclick="adjustQty(1)">+</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label>Currency</label>
-                                        <select class="form-select">
-                                            <option>₺ Turkish Lira</option>
-                                            <option>$ US Dollar</option>
-                                            <option>€ Euro</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label>Total Amount</label>
-                                        <input type="text" class="form-control" id="totalAmount" value="250" readonly />
-                                    </div>
-                                </div>
-
-                                <!-- RIGHT SIDE -->
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label>First Name</label>
-                                        <input type="text" class="form-control" placeholder="Your name" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Last Name</label>
-                                        <input type="text" class="form-control" placeholder="Your surname" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Email</label>
-                                        <input type="email" class="form-control" placeholder="your@email.com" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Phone</label>
-                                        <input type="tel" class="form-control" placeholder="5xxxxxxxxx" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Notes</label>
-                                        <textarea class="form-control" rows="3" readonly>
-Purchased tickets are valid for 15 days from the event start date. No refunds.
-                    </textarea>
-                                    </div>
-                                    <div class="mb-3 form-check">
-                                        <input class="form-check-input" type="checkbox" id="agreementCheck" required />
-                                        <label class="form-check-label" for="agreementCheck">
-                                            I have read and agree to the <a href="#">Distance Sales Agreement</a>.
-                                        </label>
-                                    </div>
-
-                                    <div class="d-flex justify-content-end">
-                                        <button type="reset" class="btn btn-outline-danger me-2">Cancel</button>
-                                        <button type="button" class="btn btn-primary" onclick="goToConfirmation()">Buy Ticket</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                    <!-- DETAILS -->
+                    <div class="tab-pane fade" id="detail-pane" role="tabpanel" aria-labelledby="detail-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="goBackTo('date')">← @Localizer["ticketSale.INDEX.BACK"]</button>
+                        </div>
+                        <div id="details-container"></div>
                     </div>
 
                     <!-- CONFIRMATION -->
-                    <div class="tab-pane fade" id="confirmation-pane" role="tabpanel">
-                        <div class="text-center">
-                            <h4 class="text-success mb-3">Your ticket has been created successfully!</h4>
-                            <p class="mb-4">Thank you for your reservation. You can print or view your ticket below.</p>
-                            <a href="/TicketSale/Index" class="btn btn-warning me-2">Buy Ticket</a>
-                            <a href="#" class="btn btn-primary">Print Ticket</a>
+                    <div class="tab-pane fade" id="confirmation-pane" role="tabpanel" aria-labelledby="confirmation-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="goBackTo('detail')">← @Localizer["ticketSale.INDEX.BACK"]</button>
                         </div>
+                        <div id="confirmation-container"></div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -185,108 +150,736 @@ Purchased tickets are valid for 15 days from the event start date. No refunds.
 
 @section scripts {
     <script>
+        /* ===============================
+           ÜRÜN → SEPET ENTEGRASYONU
+           (Bilet sepetiyle aynıdır)
+           =============================== */
+        (function(){
+          window.changeProdQty = function(btn, delta){
+            const wrap  = btn.closest('.qty-wrap');
+            if(!wrap) return;
+            const input = wrap.querySelector('.prod-qty');
+            let val = parseInt(input.value,10);
+            if (isNaN(val) || val < 1) val = 1;
+            val = Math.max(1, val + delta);
+            input.value = val;
+          };
 
-                function toggleGuideList() {
-            const guideContainer = document.getElementById("guideContainer");
-            const checkbox = document.getElementById("guideCheckbox");
-            guideContainer.style.display = checkbox.checked ? "block" : "none";
-        }
+          // Ürünü sepete ekle
+          window.addProductToCart = function(btn){
+            const card = btn.closest('.prod-card');
+            if(!card || !window.__TicketCart){ console.warn('Cart not ready'); return; }
 
-        function updatePrice() {
-            const selectedPrice = parseInt(document.getElementById("ticketTypeSelect").value);
-            const qty = parseInt(document.getElementById("ticketQty").value);
-            document.getElementById("totalAmount").value = selectedPrice * qty;
-        }
+            const id         = card.getAttribute('data-id');
+            const name       = card.getAttribute('data-name') || ('#' + id);
+            const price      = parseFloat(card.getAttribute('data-price') || '0') || 0;
+            const currencyId = card.getAttribute('data-currency-id') || '0';
+            const symbol     = card.getAttribute('data-symbol') || '';
+            const qtyInput   = card.querySelector('.prod-qty');
+            const qty        = Math.max(1, parseInt(qtyInput?.value,10) || 1);
 
-        function adjustQty(amount) {
-            const qtyInput = document.getElementById("ticketQty");
-            let qty = parseInt(qtyInput.value);
-            qty = Math.max(0, qty + amount);
-            qtyInput.value = qty;
-            updatePrice();
-        }   
-        const dummyEvents = [
-            { id: "1", name: "Kariye Camii", startTime: "10:00", endTime: "18:00", imagePath: "images/product/chora.jpeg" },
-        ];
+            // Biletlerle aynı sepete ekle (çakışma önlemek için 'P:' prefix)
+            window.__TicketCart.add({
+              id: `P:${id}`,
+              name: name,
+              price: price,
+              currencyId: currencyId,
+              symbol: symbol,
+              qty: qty
+            });
 
-        const dummySessions = [
-            { sessionId: "101", eventDate: new Date(), plannedTime: "12:00", isCancelled: false },
-            { sessionId: "102", eventDate: new Date(), plannedTime: "15:00", isCancelled: true }
-        ];
+            if(qtyInput) qtyInput.value = 1;
+            window.renderCart && window.renderCart();
+          };
 
-        // On page load
-        document.addEventListener("DOMContentLoaded", () => {
-            loadEventData(dummyEvents);
+          // Ürün arama filtresi
+          window.filterProducts = function(input){
+            const q = (input.value || '').toLowerCase().trim();
+            document.querySelectorAll('#productGrid .prod-card').forEach(function(card){
+              const hay = ((card.getAttribute('data-name')||'') + ' ' + (card.getAttribute('data-code')||'')).toLowerCase();
+              card.parentElement.style.display = (!q || hay.includes(q)) ? '' : 'none';
+            });
+          };
+
+        })();
+    </script>
+
+    <script>
+        /* ===========================
+           TAB & SAYFA AKIŞI (Sadece butonlarla)
+           =========================== */
+        document.addEventListener("DOMContentLoaded", function () {
+          const nav = document.getElementById("tabNavigation");
+          if (!nav) return;
+          // Sekme başlıklarına TIKLAMAYI tamamen engelle
+          nav.querySelectorAll(".nav-link").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              return false;
+            });
+          });
         });
 
-        // Load event cards
-        function loadEventData(data) {
-            const list = document.getElementById("event-list");
-            list.innerHTML = "";
-            data.forEach(event => {
-                list.innerHTML += `
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card">
-                            <img src="/assets/${event.imagePath}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                            <div class="card-body text-center">
-                                <h5>${event.name}</h5>
-                                <p>@Localizer["ticketSale.INDEX.START"]: ${event.startTime} - @Localizer["ticketSale.INDEX.END"]: ${event.endTime}</p>
-                                <button class="btn btn-primary" onclick="goToDateTab()">View Dates</button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
+        function enableTab(tabId) {
+          const tabBtn = document.getElementById(`${tabId}-tab`);
+          if (!tabBtn) return;
+          tabBtn.classList.remove("disabled");
+          tabBtn.removeAttribute("aria-disabled");
         }
 
-        // Switch to Date tab and load sessions
-        function goToDateTab() {
-            switchTab("event", "date");
-            loadSessionData(dummySessions);
+        function activateTab(tabId) {
+          const tabBtn = document.getElementById(`${tabId}-tab`);
+          if (!tabBtn) return;
+          const bsTab = bootstrap.Tab.getOrCreateInstance(tabBtn);
+          bsTab.show();
         }
 
-        // Load session cards
-        function loadSessionData(data) {
-            const list = document.getElementById("session-list");
-            list.innerHTML = "";
-            data.forEach(session => {
-                list.innerHTML += `
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card ${session.isCancelled ? 'border-danger' : ''}">
-                            <div class="card-body">
-                                <h5>Date: ${new Date(session.eventDate).toLocaleDateString('en-US')}</h5>
-                                <p>Time: ${session.plannedTime}</p>
-                                <span class="badge ${session.isCancelled ? 'bg-danger' : 'bg-success'}">
-                                    ${session.isCancelled ? 'Cancelled' : 'Available'}
-                                </span>
-                                ${!session.isCancelled ? `<div class="mt-3"><button class="btn btn-success" onclick="goToDetailTab()">Select</button></div>` : ''}
-                            </div>
-                        </div>
-                    </div>`;
-            });
+        function lockTab(tabId){
+          const tabBtn = document.getElementById(`${tabId}-tab`);
+          if (!tabBtn) return;
+          tabBtn.classList.add("disabled");
+          tabBtn.setAttribute("aria-disabled", "true");
         }
 
-        // Switch to Details tab
-        function goToDetailTab() {
-            switchTab("date", "detail");
+        function clearPane(target){
+          if (target === 'event') {
+            document.getElementById("session-list")?.replaceChildren();
+            document.getElementById("details-container")?.replaceChildren();
+            document.getElementById("confirmation-container")?.replaceChildren();
+            window.selectedEventId = null;
+            window.selectedSession = null;
+            if (window.__TicketCart) { window.__TicketCart.items = []; }
+          } else if (target === 'date') {
+            document.getElementById("details-container")?.replaceChildren();
+            document.getElementById("confirmation-container")?.replaceChildren();
+            window.selectedSession = null;
+            if (window.__TicketCart) { window.__TicketCart.items = []; }
+          } else if (target === 'detail') {
+            document.getElementById("confirmation-container")?.replaceChildren();
+          }
         }
 
-        // On "Buy Ticket", validate and show confirmation
-        function goToConfirmation() {
-            const agreement = document.getElementById("agreementCheck");
-            if (!agreement.checked) {
-                alert("You must agree to the Distance Sales Agreement.");
-                return;
-            }
-
-            switchTab("detail", "confirmation");
+        // GERİ GİDİNCE ileri sekmeleri kilitle + içerikleri temizle
+        function goBackTo(target) {
+          activateTab(target);
+          switch (target) {
+            case 'event':
+              ['date','detail','confirmation'].forEach(lockTab);
+              clearPane('event');
+              break;
+            case 'date':
+              ['detail','confirmation'].forEach(lockTab);
+              clearPane('date');
+              break;
+            case 'detail':
+              ['confirmation'].forEach(lockTab);
+              clearPane('detail');
+              break;
+          }
         }
 
-        // Generic tab switcher
-        function switchTab(current, next) {
-            document.getElementById(`${current}-pane`).classList.remove("active", "show");
-            document.getElementById(`${current}-tab`).classList.remove("active");
-            document.getElementById(`${next}-pane`).classList.add("active", "show");
-            document.getElementById(`${next}-tab`).classList.add("active");
+        // Global
+        window.selectedEventId = null;
+
+        function getTodayStr(){
+          const d = new Date();
+          const m = String(d.getMonth()+1).padStart(2,'0');
+          const day = String(d.getDate()).padStart(2,'0');
+          return `${d.getFullYear()}-${m}-${day}`;
+        }
+
+        function getSelectedDate(){
+          const input = document.getElementById('sessionDate');
+          if (!input) return null;
+          const todayStr = getTodayStr();
+          let val = input.value || todayStr;
+          if (val < todayStr) { val = todayStr; input.value = todayStr; }
+          return val;
+        }
+
+        async function fetchSessions(eventId, dateStr){
+          const base = '@Url.Action("GetSession", "TicketSale")';
+          const url = `${base}?eventId=${encodeURIComponent(eventId)}${dateStr ? `&date=${encodeURIComponent(dateStr)}` : ''}`;
+          try {
+            const resp = await fetch(url, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+            const html = await resp.text();
+            document.getElementById("session-list").innerHTML = html;
+          } catch (e) {
+            console.error(e);
+            document.getElementById("session-list").innerHTML =
+              `<div class="col-12"><div class="alert alert-danger">Sessions could not be loaded.</div></div>`;
+          }
+        }
+
+        async function loadSessionsAndGo(buttonEl) {
+          const eventId = buttonEl.getAttribute("data-event-id");
+          const eventName = buttonEl.getAttribute("data-event-name");
+          if (!eventId) return;
+          window.selectedEventId = eventId;
+
+          const eventNameHost = document.getElementById("selectedEventName");
+          if (eventNameHost) eventNameHost.textContent = eventName || "";
+
+          const dateStr = getSelectedDate();
+          await fetchSessions(eventId, dateStr);
+
+          enableTab("date");
+          activateTab("date"); // Programatik ileri
+        }
+
+        async function reloadSessionsForDate(){
+          if (!window.selectedEventId) return;
+          const dateStr = getSelectedDate();
+          await fetchSessions(window.selectedEventId, dateStr);
         }
     </script>
+
+    <script>
+        /* -----------------------------------------------------------
+           DETAILS + CART (global)
+           _Details partial'ını yönetir + sepet mantığı
+           ----------------------------------------------------------- */
+        (function () {
+          'use strict';
+          if (window.__ticketSaleDetailsInstalled) return;
+          window.__ticketSaleDetailsInstalled = true;
+
+          /* Helpers */
+          window.parseNumberSafe = function (v) {
+            var n = parseFloat(v);
+            return isNaN(n) ? 0 : n;
+          };
+
+          /* Basit sepet modeli */
+          const Cart = {
+            // item: { id, name, price, currencyId, symbol, qty }  (id: "123" bilet, "P:45" ürün)
+            items: [],
+            add(item) {
+              const i = this.items.findIndex(x => String(x.id) === String(item.id));
+              if (i >= 0) this.items[i].qty += item.qty;
+              else this.items.push(item);
+            },
+            remove(id) {
+              this.items = this.items.filter(x => String(x.id) !== String(id));
+            },
+            setQty(id, qty) {
+              const it = this.items.find(x => String(x.id) === String(id));
+              if (it) it.qty = Math.max(1, qty);
+            },
+            inc(id, delta) {
+              const it = this.items.find(x => String(x.id) === String(id));
+              if (it) it.qty = Math.max(1, (it.qty || 1) + delta);
+            },
+            count() {
+              return this.items.reduce((s, i) => s + (i.qty || 0), 0);
+            },
+            totalsByCurrency() {
+              const map = {};
+              for (const it of this.items) {
+                const key = String(it.currencyId);
+                if (!map[key]) map[key] = { symbol: it.symbol, total: 0 };
+                map[key].total += (it.price || 0) * (it.qty || 0);
+              }
+              return map;
+            }
+          };
+          window.__TicketCart = Cart;
+
+          /* Selection (bilet üst alan) */
+          window.changeSelectionQty = function (delta) {
+            const el = document.getElementById('ticketQty');
+            if (!el) return;
+            let val = parseInt(el.value, 10);
+            if (isNaN(val) || val < 1) val = 1;
+            val = Math.max(1, val + delta);
+            el.value = val;
+            updateSelectionTotals();
+          };
+
+          function syncCurrencyToTicket() {
+            const ticketSel = document.getElementById('ticketType');
+            const currencySel = document.getElementById('currencySelect');
+            if (!ticketSel || !currencySel || ticketSel.selectedIndex < 0) return;
+
+            const opt = ticketSel.options[ticketSel.selectedIndex];
+            const currencyId = opt.getAttribute('data-currency-id');
+
+            for (let i = 0; i < currencySel.options.length; i++) {
+              if (currencySel.options[i].value === currencyId) {
+                currencySel.selectedIndex = i; break;
+              }
+            }
+          }
+          window.syncCurrencyToTicket = syncCurrencyToTicket;
+
+          function updateSelectionTotals() {
+            const ticketSel = document.getElementById('ticketType');
+            const qtyEl = document.getElementById('ticketQty');
+            const unitInp = document.getElementById('unitPrice');
+            const selTotal = document.getElementById('selectionTotal');
+
+            const qty = parseInt(qtyEl && qtyEl.value, 10) || 1;
+
+            if (!ticketSel || ticketSel.selectedIndex < 0) {
+              unitInp && (unitInp.value = '0');
+              selTotal && (selTotal.value = '0');
+              return;
+            }
+
+            const opt = ticketSel.options[ticketSel.selectedIndex];
+            const price = window.parseNumberSafe(opt.getAttribute('data-price'));
+            const symbol = opt.getAttribute('data-currency-symbol') || '';
+
+            unitInp && (unitInp.value = price.toFixed(2) + ' ' + symbol);
+            selTotal && (selTotal.value = (price * qty).toFixed(2) + ' ' + symbol);
+
+            syncCurrencyToTicket();
+          }
+          window.updateSelectionTotals = updateSelectionTotals;
+
+          function addFromSelection() {
+            const ticketSel = document.getElementById('ticketType');
+            const qtyEl = document.getElementById('ticketQty');
+            if (!ticketSel || ticketSel.selectedIndex < 0) return;
+
+            const opt = ticketSel.options[ticketSel.selectedIndex];
+            const item = {
+              id:         opt.value, // bilet id (numeric string)
+              name:       opt.getAttribute('data-name'),
+              price:      window.parseNumberSafe(opt.getAttribute('data-price')),
+              currencyId: opt.getAttribute('data-currency-id'),
+              symbol:     opt.getAttribute('data-currency-symbol') || '',
+              qty:        Math.max(1, parseInt(qtyEl && qtyEl.value, 10) || 1)
+            };
+
+            Cart.add(item);
+
+            if (qtyEl) qtyEl.value = 1;
+            updateSelectionTotals();
+            renderCart();
+          }
+
+          function renderCart() {
+            const tbody    = document.getElementById('cartTableBody');
+            const badge    = document.getElementById('cartBadge');
+            const totalsEl = document.getElementById('cartTotals');
+            const payTotal = document.getElementById('totalAmount');
+            const note     = document.getElementById('multiCurNote');
+
+            if (!tbody) return;
+
+            tbody.innerHTML = Cart.items.map(it => {
+              const unit  = (it.price || 0).toFixed(2) + ' ' + (it.symbol || '');
+              const total = ((it.price || 0) * (it.qty || 0)).toFixed(2) + ' ' + (it.symbol || '');
+              return `
+                <tr data-id="${it.id}">
+                  <td>${it.name}</td>
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                      <button type="button" class="btn btn-sm btn-outline-secondary js-dec">−</button>
+                      <input class="form-control form-control-sm text-center js-qty" style="width:64px" value="${it.qty}">
+                      <button type="button" class="btn btn-sm btn-outline-secondary js-inc">+</button>
+                    </div>
+                  </td>
+                  <td class="text-end">${unit}</td>
+                  <td class="text-end fw-semibold">${total}</td>
+                  <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger js-del">×</button></td>
+                </tr>
+              `;
+            }).join('');
+
+            tbody.querySelectorAll('tr').forEach(tr => {
+              const id = tr.getAttribute('data-id');
+
+              tr.querySelector('.js-dec')?.addEventListener('click', () => { Cart.inc(id, -1); renderCart(); });
+              tr.querySelector('.js-inc')?.addEventListener('click', () => { Cart.inc(id,  1); renderCart(); });
+              tr.querySelector('.js-del')?.addEventListener('click', () => { Cart.remove(id); renderCart(); });
+              tr.querySelector('.js-qty')?.addEventListener('input', (e) => {
+                const q = parseInt(e.target.value, 10);
+                Cart.setQty(id, isNaN(q) ? 1 : q);
+                renderCart();
+              });
+            });
+
+            if (badge) badge.textContent = Cart.count();
+
+            const totals = Cart.totalsByCurrency();
+            const curKeys = Object.keys(totals);
+
+            if (totalsEl) {
+              totalsEl.innerHTML = curKeys.length
+                ? 'Toplamlar: ' + curKeys.map(k => `${totals[k].total.toFixed(2)} ${totals[k].symbol}`).join(' • ')
+                : '';
+            }
+
+            if (payTotal) {
+              if (curKeys.length === 1) {
+                const k = curKeys[0];
+                payTotal.value = `${totals[k].total.toFixed(2)} ${totals[k].symbol}`;
+                if (note) note.textContent = '';
+              } else if (curKeys.length > 1) {
+                payTotal.value = '—';
+                if (note) note.textContent = 'Birden fazla para birimi mevcut. Ayrıntılar yukarıdaki toplamlar bölümünde.';
+              } else {
+                payTotal.value = '0';
+                if (note) note.textContent = '';
+              }
+            }
+          }
+          window.renderCart = renderCart;
+
+          window.initDetailsBindings = function () {
+            const ticketSel = document.getElementById('ticketType');
+            const qtyInput  = document.getElementById('ticketQty');
+            const btnAdd    = document.getElementById('btnAddTicket');
+
+            ticketSel?.addEventListener('change', updateSelectionTotals);
+            qtyInput?.addEventListener('input', updateSelectionTotals);
+            btnAdd?.addEventListener('click', addFromSelection);
+
+            syncCurrencyToTicket();
+            updateSelectionTotals();
+            renderCart();
+          };
+
+          // _SessionCards partial'ında onclick="onSelectSession(this)" çağrılır
+          window.onSelectSession = async function (btn) {
+            const payload = {
+              sessionId: btn.getAttribute("data-session-id"),
+              typeId:    btn.getAttribute("data-session-type-id"),
+              typeName:  btn.getAttribute("data-session-type-name"),
+              date:      btn.getAttribute("data-session-date"),
+              start:     btn.getAttribute("data-start"),
+              end:       btn.getAttribute("data-end"),
+              capacity:  btn.getAttribute("data-capacity"),
+              b2c:       btn.getAttribute("data-b2c") === "1",
+              b2b:       btn.getAttribute("data-b2b") === "1",
+            };
+            window.selectedSession = payload;
+
+            const url = `/TicketSale/GetDetail?sessionId=${encodeURIComponent(payload.sessionId)}`;
+            try {
+              const resp = await fetch(url, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+              const html = await resp.text();
+              const host = document.getElementById("details-container");
+              if (host) host.innerHTML = html;
+
+              window.initDetailsBindings && window.initDetailsBindings();
+
+              enableTab("detail");
+              activateTab("detail");
+            } catch (e) {
+              const host = document.getElementById("details-container");
+              if (host) host.innerHTML = `<div class="alert alert-danger">Details could not be loaded.</div>`;
+              console.error(e);
+            }
+          };
+
+        })();
+    </script>
+
+    <script>
+        /* ======= GEO (Country → City → County) ======= */
+        function bindGeoSelectors() {
+          try {
+            if (!window.__geo) {
+              const tag = document.getElementById('geo-data');
+              if (tag && tag.textContent) {
+                window.__geo = JSON.parse(tag.textContent);
+              }
+            }
+          } catch (e) { console.warn('Geo parse error', e); }
+
+          const geo = window.__geo || { countries: [], cities: [], counties: [] };
+          const countrySel = document.getElementById('countrySelect');
+          const citySel    = document.getElementById('citySelect');
+          const countySel  = document.getElementById('countySelect');
+
+          if (!countrySel || !citySel || !countySel) return;
+
+          const fill = (sel, items, valueKey='id', textKey='name', placeholder='Seçiniz') => {
+            sel.innerHTML = '';
+            const opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = placeholder;
+            sel.appendChild(opt0);
+            for (const it of items) {
+              const o = document.createElement('option');
+              o.value = String(it[valueKey]);
+              o.textContent = it[textKey];
+              sel.appendChild(o);
+            }
+            sel.disabled = items.length === 0;
+          };
+
+          const onCountryChange = () => {
+            const cid = countrySel.value;
+            const cities = geo.cities.filter(x => String(x.countryId) === String(cid));
+            fill(citySel, cities, 'id', 'name', '@Localizer["ticketSale.SELECT_CITY"]');
+            fill(countySel, [], 'id', 'name', '@Localizer["ticketSale.SELECT_COUNTY"]');
+          };
+
+          const onCityChange = () => {
+            const ctid = citySel.value;
+            const counties = geo.counties.filter(x => String(x.cityId) === String(ctid));
+            fill(countySel, counties, 'id', 'name', '@Localizer["ticketSale.SELECT_COUNTY"]');
+          };
+
+          fill(countrySel, geo.countries, 'id', 'name', '@Localizer["ticketSale.SELECT_COUNTRY"]');
+          fill(citySel, [], 'id', 'name', '@Localizer["ticketSale.SELECT_CITY"]');
+          fill(countySel, [], 'id', 'name', '@Localizer["ticketSale.SELECT_COUNTY"]');
+
+          countrySel.addEventListener('change', onCountryChange);
+          citySel.addEventListener('change', onCityChange);
+        }
+
+        // initDetailsBindings içine enjekte et
+        (function augmentInit(){
+          const oldInit = window.initDetailsBindings;
+          window.initDetailsBindings = function () {
+            if (typeof oldInit === 'function') oldInit();
+            bindGeoSelectors();
+          };
+        })();
+    </script>
+
+    <script>
+        /* ================================
+           CONFIRMATION (Sepet Özeti) JS
+           ================================ */
+        window.formatMoney = function (value, symbol) {
+          var num = (typeof value === "number") ? value : parseFloat(value || 0);
+          if (isNaN(num)) num = 0;
+          return num.toFixed(2) + (symbol ? (" " + symbol) : "");
+        };
+
+        // (yalnızca bilet formu için fallback)
+        window._fallbackItemFromForm = function () {
+          var ticketSel = document.getElementById("ticketType");
+          var qty = parseInt((document.getElementById("ticketQty") || {}).value, 10) || 1;
+          if (!ticketSel || ticketSel.selectedIndex < 0) return null;
+
+          var opt = ticketSel.options[ticketSel.selectedIndex];
+          return {
+            eventTicketPriceId: parseInt(opt.value, 10),
+            name: opt.text,
+            unitPrice: parseFloat(opt.getAttribute("data-price") || "0"),
+            currencySymbol: opt.getAttribute("data-currency-symbol") || "",
+            currencyTypeId: parseInt(opt.getAttribute("data-currency-id") || "0", 10),
+            piece: qty
+          };
+        };
+
+        // ---- ÖNEMLİ: Hem bilet hem ürün payload'ı oluştur ----
+        window.buildPendingConfirmation = function () {
+          const cartItems = (window.__TicketCart && window.__TicketCart.items) ? window.__TicketCart.items : [];
+
+          // 1) TicketInformations
+          var ticketInfos = [];
+          // 2) ProductInformations
+          var productInfos = [];
+
+          if (cartItems.length) {
+            cartItems.forEach(function (it) {
+              const idStr = String(it.id || '');
+              if (idStr.startsWith('P:')) {
+                // ÜRÜN
+                const pid = parseInt(idStr.substring(2), 10);
+                if (!isNaN(pid)) {
+                  productInfos.push({
+                    ProductId: pid,
+                    Piece: parseInt(it.qty || 0, 10) || 1,
+                    UnitPrice: parseFloat(it.price || 0) || 0,
+                    CurrencyTypeId: parseInt(it.currencyId || 0, 10) || 0
+                  });
+                }
+              } else {
+                // BİLET
+                const tid = parseInt(idStr, 10);
+                if (!isNaN(tid)) {
+                  ticketInfos.push({
+                    EventTicketPriceId: tid,
+                    Piece: parseInt(it.qty || 0, 10) || 1
+                  });
+                }
+              }
+            });
+          } else {
+            // Sepet boşsa formdan tek bilet fallback'i
+            var only = window._fallbackItemFromForm();
+            if (only) {
+              ticketInfos = [{ EventTicketPriceId: only.eventTicketPriceId, Piece: only.piece }];
+            }
+          }
+
+          // 3) Payment + Total
+          var paymentTypeSel = document.getElementById("paymentType");
+          var paymentTypeId = paymentTypeSel ? parseInt(paymentTypeSel.value, 10) : 0;
+
+          var total = 0, symbol = "";
+          if (cartItems.length) {
+            cartItems.forEach(function (it) {
+              total += (parseFloat(it.price || 0) * parseInt(it.qty || 0, 10));
+              if (!symbol) symbol = it.symbol || "";
+            });
+          } else {
+            var fallback = window._fallbackItemFromForm();
+            if (fallback) {
+              total = fallback.unitPrice * fallback.piece;
+              symbol = fallback.currencySymbol || "";
+            }
+          }
+
+          // 4) Personal
+          var countyEl = document.getElementById("countySelect");
+          var personal = {
+            FirstName: (document.getElementById("firstName") || {}).value || "",
+            Surname:   (document.getElementById("lastName")  || {}).value || "",
+            Email:     (document.getElementById("email")     || {}).value || "",
+            Phone:     (document.getElementById("phone")     || {}).value || "",
+            CountyId:  countyEl ? parseInt(countyEl.value, 10) : 0
+          };
+
+          // 5) Paket
+          var payload = {
+            PersonalInformation: personal,
+            TicketInformations: ticketInfos,
+            ProductInformations: productInfos, // <-- YENİ
+            PaymentInformation: {
+              PaymentTypeId: paymentTypeId,
+              TotalAmount: parseFloat(total.toFixed(2))
+            },
+            __meta: { totalSymbol: symbol }
+          };
+
+          return payload;
+        };
+
+        window.renderConfirmationView = function () {
+          var hostEmpty = document.getElementById("conf-cart-empty");
+          var hostWrap  = document.getElementById("conf-cart-wrap");
+          var tbody     = document.getElementById("conf-cart-rows");
+          var grand     = document.getElementById("conf-grand-total");
+          if (!hostEmpty || !hostWrap || !tbody || !grand) return;
+
+          var viewItems = [];
+          var symbol = "";
+
+          if (window.__TicketCart && window.__TicketCart.items && window.__TicketCart.items.length) {
+            viewItems = window.__TicketCart.items.map(function (it) {
+              symbol = symbol || it.symbol || "";
+              return {
+                name: it.name,
+                unitPrice: parseFloat(it.price || 0),
+                piece: parseInt(it.qty || 0, 10),
+                subtotal: (parseFloat(it.price || 0) * parseInt(it.qty || 0, 10))
+              };
+            });
+          } else {
+            var fallback = window._fallbackItemFromForm();
+            if (fallback) {
+              symbol = fallback.currencySymbol || "";
+              viewItems = [{
+                name: fallback.name,
+                unitPrice: fallback.unitPrice,
+                piece: fallback.piece,
+                subtotal: fallback.unitPrice * fallback.piece
+              }];
+            }
+          }
+
+          if (!viewItems.length) {
+            hostWrap.classList.add("d-none");
+            hostEmpty.classList.remove("d-none");
+            tbody.innerHTML = "";
+            grand.textContent = "0";
+            return;
+          }
+
+          hostEmpty.classList.add("d-none");
+          hostWrap.classList.remove("d-none");
+
+          var total = 0;
+          var rows = viewItems.map(function (it) {
+            total += it.subtotal;
+            return (
+              `<tr>
+                <td>${it.name}</td>
+                <td class="text-center">${it.piece}</td>
+                <td class="text-end">${window.formatMoney(it.unitPrice, symbol)}</td>
+                <td class="text-end">${window.formatMoney(it.subtotal, symbol)}</td>
+              </tr>`
+            );
+          }).join("");
+
+          tbody.innerHTML = rows;
+          grand.textContent = window.formatMoney(total, symbol);
+        };
+
+        window.goToConfirmation = async function () {
+          if (!document.getElementById("conf-cart-wrap")) {
+            try {
+              var url = '/TicketSale/GetConfirmation';
+              var resp = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+              var html = await resp.text();
+              var host = document.getElementById("confirmation-container");
+              if (host) host.innerHTML = html;
+            } catch (e) {
+              var host = document.getElementById("confirmation-container");
+              if (host) host.innerHTML = '<div class="alert alert-danger">Confirmation could not be loaded.</div>';
+            }
+          }
+
+          window.pendingConfirmation = window.buildPendingConfirmation();
+          window.renderConfirmationView();
+
+          enableTab("confirmation");
+          activateTab("confirmation");
+        };
+
+        window.clearCartAndBack = function () {
+          if (window.__TicketCart) window.__TicketCart.items = [];
+          window.pendingConfirmation = null;
+          var host = document.getElementById("confirmation-container");
+          if (host) host.innerHTML = "";
+          enableTab("detail");
+          activateTab("detail");
+        };
+
+        window.submitConfirmation = async function () {
+          var payload = window.pendingConfirmation || window.buildPendingConfirmation();
+          var hasTickets = payload?.TicketInformations?.length > 0;
+          var hasProducts = payload?.ProductInformations?.length > 0;
+
+          if (!hasTickets && !hasProducts) {
+            alert("@Localizer["confirmation.ALERT_EMPTY_CART"]");
+            return;
+          }
+
+          try {
+            const resp = await fetch('/TicketSale/Confirm', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              body: JSON.stringify({
+                PersonalInformation: payload.PersonalInformation,
+                TicketInformations:  payload.TicketInformations,
+                ProductInformations: payload.ProductInformations, // <-- YENİ
+                PaymentInformation:  payload.PaymentInformation
+              })
+            });
+
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+            window.location.href = '@Url.Action("Index", "TicketSale")';
+          } catch (e) {
+            console.error(e);
+            alert("@Localizer["confirmation.ERROR"]");
+          }
+        };
+    </script>
 }
+

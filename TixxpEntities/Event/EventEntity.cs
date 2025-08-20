@@ -10,6 +10,9 @@ namespace Tixxp.Entities.Events
         [Column("Name")]
         public string? Name { get; set; }
 
+        [Column("ImagePath")]
+        public string? ImagePath { get; set; }
+
         [Column("OpeningTime")]
         public TimeSpan? OpeningTime { get; set; }
 

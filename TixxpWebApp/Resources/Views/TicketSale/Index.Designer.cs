@@ -61,6 +61,24 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        internal static string ticketSale_INDEX_BACK {
+            get {
+                return ResourceManager.GetString("ticketSale.INDEX.BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Closing Time.
+        /// </summary>
+        internal static string ticketSale_INDEX_CLOSING {
+            get {
+                return ResourceManager.GetString("ticketSale.INDEX.CLOSING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirmation.
         /// </summary>
         internal static string ticketSale_INDEX_CONFIRMATION {
@@ -70,7 +88,7 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Date.
+        ///   Looks up a localized string similar to Select Date.
         /// </summary>
         internal static string ticketSale_INDEX_DATE {
             get {
@@ -79,20 +97,11 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Details.
+        ///   Looks up a localized string similar to Detail.
         /// </summary>
         internal static string ticketSale_INDEX_DETAILS {
             get {
                 return ResourceManager.GetString("ticketSale.INDEX.DETAILS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to End.
-        /// </summary>
-        internal static string ticketSale_INDEX_END {
-            get {
-                return ResourceManager.GetString("ticketSale.INDEX.END", resourceCulture);
             }
         }
         
@@ -106,6 +115,24 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Record Not Found.
+        /// </summary>
+        internal static string ticketSale_INDEX_NO_EVENTS {
+            get {
+                return ResourceManager.GetString("ticketSale.INDEX.NO_EVENTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opening Time.
+        /// </summary>
+        internal static string ticketSale_INDEX_OPENING {
+            get {
+                return ResourceManager.GetString("ticketSale.INDEX.OPENING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sell Ticket.
         /// </summary>
         internal static string ticketSale_INDEX_SELL_TICKET {
@@ -115,11 +142,47 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Start.
+        ///   Looks up a localized string similar to Session.
         /// </summary>
-        internal static string ticketSale_INDEX_START {
+        internal static string ticketSale_INDEX_SESSION {
             get {
-                return ResourceManager.GetString("ticketSale.INDEX.START", resourceCulture);
+                return ResourceManager.GetString("ticketSale.INDEX.SESSION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Sessions.
+        /// </summary>
+        internal static string ticketSale_INDEX_VIEW_SESSIONS {
+            get {
+                return ResourceManager.GetString("ticketSale.INDEX.VIEW_SESSIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select City.
+        /// </summary>
+        internal static string ticketSale_SELECT_CITY {
+            get {
+                return ResourceManager.GetString("ticketSale.SELECT_CITY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Country.
+        /// </summary>
+        internal static string ticketSale_SELECT_COUNTRY {
+            get {
+                return ResourceManager.GetString("ticketSale.SELECT_COUNTRY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select County.
+        /// </summary>
+        internal static string ticketSale_SELECT_COUNTY {
+            get {
+                return ResourceManager.GetString("ticketSale.SELECT_COUNTY", resourceCulture);
             }
         }
     }

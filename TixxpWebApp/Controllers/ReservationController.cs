@@ -39,11 +39,11 @@ namespace Tixxp.WebApp.Controllers
             return Json(new
             {
                 id = result.Data.Id,
-                name = result.Data.Name,
-                surname = result.Data.Surname,
-                email = result.Data.Email,
-                phone = result.Data.Phone,
-                numberOfTickets = result.Data.NumberOfTickets,
+                //name = result.Data.Name,
+                //surname = result.Data.Surname,
+                //email = result.Data.Email,
+                //phone = result.Data.Phone,
+                //numberOfTickets = result.Data.NumberOfTickets,
                 totalPrice = result.Data.TotalPrice,
                 statusId = result.Data.StatusId
             });
@@ -67,11 +67,11 @@ namespace Tixxp.WebApp.Controllers
             if (!existing.Success)
                 return Json(new { success = false, message = "Kayıt bulunamadı." });
 
-            existing.Data.Name = model.Name;
-            existing.Data.Surname = model.Surname;
-            existing.Data.Email = model.Email;
-            existing.Data.Phone = model.Phone;
-            existing.Data.NumberOfTickets = model.NumberOfTickets;
+            //existing.Data.Name = model.Name;
+            //existing.Data.Surname = model.Surname;
+            //existing.Data.Email = model.Email;
+            //existing.Data.Phone = model.Phone;
+            //existing.Data.NumberOfTickets = model.NumberOfTickets;
             existing.Data.TotalPrice = model.TotalPrice;
             existing.Data.StatusId = model.StatusId;
             existing.Data.Updated_Date = DateTime.Now;

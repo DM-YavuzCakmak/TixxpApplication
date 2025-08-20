@@ -34,10 +34,10 @@
                                 foreach (var item in Model)
                                 {
                                     <tr>
-                                        <td>@item.Name @item.Surname</td>
+                                       @*  <td>@item.Name @item.Surname</td>
                                         <td>@item.Email</td>
                                         <td>@item.Phone</td>
-                                        <td>@item.NumberOfTickets</td>
+                                        <td>@item.NumberOfTickets</td> *@
                                         <td>@item.TotalPrice?.ToString("N2")</td>
                                         <td>@((ReservationStatusEnum)item.StatusId)</td>
                                         <td>
