@@ -1,0 +1,95 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.ReservationManagement.ReservationListResultVm
+<div class="card-body p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 90px;">@Localizer["_ReservationList.ID"]</th>
+                    <th style="width: 160px;">@Localizer["_ReservationList.CREATED_DATE"]</th>
+                    <th>@Localizer["_ReservationList.Channel"]</th>
+                    <th>Customer</th>
+                    <th style="width: 160px;">@Localizer["_ReservationList.PAYMENT_TYPE"]</th>
+                    <th style="width: 130px;">@Localizer["_ReservationList.STATUS"]</th>
+                    <th class="text-end" style="width: 140px;">@Localizer["_ReservationList.TOTAL"]</th>
+                    <th style="width: 320px;">@Localizer["_ReservationList.ACTIONS"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    foreach (var r in Model.Items)
+                    {
+                        var badgeClass = r.StatusId switch
+                        {
+                            1 => "bg-warning",
+                            2 => "bg-success",
+                            3 => "bg-danger",
+                            _ => "bg-secondary"
+                        };
+                        <tr>
+                            <td class="fw-semibold">#@r.Id</td>
+                            <td>@r.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@r.ChannelName</td>
+                            <td>
+                                <div class="small text-muted">@r.Email</div>
+                                <div>@r.FullName</div>
+                            </td>
+                            <td>@r.PaymentTypeName</td>
+                            <td><span class="badge @badgeClass">@r.StatusName</span></td>
+                            <td class="text-end">@r.TotalPrice.ToString("0.00")</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-secondary js-detail" data-id="@r.Id">
+                                        <i class="ti ti-eye me-1"></i> @Localizer["_ReservationList.DETAIL"]
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary js-change-pay" data-id="@r.Id">
+                                        <i class="ti ti-credit-card me-1"></i> @Localizer["_ReservationList.CHANGE_PAYMENT"]
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger js-cancel" data-id="@r.Id">
+                                        <i class="ti ti-ban me-1"></i> @Localizer["_ReservationList.CANCEL"]
+                                    </button>
+                                    <button type="button" class="btn btn-outline-dark js-resend" data-id="@r.Id">
+                                        <i class="ti ti-mail me-1"></i> @Localizer["_ReservationList.RESEND_EMAIL"]
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">@Localizer["_ReservationList.NO_RECORDS_FOUND"].</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- pagination -->
+    @{
+        var totalPages = (int)Math.Ceiling((Model.TotalCount * 1.0) / Math.Max(1, Model.PageSize));
+        if (totalPages < 1) totalPages = 1;
+    }
+    <div class="d-flex justify-content-between align-items-center p-3">
+        <div class="small text-muted">
+            Page @Model.Page / @totalPages • Total @Model.TotalCount
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link js-page" href="#" data-page="@(Model.Page - 1)">@Localizer["_ReservationList.PREV"]</a>
+                </li>
+                @for (var i = 1; i <= totalPages && i <= 10; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link js-page" href="#" data-page="@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.Page >= totalPages ? "disabled" : "")">
+                    <a class="page-link js-page" href="#" data-page="@(Model.Page + 1)">@Localizer["_ReservationList.NEXT"]</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

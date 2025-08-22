@@ -79,4 +79,17 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity, new()
             return new SuccessDataResult<T>(result);
         return new ErrorDataResult<T>("Kayıt bulunamadı.");
     }
+
+    public IDataResult<T> GetFirstOrDefaultWithInclude(
+     Expression<Func<T, bool>> filter,
+     params Expression<Func<T, object>>[] includes)
+    {
+        includes ??= Array.Empty<Expression<Func<T, object>>>();
+
+        var result = _repository.GetFirstOrDefaultWithInclude(filter, includes);
+        if (result != null)
+            return new SuccessDataResult<T>(result);
+
+        return new ErrorDataResult<T>("Kayıt bulunamadı.");
+    }
 }

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using Tixxp.Business;
+using Tixxp.Business.Services.Abstract.CurrenctUser;
+using Tixxp.Business.Services.Concrete.CurrentUser;
 using Tixxp.Infrastructure;
 using Tixxp.WebApp.Middlewares;
 
@@ -53,6 +55,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddBusinessServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddTixxpDbContext(builder.Configuration);

@@ -21,6 +21,7 @@ using Tixxp.Entities.ProductSaleInvoiceInfo;
 using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
 using Tixxp.Entities.ReservationDetail;
+using Tixxp.Entities.ReservationProductDetail;
 using Tixxp.Entities.ReservationSaleInvoiceInfo;
 using Tixxp.Entities.ReservationStatus;
 using Tixxp.Entities.ReservationStatusTranslation;
@@ -50,6 +51,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ReservationProductDetailEntity>(entity =>
+            {
+                entity.ToTable("ReservationProductDetail", _schema);
+            });
             modelBuilder.Entity<ReservationDetailEntity>(entity =>
             {
                 entity.ToTable("ReservationDetail", _schema);
@@ -195,6 +200,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         public DbSet<CounterEntity> Counters { get; set; }
         public DbSet<ChannelEntity> Channels { get; set; }
+        public DbSet<ReservationProductDetailEntity> ReservationProductDetails { get; set; }
         public DbSet<SessionStatusEntity> SessionStatuses { get; set; }
         public DbSet<ReservationSaleInvoiceInfoEntity> ReservationSaleInvoiceInfos { get; set; }
         public DbSet<ReservationDetailEntity> ReservationDetails { get; set; }

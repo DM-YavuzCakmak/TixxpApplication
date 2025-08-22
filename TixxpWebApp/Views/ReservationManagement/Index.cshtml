@@ -1,0 +1,453 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Reservation Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Lookups from ViewBag:
+    var channels = ViewBag.Channels as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
+    var paymentTypes = ViewBag.PaymentTypes as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
+    var statuses = ViewBag.Statuses as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
+}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center my-4 page-header-breadcrumb">
+            <h1 class="page-title fw-semibold fs-18 mb-0">@Localizer["reservationManagement.INDEX.RESERVATION_MANAGEMENT"]</h1>
+        </div>
+
+        <!-- Filters Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-semibold">@Localizer["reservationManagement.INDEX.FILTERS"]</div>
+            <div class="card-body">
+                <form id="filterForm" class="row g-3">
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.CHANNEL"]</label>
+                        <select class="form-select" id="fChannel">
+                            <option value="">@Localizer["reservationManagement.INDEX.ALL"]</option>
+                            @foreach (var c in channels)
+                            {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.PAYMENT_TYPE"]</label>
+                        <select class="form-select" id="fPaymentType">
+                            <option value="">@Localizer["reservationManagement.INDEX.ALL"]</option>
+                            @foreach (var p in paymentTypes)
+                            {
+                                <option value="@p.Id">@p.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.STATUS"]</label>
+                        <select class="form-select" id="fStatus">
+                            <option value="">@Localizer["reservationManagement.INDEX.ALL"]</option>
+                            @foreach (var s in statuses)
+                            {
+                                <option value="@s.Id">@s.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.RESERVATION_ID"]</label>
+                        <input type="number" class="form-control" id="fReservationId" placeholder="@Localizer["reservationManagement.INDEX.RESERVATION_ID.PLACEHOLDER"]" />
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.E-MAIL"]</label>
+                        <input type="email" class="form-control" id="fEmail" placeholder="@Localizer["reservationManagement.INDEX.E-MAIL.PLACEHOLDER"]" />
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.START_DATE"]</label>
+                        <input type="date" class="form-control" id="fStartDate" />
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.END_DATE"]</label>
+                        <input type="date" class="form-control" id="fEndDate" />
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">@Localizer["reservationManagement.INDEX.PAGE_SIZE"]</label>
+                        <select class="form-select" id="fPageSize">
+                            <option>25</option>
+                            <option>50</option>
+                            <option>100</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2">
+                        <button type="button" class="btn btn-primary" id="btnSearch">
+                            <i class="ti ti-search me-1"></i> @Localizer["reservationManagement.INDEX.SEARCH"]
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="btnReset">@Localizer["reservationManagement.INDEX.RESET"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted">@Localizer["reservationManagement.INDEX.USE_FILTERS_DESC"] <strong>@Localizer["reservationManagement.INDEX.SEARCH"]</strong>.</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- hidden antiforgery for AJAX posts -->
+<form id="af" method="post" class="d-none">
+    @Html.AntiForgeryToken()
+</form>
+
+<!-- MODALS -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["reservationManagement.INDEX.RESERVATION_DETAIL"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["reservationManagement.INDEX.CANCEL_RESERVATION"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="cancelModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="paymentTypeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["reservationManagement.INDEX.CHANGE_PAYMENT_TYPE"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="paymentTypeModalBody"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        (() => {
+          // ======== Culture helpers (her isteğe eklenecek) ========
+          const __culture   = '@System.Globalization.CultureInfo.CurrentCulture.Name';
+          const __uiCulture = '@System.Globalization.CultureInfo.CurrentUICulture.Name';
+          function withCulture(urlOrPath) {
+            // relative path da gelse absolute da gelse aynı şekilde çalışır
+            const u = new URL(urlOrPath, window.location.origin);
+            if (!u.searchParams.has('culture'))     u.searchParams.set('culture', __culture);
+            if (!u.searchParams.has('ui-culture')) u.searchParams.set('ui-culture', __uiCulture);
+            return u.pathname + (u.search ? u.search : '');
+          }
+
+          // ======== DOM + helpers ========
+          const results = document.getElementById('results');
+          const qs  = (sel, root=document) => root.querySelector(sel);
+          const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+          const afToken = () => (document.querySelector('#af input[name="__RequestVerificationToken"]') || {}).value || '';
+
+          // SweetAlert2 varsa onu kullan; yoksa toast/alert fallback
+          const hasSwal = () => (typeof Swal !== 'undefined' && typeof Swal.fire === 'function');
+          function showSuccess(msg) {
+            if (hasSwal()) Swal.fire({ icon:'success', title: msg, timer: 1800, showConfirmButton:false });
+            else if (typeof toast === 'function') toast(msg, true);
+            else alert(msg);
+          }
+          function showError(msg) {
+            if (hasSwal()) Swal.fire({ icon:'error', title:'Hata', html: msg });
+            else if (typeof toast === 'function') toast(msg, false);
+            else alert('Hata: ' + msg);
+          }
+          async function confirmDialog(msg, confirmText='Evet', cancelText='Vazgeç') {
+            if (hasSwal()) {
+              const res = await Swal.fire({
+                icon:'question', title: msg, showCancelButton:true,
+                confirmButtonText: confirmText, cancelButtonText: cancelText
+              });
+              return res.isConfirmed;
+            }
+            return window.confirm(msg.replace(/<[^>]+>/g,'')); // HTML varsa temizle
+          }
+          function setSubmitting(form, isBusy) {
+            const btn = form.querySelector('button[type="submit"]');
+            if (!btn) return;
+            btn.disabled = !!isBusy;
+            btn.dataset._origText ??= btn.innerHTML;
+            btn.innerHTML = isBusy
+              ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Kaydediliyor...'
+              : btn.dataset._origText;
+          }
+          async function extractErrorMessage(resp) {
+            try {
+              const ct = resp.headers.get('content-type') || '';
+              if (ct.includes('application/json')) {
+                const j = await resp.json();
+                return (j && (j.message || j.error)) ? (j.message || j.error) : JSON.stringify(j);
+              }
+              const txt = await resp.text();
+              if (ct.includes('text/html')) {
+                const div = document.createElement('div'); div.innerHTML = txt;
+                const msgs = [];
+                div.querySelectorAll('.validation-summary-errors li, .field-validation-error')
+                   .forEach(el => { const t=(el.textContent||'').trim(); if (t) msgs.push(t); });
+                if (msgs.length) return msgs.join('<br>');
+                return (div.textContent||'').trim() || 'Bilinmeyen hata';
+              }
+              return txt || 'Bilinmeyen hata';
+            } catch { return 'Bilinmeyen hata'; }
+          }
+
+          // ======== Filters / query ========
+          function getFilters(page=1){
+            return {
+              ChannelId:     qs('#fChannel')?.value || '',
+              PaymentTypeId: qs('#fPaymentType')?.value || '',
+              StatusId:      qs('#fStatus')?.value || '',
+              ReservationId: qs('#fReservationId')?.value || '',
+              Email:         qs('#fEmail')?.value || '',
+              StartDate:     qs('#fStartDate')?.value || '',
+              EndDate:       qs('#fEndDate')?.value || '',
+              Page:          page,
+              PageSize:      parseInt(qs('#fPageSize')?.value,10) || 25
+            };
+          }
+          function toQuery(obj){
+            const p = new URLSearchParams();
+            Object.entries(obj).forEach(([k,v]) => { if(v!=='' && v!=null) p.append(k, v); });
+            return p.toString();
+          }
+
+          // ======== Search + bind ========
+          async function search(page=1){
+            const f   = getFilters(page);
+            const url = withCulture('@Url.Action("Search", "ReservationManagement")' + '?' + toQuery(f));
+
+            if (results) {
+              results.innerHTML = `
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
+                    <div>@Localizer["reservationManagement.INDEX.LOADING"]…</div>
+                  </div>
+                </div>`;
+            }
+
+            try {
+              const resp = await fetch(url, { headers: { 'X-Requested-With':'XMLHttpRequest' } });
+              const html = await resp.text();
+              if (results) results.innerHTML = html;
+              bindPaging();
+              bindRowActions();
+            } catch (e) {
+              console.error(e);
+              if (results) results.innerHTML = `
+                <div class="card-body">
+                  <div class="alert alert-danger mb-0">Liste yüklenemedi. Lütfen tekrar deneyin.</div>
+                </div>`;
+            }
+          }
+          window.search = search; // diğer yerlerden çağrılabilsin
+
+          function resetFilters(){
+            ['#fChannel','#fPaymentType','#fStatus','#fReservationId','#fEmail','#fStartDate','#fEndDate']
+              .forEach(id => { const el = qs(id); if (el) el.value=''; });
+            const ps = qs('#fPageSize'); if (ps) ps.value = '25';
+          }
+
+          function bindPaging(){
+            qsa('.js-page', results).forEach(a => {
+              a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const p = parseInt(a.getAttribute('data-page'),10);
+                if (p && p>0) search(p);
+              });
+            });
+          }
+
+          function bindRowActions(){
+            // ---- Detail (GET partial -> modal)
+            qsa('.js-detail', results).forEach(btn => {
+              btn.addEventListener('click', async () => {
+                const id  = btn.getAttribute('data-id');
+                const url = withCulture('@Url.Action("Detail", "ReservationManagement")' + '?id=' + encodeURIComponent(id));
+                try {
+                  const resp = await fetch(url, { headers: { 'X-Requested-With':'XMLHttpRequest' }});
+                  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                  const html = await resp.text();
+                  qs('#detailModalBody').innerHTML = html;
+                  new bootstrap.Modal(qs('#detailModal')).show();
+                } catch (e) {
+                  console.error(e);
+                  showError('@Localizer["reservationManagement.INDEX.DETAILS_NOT_LOADED"]');
+                }
+              });
+            });
+
+            // ---- Cancel (GET form -> modal -> POST)
+            qsa('.js-cancel', results).forEach(btn => {
+              btn.addEventListener('click', async () => {
+                const id  = btn.getAttribute('data-id');
+                const url = withCulture('@Url.Action("Cancel", "ReservationManagement")' + '?id=' + encodeURIComponent(id));
+                try {
+                  const resp = await fetch(url, { headers: { 'X-Requested-With':'XMLHttpRequest' }});
+                  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                  const html = await resp.text();
+                  qs('#cancelModalBody').innerHTML = html;
+
+                  const modalEl = qs('#cancelModal');
+                  const form = qs('#cancelModalBody form');
+                  if (form) {
+                    form.addEventListener('submit', async (e) => {
+                      e.preventDefault();
+
+                      const ok = await confirmDialog('@Localizer["reservationManagement.INDEX.DOU_YOU_WANT_CANCEL_RESREVATION"]');
+                      if (!ok) return;
+
+                      const fd = new FormData(form);
+                      setSubmitting(form, true);
+                      try {
+                        const postUrl = withCulture(form.action);
+                        const resp2 = await fetch(postUrl, {
+                          method: 'POST',
+                          headers: { 'X-Requested-With':'XMLHttpRequest', 'RequestVerificationToken': afToken() },
+                          body: fd
+                        });
+                        if (resp2.ok){
+                          bootstrap.Modal.getInstance(modalEl).hide();
+                          showSuccess('@Localizer["reservationManagement.INDEX.RESERVATION_CANCELLED"]');
+                          search(); // refresh
+                        } else {
+                          const msg = await extractErrorMessage(resp2);
+                          showError(msg || '@Localizer["reservationManagement.INDEX.CANCELLATION_FAILED"]');
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        showError('@Localizer["reservationManagement.INDEX.REQUEST_ERROR"]');
+                      } finally {
+                        setSubmitting(form, false);
+                      }
+                    });
+                  }
+
+                  new bootstrap.Modal(modalEl).show();
+                } catch (e) {
+                  console.error(e);
+                  showError('@Localizer["reservationManagement.INDEX.CANCEL_FORM_LOAD"]');
+                }
+              });
+            });
+
+            // ---- Change Payment Type (GET form -> modal -> POST)
+            qsa('.js-change-pay', results).forEach(btn => {
+              btn.addEventListener('click', async () => {
+                const id  = btn.getAttribute('data-id');
+                const url = withCulture('@Url.Action("ChangePaymentType", "ReservationManagement")' + '?id=' + encodeURIComponent(id));
+
+                try {
+                  const resp = await fetch(url, { headers: { 'X-Requested-With':'XMLHttpRequest' }});
+                  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                  const html = await resp.text();
+                  qs('#paymentTypeModalBody').innerHTML = html;
+
+                  const modalEl = qs('#paymentTypeModal');
+                  const form = qs('#paymentTypeModalBody form');
+                  if (form) {
+                    form.addEventListener('submit', async (e) => {
+                      e.preventDefault();
+
+                      // Seçili ödeme tipi adı
+                      const sel = form.querySelector('select[name="PaymentTypeId"]');
+                      const selectedText = sel?.options?.[sel.selectedIndex]?.text || '—';
+                      const ok = await confirmDialog(
+                        `@Localizer["reservationManagement.INDEX.PAYMENT_TYPE_QUESTION"] <b>${selectedText}</b> @Localizer["reservationManagement.INDEX.DO_YOU_WANT_UPDATE_AS"]`
+                      );
+                      if (!ok) return;
+
+                      const fd = new FormData(form);
+                      setSubmitting(form, true);
+                      try {
+                        const postUrl = withCulture(form.action);
+                        const resp2 = await fetch(postUrl, {
+                          method: 'POST',
+                          headers: {
+                            'X-Requested-With':'XMLHttpRequest',
+                            'RequestVerificationToken': afToken()
+                          },
+                          body: fd
+                        });
+                        if (resp2.ok){
+                          bootstrap.Modal.getInstance(modalEl).hide();
+                          showSuccess('@Localizer["reservationManagement.INDEX.PAYMENT_TPYE_UPDATED"]');
+                          search(); // refresh
+                        } else {
+                          const msg = await extractErrorMessage(resp2);
+                          showError(msg || '@Localizer["reservationManagement.INDEX.UPDATE_FAILED"]');
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        showError('@Localizer["reservationManagement.INDEX.REQUEST_ERROR"]');
+                      } finally {
+                        setSubmitting(form, false);
+                      }
+                    });
+                  }
+
+                  new bootstrap.Modal(modalEl).show();
+                } catch (err) {
+                  console.error(err);
+                  showError('@Localizer["reservationManagement.INDEX.FORM_FAILED_LOAD"]');
+                }
+              });
+            });
+
+            // ---- Resend Email (POST)
+            qsa('.js-resend', results).forEach(btn => {
+              btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const ok = await confirmDialog(`Rezervasyon #${id} için e-posta yeniden gönderilsin mi?`);
+                if (!ok) return;
+
+                const url = withCulture('@Url.Action("ResendEmail", "ReservationManagement")' + '?id=' + encodeURIComponent(id));
+                try {
+                  const resp = await fetch(url, {
+                    method:'POST',
+                    headers: { 'X-Requested-With':'XMLHttpRequest', 'RequestVerificationToken': afToken() }
+                  });
+                  if (resp.ok) {
+                    let msg = 'E-posta kuyruğa alındı.';
+                    try { const j = await resp.json(); if (j?.message) msg = j.message; } catch {}
+                    showSuccess(msg);
+                  } else {
+                    const msg = await extractErrorMessage(resp);
+                    showError(msg || '@Localizer["reservationManagement.INDEX.CREATE_MAIL_SENDING_REQUEST"]');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  showError('@Localizer["reservationManagement.INDEX.REQUEST_ERROR"]');
+                }
+              });
+            });
+          }
+
+          // ======== Buttons ========
+          qs('#btnSearch')?.addEventListener('click', () => search(1));
+          qs('#btnReset')?.addEventListener('click', () => { resetFilters(); search(1); });
+
+          // İsteğe bağlı: İlk yüklemede otomatik getir
+          // search(1);
+        })();
+    </script>
+}

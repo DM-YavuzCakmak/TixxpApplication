@@ -33,6 +33,7 @@ using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Abstract.Reservation;
 using Tixxp.Business.Services.Abstract.ReservationDetail;
+using Tixxp.Business.Services.Abstract.ReservationProductDetail;
 using Tixxp.Business.Services.Abstract.ReservationSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.ReservationStatus;
 using Tixxp.Business.Services.Abstract.ReservationStatusTranslation;
@@ -82,6 +83,7 @@ using Tixxp.Business.Services.Concrete.ProductSaleInvoiceInfo;
 using Tixxp.Business.Services.Concrete.ProductTranslation;
 using Tixxp.Business.Services.Concrete.Reservation;
 using Tixxp.Business.Services.Concrete.ReservationDetail;
+using Tixxp.Business.Services.Concrete.ReservationProductDetail;
 using Tixxp.Business.Services.Concrete.ReservationSaleInvoiceInfo;
 using Tixxp.Business.Services.Concrete.ReservationStatus;
 using Tixxp.Business.Services.Concrete.ReservationStatusTranslation;
@@ -108,6 +110,7 @@ public static class BusinessServiceRegistration
 
 
         services.AddScoped<IPersonnelService, PersonnelService>();
+        services.AddScoped<IReservationProductDetailService, ReservationProductDetailService>();
         services.AddScoped<ILanguageService, LanguageService>();
         services.AddScoped<IPaymentTypeService, PaymentTypeService>();
         services.AddScoped<IReservationDetailService, ReservationDetailService>();

@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.ReservationManagement.ChangePaymentTypeVm
+
+<form method="post" action="@Url.Action("ChangePaymentType","ReservationManagement")" id="changePaymentForm">
+  @Html.AntiForgeryToken()
+
+  <input type="hidden" name="ReservationId" value="@Model.ReservationId" />
+
+  <div class="mb-3">
+        <label class="form-label" for="PaymentTypeId">@Localizer["_ChangePaymentType.PAYMENT_TYPE"]</label>
+    <select class="form-select" id="PaymentTypeId" name="PaymentTypeId" required>
+            <option value="">@Localizer["_ChangePaymentType.SELECT"]…</option>
+      @foreach (var p in (Model?.PaymentTypeOptions ?? Enumerable.Empty<dynamic>()))
+      {
+          var isSelected = Convert.ToString(Model?.CurrentPaymentTypeId) == Convert.ToString(p.Id);
+          <option value="@p.Id">@p.Name</option>
+      }
+    </select>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@Localizer["_ChangePaymentType.CLOSE"]</button>
+        <button type="submit" class="btn btn-primary">@Localizer["_ChangePaymentType.SAVE"]</button>
+  </div>
+</form>

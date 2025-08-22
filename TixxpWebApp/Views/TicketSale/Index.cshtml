@@ -745,7 +745,7 @@
           var payload = {
             PersonalInformation: personal,
             TicketInformations: ticketInfos,
-            ProductInformations: productInfos, // <-- YENİ
+            ProductInformations: productInfos, // <-- ÜRÜNLER
             PaymentInformation: {
               PaymentTypeId: paymentTypeId,
               TotalAmount: parseFloat(total.toFixed(2))
@@ -817,6 +817,31 @@
           grand.textContent = window.formatMoney(total, symbol);
         };
 
+        // --- Popup helper'ları ---
+        function hasSwal(){ return typeof Swal !== 'undefined' && typeof Swal.fire === 'function'; }
+        function showSuccessThenRedirect(message, url){
+          if (hasSwal()){
+            Swal.fire({
+              icon: 'success',
+              title: message,
+              timer: 1600,
+              showConfirmButton: false,
+              allowOutsideClick: false,
+              allowEscapeKey: false
+            }).then(() => { window.location.href = url; });
+          } else {
+            alert(message);
+            window.location.href = url;
+          }
+        }
+        function showError(message){
+          if (hasSwal()){
+            Swal.fire({ icon:'error', title: message });
+          } else {
+            alert(message);
+          }
+        }
+
         window.goToConfirmation = async function () {
           if (!document.getElementById("conf-cart-wrap")) {
             try {
@@ -867,17 +892,19 @@
               body: JSON.stringify({
                 PersonalInformation: payload.PersonalInformation,
                 TicketInformations:  payload.TicketInformations,
-                ProductInformations: payload.ProductInformations, // <-- YENİ
+                ProductInformations: payload.ProductInformations,
                 PaymentInformation:  payload.PaymentInformation
               })
             });
 
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
 
-            window.location.href = '@Url.Action("Index", "TicketSale")';
+            // ✅ Başarılı: önce popup göster, sonra yönlendir
+            showSuccessThenRedirect('@Localizer["confirmation.SUCCESS"]', '@Url.Action("Index", "TicketSale")');
+
           } catch (e) {
             console.error(e);
-            alert("@Localizer["confirmation.ERROR"]");
+            showError('@Localizer["confirmation.ERROR"]');
           }
         };
     </script>

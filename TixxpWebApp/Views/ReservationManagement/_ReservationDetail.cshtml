@@ -1,0 +1,115 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.ReservationManagement.ReservationDetailVm
+
+@{
+    // Güvenli ad/soyad birleştirme + ödeme tipi adı fallback
+    var fullName = string.Join(" ",
+        new[] { Model?.InvoiceInfo?.Name, Model?.InvoiceInfo?.Surname }
+            .Where(s => !string.IsNullOrWhiteSpace(s)));
+    if (string.IsNullOrWhiteSpace(fullName)) fullName = "-";
+
+    var paymentTypeText =
+        !string.IsNullOrWhiteSpace(Model?.InvoiceInfo?.PaymentTypeName)
+            ? Model.InvoiceInfo.PaymentTypeName
+            : (Model?.InvoiceInfo?.PaymentTypeId != null
+                ? $"#{Model.InvoiceInfo.PaymentTypeId}"
+                : "-");
+}
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <!-- Reservation summary -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header fw-semibold">@Localizer["_ReservationDetail.RESERVATION"]</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-5">@Localizer["_ReservationDetail.RESERVATION_ID"]</dt>
+                        <dd class="col-7">#@Model.ReservationId</dd>
+
+                        <dt class="col-5">@Localizer["_ReservationDetail.CREATED_DATE"]</dt>
+                        <dd class="col-7">@Model.CreatedDate.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                        <dt class="col-5">@Localizer["_ReservationDetail.STATUS"]</dt>
+                        <dd class="col-7">@Model.StatusName</dd>
+
+                        <dt class="col-5">@Localizer["_ReservationDetail.CHANNEL"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.ChannelName) ? Model.ChannelName : $"#{Model.ChannelId}")</dd>
+
+                        <dt class="col-5">@Localizer["_ReservationDetail.TOTAL"]</dt>
+                        <dd class="col-7">@Model.TotalPrice.ToString("0.00")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice / Customer -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header fw-semibold">@Localizer["_ReservationDetail.INVOICE_CUSTOMER"]</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-5">@Localizer["_ReservationDetail.NAME"]</dt>
+                        <dd class="col-7">@fullName</dd>
+
+                        <dt class="col-5">@Localizer["_ReservationDetail.EMAIL"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model?.InvoiceInfo?.Email) ? Model.InvoiceInfo.Email : "-")</dd>
+
+                        <dt class="col-5">@Localizer["_ReservationDetail.PHONE"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model?.InvoiceInfo?.Phone) ? Model.InvoiceInfo.Phone : "-")</dd>
+
+                        <dt class="col-5">@Localizer["_ReservationDetail.PAYMENT_TYPE"]</dt>
+                        <dd class="col-7">@paymentTypeText</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header fw-semibold">@Localizer["_ReservationDetail.TICKETS"]</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 240px;">@Localizer["_ReservationDetail.TICKET_TYPE"]</th>
+                                    <th style="width: 240px;">@Localizer["_ReservationDetail.SUB_TYPE"]</th>
+                                    <th style="width: 120px;">@Localizer["_ReservationDetail.PIECE"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Tickets != null && Model.Tickets.Any())
+                                {
+                                    foreach (var t in Model.Tickets)
+                                    {
+                                        <tr>
+                                            <td>@(string.IsNullOrWhiteSpace(t.TicketTypeName) ? $"#{t.TicketTypeId}" : t.TicketTypeName)</td>
+                                            <td>
+                                                @(string.IsNullOrWhiteSpace(t.TicketSubTypeName)
+                                                                                        ? (t.TicketSubTypeId > 0 ? $"#{t.TicketSubTypeId}" : "-")
+                                                                                        : t.TicketSubTypeName)
+                                    </td>
+                                    <td>@t.Piece</td>
+                                </tr>
+                                                                }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">
+                                            @Localizer["_ReservationDetail.TICKET_NOT_FOUND"]
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

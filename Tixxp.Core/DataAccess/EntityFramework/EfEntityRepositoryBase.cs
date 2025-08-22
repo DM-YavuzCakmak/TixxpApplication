@@ -92,4 +92,22 @@ public class EfEntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEnti
         _context.SaveChanges();
         return entity; // => burada Id dahil tüm değerleriyle geri döner
     }
+
+    public TEntity? GetFirstOrDefaultWithInclude(
+        Expression<Func<TEntity, bool>> filter,
+        params Expression<Func<TEntity, object>>[] includes)
+    {
+        IQueryable<TEntity> query = _context.Set<TEntity>();
+
+        if (includes != null && includes.Length > 0)
+        {
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+        return (filter != null)
+            ? query.AsNoTracking().FirstOrDefault(filter)
+            : query.AsNoTracking().FirstOrDefault();
+    }
 }

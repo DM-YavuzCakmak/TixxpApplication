@@ -14,6 +14,9 @@ public class ReservationStatusTranslationEntity : BaseEntity
     [Column("LanguageId")]
     public long LanguageId { get; set; }
 
+    [Column("Name")]
+    public string Name { get; set; }
+
     [ForeignKey(nameof(ReservationStatusId))]
     public virtual ReservationStatusEntity ReservationStatus { get; set; }
 

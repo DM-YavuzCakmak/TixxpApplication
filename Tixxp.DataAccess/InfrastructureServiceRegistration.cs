@@ -37,6 +37,7 @@ using Tixxp.Infrastructure.DataAccess.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Abstract.ProductTranslation;
 using Tixxp.Infrastructure.DataAccess.Abstract.Reservation;
 using Tixxp.Infrastructure.DataAccess.Abstract.ReservationDetail;
+using Tixxp.Infrastructure.DataAccess.Abstract.ReservationProductDetail;
 using Tixxp.Infrastructure.DataAccess.Abstract.ReservationSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Abstract.ReservationStatus;
 using Tixxp.Infrastructure.DataAccess.Abstract.ReservationStatusTranslation;
@@ -85,6 +86,7 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductSaleInvoic
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ProductTranslation;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Reservation;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ReservationDetail;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ReservationProductDetail;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ReservationSaleInvoiceInfo;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ReservationStatus;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.ReservationStatusTranslation;
@@ -131,6 +133,7 @@ public static class InfrastructureServiceRegistration
             return new TixappContext(optionsBuilder.Options, "dbo");
         });
         services.AddScoped<IPersonnelRepository, PersonnelRepository>();
+        services.AddScoped<IReservationProductDetailRepository, ReservationProductDetailRepository>();
         services.AddScoped<IPaymentTypeRepository, PaymentTypeRepository>();
         services.AddScoped<IReservationDetailRepository, ReservationDetailRepository>();
         services.AddScoped<IPaymentTypeTranslationRepository, PaymentTypeTranslationRepository>();

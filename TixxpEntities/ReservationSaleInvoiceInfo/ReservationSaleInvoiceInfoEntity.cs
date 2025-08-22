@@ -35,25 +35,25 @@ public class ReservationSaleInvoiceInfoEntity : BaseEntity
     #region String Properties
 
     [Column("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [Column("Surname")]
-    public string Surname { get; set; }
+    public string? Surname { get; set; }
 
     [Column("Email")]
-    public string Email { get; set; }
+    public string? Email { get; set; }
 
     [Column("Phone")]
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
 
     [Column("CompanyName")]
-    public string CompanyName { get; set; }
+    public string? CompanyName { get; set; }
 
     [Column("TaxNumber")]
-    public string TaxNumber { get; set; }
+    public string? TaxNumber { get; set; }
 
     [Column("TaxOffice")]
-    public string TaxOffice { get; set; }
+    public string? TaxOffice { get; set; }
 
     #endregion
 

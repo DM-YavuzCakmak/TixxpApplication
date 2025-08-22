@@ -9,6 +9,8 @@ namespace Tixxp.Business.Services.Abstract.Base
         IDataResult<T> GetById(long id);
         IDataResult<List<T>> GetAll();
         IDataResult<T> GetFirstOrDefault(Expression<Func<T, bool>> filter);
+        IDataResult<T> GetFirstOrDefaultWithInclude(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
+
         IResult Add(T entity);
         IResult AddRange(List<T> entities);
         IResult Update(T entity);

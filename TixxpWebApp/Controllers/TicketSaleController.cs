@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using Tixxp.Business.Services.Abstract.City;
 using Tixxp.Business.Services.Abstract.CityTranslation;
 using Tixxp.Business.Services.Abstract.CountryTranslation;
 using Tixxp.Business.Services.Abstract.County;
 using Tixxp.Business.Services.Abstract.CountyTranslation;
+using Tixxp.Business.Services.Abstract.CurrenctUser;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
@@ -17,6 +19,7 @@ using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Abstract.Reservation;
 using Tixxp.Business.Services.Abstract.ReservationDetail;
+using Tixxp.Business.Services.Abstract.ReservationProductDetail;
 using Tixxp.Business.Services.Abstract.ReservationSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.Session;
 using Tixxp.Business.Services.Abstract.SessionEventTicketPrice;
@@ -33,6 +36,7 @@ using Tixxp.Entities.PaymentTypeTranslation;
 using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
 using Tixxp.Entities.ReservationDetail;
+using Tixxp.Entities.ReservationProductDetail;
 using Tixxp.Entities.ReservationSaleInvoiceInfo;
 using Tixxp.Entities.Session;
 using Tixxp.Entities.SessionEventTicketPrice;
@@ -46,6 +50,10 @@ namespace Tixxp.WebApp.Controllers;
 
 public class TicketSaleController : Controller
 {
+    private readonly IReservationProductDetailService _reservationProductDetailService;
+    private readonly ICurrentUser _currentUser;
+
+
     private readonly IProductService _productService;
     private readonly IProductPriceService _productPriceService;
     private readonly ICurrencyTypeService _currencyTypeService;
@@ -75,7 +83,7 @@ public class TicketSaleController : Controller
     private readonly ISessionTypeTranslationRepository _sessionTypeTranslationRepository;
     private readonly ILanguageService _languageService;
 
-    public TicketSaleController(IEventService eventService, ISessionService sessionService, ILanguageService languageService, ISessionTypeTranslationRepository sessionTypeTranslationRepository, IPaymentTypeService paymentTypeService, ISessionEventTicketPriceService sessionEventTicketPriceService, IEventTicketPriceService eventTicketPriceService, IPaymentTypeTranslationService paymentTypeTranslationService, ICountryTranslationService countryTranslationService, ICityTranslationService cityTranslationService, ICityService cityService, ICountyTranslationService countyTranslationService, ICountyService countyService, IReservationSaleInvoiceInfoService reservationSaleInvoiceInfoService, IReservationService reservationService, ITicketSubTypeService ticketSubTypeService, IReservationDetailService reservationDetailService, IProductService productService, IProductPriceService productPriceService, ICurrencyTypeService currencyTypeService, IProductTranslationService productTranslationService)
+    public TicketSaleController(IEventService eventService, ISessionService sessionService, ILanguageService languageService, ISessionTypeTranslationRepository sessionTypeTranslationRepository, IPaymentTypeService paymentTypeService, ISessionEventTicketPriceService sessionEventTicketPriceService, IEventTicketPriceService eventTicketPriceService, IPaymentTypeTranslationService paymentTypeTranslationService, ICountryTranslationService countryTranslationService, ICityTranslationService cityTranslationService, ICityService cityService, ICountyTranslationService countyTranslationService, ICountyService countyService, IReservationSaleInvoiceInfoService reservationSaleInvoiceInfoService, IReservationService reservationService, ITicketSubTypeService ticketSubTypeService, IReservationDetailService reservationDetailService, IProductService productService, IProductPriceService productPriceService, ICurrencyTypeService currencyTypeService, IProductTranslationService productTranslationService, IReservationProductDetailService reservationProductDetailService, ICurrentUser currentUser)
     {
         _eventService = eventService;
         _sessionService = sessionService;
@@ -98,6 +106,8 @@ public class TicketSaleController : Controller
         _productPriceService = productPriceService;
         _currencyTypeService = currencyTypeService;
         _productTranslationService = productTranslationService;
+        _reservationProductDetailService = reservationProductDetailService;
+        _currentUser = currentUser;
     }
 
     public IActionResult Index()
@@ -387,7 +397,7 @@ public class TicketSaleController : Controller
             IsInvoiced = false,
             IsDeleted = false,
             TotalTicket = getConfirmation.TicketInformations?.Sum(x => x.Piece) ?? 0,
-            CreatedBy = 6
+            CreatedBy = _currentUser.GetRequiredUserId()
         };
         var reservationNewEntity = _reservationService.AddAndReturn(reservationEntity);
         #endregion
@@ -404,7 +414,7 @@ public class TicketSaleController : Controller
                 Email = getConfirmation.PersonalInformation.Email,
                 Phone = getConfirmation.PersonalInformation.Phone,
                 CountyId = getConfirmation.PersonalInformation.CountyId,
-                CreatedBy = 6
+                CreatedBy = _currentUser.GetRequiredUserId()
             };
             _reservationSaleInvoiceInfoService.Add(inv);
         }
@@ -430,22 +440,19 @@ public class TicketSaleController : Controller
         }
         #endregion
 
-        #region Reservation Product (Optional / TODO)
-        // Ürün satırları backend’e geldi. Burada kendi veri modeline göre kaydet.
-        // Örn: IReservationProductService varsa:
-        // foreach (var p in getConfirmation.ProductInformations ?? Enumerable.Empty<ProductInformationDto>())
-        // {
-        //     var line = new ReservationProductEntity {
-        //         ReservationId = reservationNewEntity.Data.Id,
-        //         ProductId = p.ProductId,
-        //         Quantity = p.Piece,
-        //         UnitPrice = p.UnitPrice,
-        //         CurrencyTypeId = p.CurrencyTypeId
-        //     };
-        //     _reservationProductService.Add(line);
-        // }
-        #endregion
-
+        #region Reservation Product Sales
+        foreach (var p in getConfirmation.ProductInformations)
+        {
+            var line = new ReservationProductDetailEntity
+            {
+                ReservationId = reservationNewEntity.Data.Id,
+                ProductId = p.ProductId,
+                Piece = p.Piece,
+                CreatedBy = _currentUser.GetRequiredUserId()
+            };
+            _reservationProductDetailService.Add(line);
+        }
         return Ok();
+        #endregion
     }
 }
