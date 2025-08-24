@@ -3,8 +3,9 @@
 @using Tixxp.Entities.TicketType
 @using Tixxp.Entities.PriceCategory
 @using Tixxp.Entities.CurrencyType
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @model List<EventTicketPriceEntity>
-
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Etkinlik Bilet Fiyatları";
@@ -17,8 +18,8 @@
 <div class="main-content app-content">
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Etkinlik Bilet Fiyatları</h1>
-            <button class="btn btn-primary btn-sm" onclick="openEditEventTicketPriceModal(0)">+ Yeni Fiyat</button>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["eventTicketPrice.INDEX.EVENT_TICKET_PRICE"]</h1>
+            <button class="btn btn-primary btn-sm" onclick="openEditEventTicketPriceModal(0)">+ @Localizer["eventTicketPrice.INDEX.NEW_PRICE"]</button>
         </div>
 
         <div class="card custom-card">
@@ -27,12 +28,12 @@
                     <table class="table table-bordered table-sm text-nowrap">
                         <thead>
                             <tr>
-                                <th>Etkinlik</th>
-                                <th>Bilet Tipi</th>
-                                <th>Fiyat Kategorisi</th>
-                                <th>Fiyat</th>
-                                <th>Para Birimi</th>
-                                <th>İşlem</th>
+                                <th>@Localizer["eventTicketPrice.INDEX.EVENT"]</th>
+                                <th>@Localizer["eventTicketPrice.INDEX.TICKET_TYPE"]</th>
+                                <th>@Localizer["eventTicketPrice.INDEX.PRICE_CATEGORY"]</th>
+                                <th>@Localizer["eventTicketPrice.INDEX.PRICE"]</th>
+                                <th>@Localizer["eventTicketPrice.INDEX.CURRENCY_TYPE"]</th>
+                                <th>@Localizer["eventTicketPrice.INDEX.ACTIONS"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -61,7 +62,7 @@
                             }
                             else
                             {
-                                <tr><td colspan="6" class="text-center">Kayıt bulunamadı.</td></tr>
+                                <tr><td colspan="6" class="text-center">@Localizer["eventTicketPrice.INDEX.NO_RECORDS_FOUND"].</td></tr>
                             }
                         </tbody>
                     </table>
@@ -76,16 +77,16 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light">
-                <h5 class="modal-title">Etkinlik Bilet Fiyatı</h5>
+                <h5 class="modal-title">@Localizer["eventTicketPrice.INDEX.EVENT_TICKET_PRICE"]</h5>
                 <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="editEventTicketPriceForm">
                     <input type="hidden" id="eventTicketPriceId" name="Id" />
                     <div class="mb-3">
-                        <label>Etkinlik</label>
+                        <label>@Localizer["eventTicketPrice.INDEX.EVENT"]</label>
                         <select class="form-select" id="eventId" required>
-                            <option value="">Seçiniz</option>
+                            <option value="">@Localizer["eventTicketPrice.INDEX.SELECT"]</option>
                             @foreach (var ev in events)
                             {
                                 <option value="@ev.Id">@ev.Name</option>
@@ -93,9 +94,9 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Bilet Tipi</label>
+                        <label>@Localizer["eventTicketPrice.INDEX.TICKET_TYPE"]</label>
                         <select class="form-select" id="ticketTypeId" required>
-                            <option value="">Seçiniz</option>
+                            <option value="">@Localizer["eventTicketPrice.INDEX.SELECT"]</option>
                             @foreach (var t in ticketTypes)
                             {
                                 <option value="@t.Id">@t.Name</option>
@@ -103,9 +104,9 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Fiyat Kategorisi</label>
+                        <label>@Localizer["eventTicketPrice.INDEX.PRICE_CATEGORY"]</label>
                         <select class="form-select" id="priceCategoryId" required>
-                            <option value="">Seçiniz</option>
+                            <option value="">@Localizer["eventTicketPrice.INDEX.SELECT"]</option>
                             @foreach (var p in priceCategories)
                             {
                                 <option value="@p.Id">@p.Name</option>
@@ -113,9 +114,9 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Para Birimi</label>
+                        <label>@Localizer["eventTicketPrice.INDEX.CURRENCY_TYPE"]</label>
                         <select class="form-select" id="currencyTypeId" required>
-                            <option value="">Seçiniz</option>
+                            <option value="">@Localizer["eventTicketPrice.INDEX.SELECT"]</option>
                             @foreach (var c in currencyTypes)
                             {
                                 <option value="@c.Id">@c.Symbol</option>
@@ -123,10 +124,10 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Fiyat</label>
+                        <label>@Localizer["eventTicketPrice.INDEX.PRICE"]</label>
                         <input type="number" class="form-control" id="price" step="0.01" required />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                    <button type="submit" class="btn btn-primary w-100">@Localizer["eventTicketPrice.INDEX.SAVE"]</button>
                 </form>
             </div>
         </div>
@@ -142,7 +143,7 @@
             if (id === 0) {
                 form[0].reset();
                 $('#eventTicketPriceId').val(0);
-                modal.find('.modal-title').text("Yeni Etkinlik Bilet Fiyatı");
+                modal.find('.modal-title').text("@Localizer["eventTicketPrice.INDEX.NEW_EVENT_TICKET_PRICE"]");
                 modal.modal('show');
                 return;
             }
@@ -154,9 +155,9 @@
                 $('#priceCategoryId').val(data.priceCategoryId);
                 $('#currencyTypeId').val(data.currencyTypeId);
                 $('#price').val(data.price);
-                modal.find('.modal-title').text("Fiyatı Düzenle");
+                modal.find('.modal-title').text("@Localizer["eventTicketPrice.INDEX.EDIT_PRICE"]");
                 modal.modal('show');
-            }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
+            }).fail(() => Swal.fire("@Localizer["eventTicketPrice.INDEX.ERROR"]", "@Localizer["eventTicketPrice.INDEX.DATA_NOT_BE_RECEIVED"].", "error"));
         }
 
         $('#editEventTicketPriceForm').submit(function (e) {
@@ -181,30 +182,30 @@
                 data: JSON.stringify(data),
                 success: function (res) {
                     if (res.success) {
-                        Swal.fire("Başarılı", res.message, "success").then(() => location.reload());
+                        Swal.fire("@Localizer["eventTicketPrice.INDEX.SUCCESS"]", res.message, "success").then(() => location.reload());
                     } else {
-                        Swal.fire("Hata", res.message, "error");
+                        Swal.fire("@Localizer["eventTicketPrice.INDEX.ERROR"]", res.message, "error");
                     }
                 },
-                error: () => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error")
+                error: () => Swal.fire("@Localizer["eventTicketPrice.INDEX.ERROR"]", "@Localizer["eventTicketPrice.INDEX.SERVER_NOT_BE_RECEIVED"]", "error")
             });
         });
 
         function confirmDeleteEventTicketPrice(id) {
             Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu fiyat bilgisini silmek üzeresiniz.",
+                title: '@Localizer["eventTicketPrice.INDEX.ARE_YOU_SURE"]?',
+                text: "@Localizer["eventTicketPrice.INDEX.DELETE_PRICE_INFO"]",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Vazgeç'
+                confirmButtonText: '@Localizer["eventTicketPrice.INDEX.YES_DELETE"]!',
+                cancelButtonText: '@Localizer["eventTicketPrice.INDEX.CANCEL"]'
             }).then(result => {
                 if (result.isConfirmed) {
                     $.post('/EventTicketPrice/Delete', { id: id }, function (res) {
                         if (res.success) {
-                            Swal.fire("Silindi", res.message, "success").then(() => location.reload());
+                            Swal.fire("@Localizer["eventTicketPrice.INDEX.DELETED"]", res.message, "success").then(() => location.reload());
                         } else {
-                            Swal.fire("Hata", res.message, "error");
+                            Swal.fire("@Localizer["eventTicketPrice.INDEX.ERROR"]", res.message, "error");
                         }
                     });
                 }

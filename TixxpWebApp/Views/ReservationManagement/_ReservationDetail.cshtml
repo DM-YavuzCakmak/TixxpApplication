@@ -19,6 +19,7 @@
 
 <div class="container-fluid">
     <div class="row g-3">
+
         <!-- Reservation summary -->
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">
@@ -101,6 +102,44 @@
                                     <tr>
                                         <td colspan="3" class="text-center text-muted py-3">
                                             @Localizer["_ReservationDetail.TICKET_NOT_FOUND"]
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header fw-semibold">@Localizer["_ReservationDetail.PRODUCTS"]</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>@Localizer["_ReservationDetail.PRODUCT_NAME"]</th>
+                                    <th style="width: 120px;">@Localizer["_ReservationDetail.PIECE"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Products != null && Model.Products.Any())
+                                {
+                                    foreach (var p in Model.Products)
+                                    {
+                                        <tr>
+                                            <td>@(string.IsNullOrWhiteSpace(p.ProductName) ? $"#{p.ProductId}" : p.ProductName)</td>
+                                            <td>@p.Piece</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted py-3">
+                                            @Localizer["_ReservationDetail.PRODUCT_NOT_FOUND"]
                                         </td>
                                     </tr>
                                 }

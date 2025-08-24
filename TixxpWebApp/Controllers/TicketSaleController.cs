@@ -24,6 +24,7 @@ using Tixxp.Business.Services.Abstract.ReservationSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.Session;
 using Tixxp.Business.Services.Abstract.SessionEventTicketPrice;
 using Tixxp.Business.Services.Abstract.TicketSubType;
+using Tixxp.Core.Utilities.Enums.ReservationStatusEnum;
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Entities.City;
 using Tixxp.Entities.CityTranslation;
@@ -388,7 +389,7 @@ public class TicketSaleController : Controller
         #region Reservation
         var reservationEntity = new ReservationEntity
         {
-            StatusId = 1,
+            StatusId = Convert.ToInt64(ReservationStatusEnum.Processing),
             ChannelId = 1,
             CurrencyId = 1,
             TotalPrice = getConfirmation.PaymentInformation.TotalAmount,
@@ -453,6 +454,10 @@ public class TicketSaleController : Controller
             _reservationProductDetailService.Add(line);
         }
         return Ok();
+        #endregion
+
+        #region 
+        //TODO:Ticket Add Logic
         #endregion
     }
 }

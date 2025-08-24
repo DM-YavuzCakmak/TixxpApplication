@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tixxp.Business.Services.Abstract.CurrenctUser;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
+using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Business.Services.Abstract.PriceCategory;
 using Tixxp.Business.Services.Abstract.TicketType;
-using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Entities.EventTicketPrice;
-using System;
 
 namespace Tixxp.WebApp.Controllers
 {
     public class EventTicketPriceController : Controller
     {
+        private readonly ICurrentUser _currentUser;
+
+
         private readonly IEventService _eventService;
         private readonly ITicketTypeService _ticketTypeService;
         private readonly IPriceCategoryService _priceCategoryService;
@@ -22,13 +25,15 @@ namespace Tixxp.WebApp.Controllers
             ITicketTypeService ticketTypeService,
             IPriceCategoryService priceCategoryService,
             ICurrencyTypeService currencyTypeService,
-            IEventTicketPriceService eventTicketPriceService)
+            IEventTicketPriceService eventTicketPriceService,
+            ICurrentUser currentUser)
         {
             _eventService = eventService;
             _ticketTypeService = ticketTypeService;
             _priceCategoryService = priceCategoryService;
             _currencyTypeService = currencyTypeService;
             _eventTicketPriceService = eventTicketPriceService;
+            _currentUser = currentUser;
         }
 
         public IActionResult Index()
@@ -72,7 +77,7 @@ namespace Tixxp.WebApp.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] EventTicketPriceEntity model)
         {
-            model.CreatedBy = 6; // Bu kullanıcı kimliği, örnek amaçlı
+            model.CreatedBy = _currentUser.GetRequiredUserId();
             model.Created_Date = DateTime.Now;
             model.IsDeleted = false;
 

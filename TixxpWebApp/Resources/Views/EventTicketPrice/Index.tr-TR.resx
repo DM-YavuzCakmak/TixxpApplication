@@ -117,61 +117,70 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="_ReservationDetail.CHANNEL" xml:space="preserve">
-    <value>Satış Kanalı</value>
+  <data name="eventTicketPrice.INDEX.ACTIONS" xml:space="preserve">
+    <value>İşlemler</value>
   </data>
-  <data name="_ReservationDetail.CREATED_DATE" xml:space="preserve">
-    <value>Oluşturulma Tarihi</value>
+  <data name="eventTicketPrice.INDEX.ARE_YOU_SURE" xml:space="preserve">
+    <value>Emin misiniz</value>
   </data>
-  <data name="_ReservationDetail.EMAIL" xml:space="preserve">
-    <value>E-Posta</value>
+  <data name="eventTicketPrice.INDEX.CANCEL" xml:space="preserve">
+    <value>Vazgeç</value>
   </data>
-  <data name="_ReservationDetail.INVOICE_CUSTOMER" xml:space="preserve">
-    <value>Fatura / Müşteri Bilgileri</value>
+  <data name="eventTicketPrice.INDEX.CURRENCY_TYPE" xml:space="preserve">
+    <value>Para Birimi</value>
   </data>
-  <data name="_ReservationDetail.NAME" xml:space="preserve">
-    <value>İsim</value>
+  <data name="eventTicketPrice.INDEX.DATA_NOT_BE_RECEIVED" xml:space="preserve">
+    <value>Veri Alınamadı</value>
   </data>
-  <data name="_ReservationDetail.PAYMENT_TYPE" xml:space="preserve">
-    <value>Ödeme Yöntemi</value>
+  <data name="eventTicketPrice.INDEX.DELETED" xml:space="preserve">
+    <value>Silindi</value>
   </data>
-  <data name="_ReservationDetail.PHONE" xml:space="preserve">
-    <value>Telefon</value>
+  <data name="eventTicketPrice.INDEX.DELETE_PRICE_INFO" xml:space="preserve">
+    <value>Bu fiyat bilgisini silmek üzeresiniz.</value>
   </data>
-  <data name="_ReservationDetail.PIECE" xml:space="preserve">
-    <value>Adet</value>
+  <data name="eventTicketPrice.INDEX.EDIT_PRICE" xml:space="preserve">
+    <value>Fiyatı Düzenle</value>
   </data>
-  <data name="_ReservationDetail.PRODUCTS" xml:space="preserve">
-    <value>Ürünler</value>
+  <data name="eventTicketPrice.INDEX.ERROR" xml:space="preserve">
+    <value>Hata</value>
   </data>
-  <data name="_ReservationDetail.PRODUCT_NAME" xml:space="preserve">
-    <value>Ürün Adı</value>
+  <data name="eventTicketPrice.INDEX.EVENT" xml:space="preserve">
+    <value>Etkinlik</value>
   </data>
-  <data name="_ReservationDetail.PRODUCT_NOT_FOUND" xml:space="preserve">
-    <value>Ürün Bulunamadı</value>
+  <data name="eventTicketPrice.INDEX.EVENT_TICKET_PRICE" xml:space="preserve">
+    <value>Etkinlik Bilet Fiyatları</value>
   </data>
-  <data name="_ReservationDetail.RESERVATION" xml:space="preserve">
-    <value>Rezervasyon</value>
+  <data name="eventTicketPrice.INDEX.NEW_EVENT_TICKET_PRICE" xml:space="preserve">
+    <value>Yeni Etkinlik Bilet Fiyatı</value>
   </data>
-  <data name="_ReservationDetail.RESERVATION_ID" xml:space="preserve">
-    <value>Rezervasyon No</value>
+  <data name="eventTicketPrice.INDEX.NEW_PRICE" xml:space="preserve">
+    <value>Yeni Fiyat</value>
   </data>
-  <data name="_ReservationDetail.STATUS" xml:space="preserve">
-    <value>Durum</value>
+  <data name="eventTicketPrice.INDEX.NO_RECORDS_FOUND" xml:space="preserve">
+    <value>Kayıt Bulunamadı</value>
   </data>
-  <data name="_ReservationDetail.SUB_TYPE" xml:space="preserve">
-    <value>Alt Tipi</value>
+  <data name="eventTicketPrice.INDEX.PRICE" xml:space="preserve">
+    <value>Fiyat</value>
   </data>
-  <data name="_ReservationDetail.TICKETS" xml:space="preserve">
-    <value>Biletler</value>
+  <data name="eventTicketPrice.INDEX.PRICE_CATEGORY" xml:space="preserve">
+    <value>Fiyat Kategorisi</value>
   </data>
-  <data name="_ReservationDetail.TICKET_NOT_FOUND" xml:space="preserve">
-    <value>Bilet Bulunamadı</value>
+  <data name="eventTicketPrice.INDEX.SAVE" xml:space="preserve">
+    <value>Kaydet</value>
   </data>
-  <data name="_ReservationDetail.TICKET_TYPE" xml:space="preserve">
+  <data name="eventTicketPrice.INDEX.SELECT" xml:space="preserve">
+    <value>Seçiniz</value>
+  </data>
+  <data name="eventTicketPrice.INDEX.SERVER_NOT_BE_RECEIVED" xml:space="preserve">
+    <value>Sunucuya Ulaşılamadı</value>
+  </data>
+  <data name="eventTicketPrice.INDEX.SUCCESS" xml:space="preserve">
+    <value>Başarılı</value>
+  </data>
+  <data name="eventTicketPrice.INDEX.TICKET_TYPE" xml:space="preserve">
     <value>Bilet Tipi</value>
   </data>
-  <data name="_ReservationDetail.TOTAL" xml:space="preserve">
-    <value>Toplam</value>
+  <data name="eventTicketPrice.INDEX.YES_DELETE" xml:space="preserve">
+    <value>Evet, Sil</value>
   </data>
 </root>

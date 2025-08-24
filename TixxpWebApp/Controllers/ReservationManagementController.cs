@@ -6,14 +6,18 @@ using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PaymentType;
 using Tixxp.Business.Services.Abstract.PaymentTypeTranslation;
+using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Abstract.Reservation;
 using Tixxp.Business.Services.Abstract.ReservationDetail;
+using Tixxp.Business.Services.Abstract.ReservationProductDetail;
 using Tixxp.Business.Services.Abstract.ReservationSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.ReservationStatusTranslation; // <-- eklendi
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Entities.PaymentTypeTranslation;
+using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
 using Tixxp.Entities.ReservationDetail;
+using Tixxp.Entities.ReservationProductDetail;
 using Tixxp.Entities.ReservationSaleInvoiceInfo;
 using Tixxp.Entities.ReservationStatusTranslation; // <-- gerekiyorsa (entity kullanmıyoruz ama namespace tutarlılığı için)
 using Tixxp.WebApp.Models.ReservationManagement;
@@ -23,6 +27,8 @@ namespace Tixxp.WebApp.Controllers
     public class ReservationManagementController : Controller
     {
         // === services ===
+        private readonly IProductTranslationService _productTranslationService;
+        private readonly IReservationProductDetailService _reservationProductDetailService;
         private readonly IReservationService _reservationService;
         private readonly IReservationSaleInvoiceInfoService _invoiceInfoService;
         private readonly IReservationDetailService _reservationDetailService;
@@ -42,8 +48,9 @@ namespace Tixxp.WebApp.Controllers
             IPaymentTypeTranslationService paymentTypeTranslationService,
             ILanguageService languageService,
             IEventTicketPriceService eventTicketPriceService,
-            IReservationStatusTranslationService reservationStatusTranslationService // <-- eklendi
-        )
+            IReservationStatusTranslationService reservationStatusTranslationService,
+            IReservationProductDetailService reservationProductDetailService,
+            IProductTranslationService productTranslationService)
         {
             _reservationService = reservationService;
             _invoiceInfoService = invoiceInfoService;
@@ -53,6 +60,8 @@ namespace Tixxp.WebApp.Controllers
             _languageService = languageService;
             _eventTicketPriceService = eventTicketPriceService;
             _reservationStatusTranslationService = reservationStatusTranslationService; // <-- eklendi
+            _reservationProductDetailService = reservationProductDetailService;
+            _productTranslationService = productTranslationService;
         }
 
         // INDEX
@@ -168,31 +177,34 @@ namespace Tixxp.WebApp.Controllers
             return PartialView("_ReservationList", vm);
         }
 
-        // DETAIL (partial)
         [HttpGet]
         public IActionResult Detail(long id)
         {
-            // Rezervasyon (Channel include)
+            // 1) Dil -> languageId
+            var cultureCode = CultureInfo.CurrentUICulture.Name;
+            var langRes = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+            long? languageId = langRes.Success ? langRes.Data?.Id : null;
+
+            // 2) Rezervasyon (Channel include)
             var rDr = _reservationService.GetFirstOrDefaultWithInclude(x => x.Id == id, x => x.Channel);
             if (!rDr.Success || rDr.Data == null)
                 return NotFound("Reservation not found.");
 
-            // Fatura/kişisel bilgi
+            // 3) Fatura/kişisel bilgi
             var invDr = _invoiceInfoService.GetFirstOrDefault(x => x.ReservationId == id);
             var inv = invDr.Success ? invDr.Data : null;
 
-            // Satırlar (TicketType ve TicketSubType include)
+            // 4) Bilet satırları (TicketType & TicketSubType include) + adlar
             var detDr = _reservationDetailService.GetListWithInclude(
                 x => x.ReservationId == id && !x.IsDeleted,
                 x => x.TicketSubType,
                 x => x.TicketType
             );
-            var lines = (detDr.Success && detDr.Data != null)
+            var ticketLines = (detDr.Success && detDr.Data != null)
                 ? detDr.Data.ToList()
                 : new List<ReservationDetailEntity>();
 
-            // Satırları VM'e projekte et — İSİMLER DAHİL
-            var ticketRows = lines.Select(line => new ReservationDetailTicketVm
+            var ticketRows = ticketLines.Select(line => new ReservationDetailTicketVm
             {
                 TicketTypeId = line.TicketTypeId,
                 TicketTypeName = line.TicketType?.Name ?? $"#{line.TicketTypeId}",
@@ -201,7 +213,55 @@ namespace Tixxp.WebApp.Controllers
                 Piece = line.NumberOfTickets
             }).ToList();
 
-            // Dil bazlı status + payment type adları
+            // 5) ÜRÜN satırları (ReservationProductDetail -> Product include)
+            var rpdDr = _reservationProductDetailService.GetListWithInclude(
+                x => x.ReservationId == id && !x.IsDeleted,
+                x => x.Product
+            );
+            var productLines = (rpdDr.Success && rpdDr.Data != null)
+                ? rpdDr.Data.ToList()
+                : new List<ReservationProductDetailEntity>();
+
+            // 5.a) ProductTranslation’dan dil bazlı adları çek
+            var productRows = new List<ReservationDetailProductVm>();
+            if (productLines.Any())
+            {
+                var productIds = productLines
+                    .Where(p => p.ProductId > 0)
+                    .Select(p => p.ProductId)
+                    .Distinct()
+                    .ToList();
+
+                var trDr = (languageId.HasValue)
+                    ? _productTranslationService.GetList(x => !x.IsDeleted && x.LanguageId == languageId.Value && productIds.Contains(x.ProductId))
+                    : _productTranslationService.GetList(x => !x.IsDeleted && productIds.Contains(x.ProductId));
+
+                var translations = (trDr.Success && trDr.Data != null)
+                    ? trDr.Data.ToList()
+                    : new List<ProductTranslationEntity>();
+
+                // (ProductId -> Name) sözlüğü
+                var trMap = translations
+                    .GroupBy(t => t.ProductId)
+                    .ToDictionary(g => g.Key, g => g.First().Name);
+
+                productRows = productLines.Select(p =>
+                {
+                    // Çeviri -> Product.Code -> #Id
+                    var nameFromTr = trMap.TryGetValue(p.ProductId, out var trName) ? trName : null;
+                    var fallback = p.Product?.Code ?? $"#{p.ProductId}";
+                    var finalName = string.IsNullOrWhiteSpace(nameFromTr) ? fallback : nameFromTr;
+
+                    return new ReservationDetailProductVm
+                    {
+                        ProductId = p.ProductId,
+                        ProductName = finalName,
+                        Piece = p.Piece
+                    };
+                }).ToList();
+            }
+
+            // 6) Dil bazlı Status ve PaymentType adları
             var statusNames = GetReservationStatusNames();
             var paymentTypeNames = GetPaymentTypeNames();
 
@@ -210,6 +270,7 @@ namespace Tixxp.WebApp.Controllers
                     ? ptn
                     : (inv?.PaymentTypeId != null ? $"#{inv.PaymentTypeId}" : "-");
 
+            // 7) ViewModel
             var vm = new ReservationDetailVm
             {
                 ReservationId = rDr.Data.Id,
@@ -219,7 +280,6 @@ namespace Tixxp.WebApp.Controllers
                 ChannelId = rDr.Data.ChannelId,
                 ChannelName = rDr.Data.Channel?.Name,
                 TotalPrice = rDr.Data.TotalPrice ?? 0,
-
                 InvoiceInfo = new ReservationInvoiceMiniVm
                 {
                     Name = inv?.Name,
@@ -227,15 +287,14 @@ namespace Tixxp.WebApp.Controllers
                     Email = inv?.Email,
                     Phone = inv?.Phone,
                     PaymentTypeId = inv?.PaymentTypeId,
-                    PaymentTypeName = paymentTypeName     // <<< burası eklendi
+                    PaymentTypeName = paymentTypeName
                 },
-
-                Tickets = ticketRows
+                Tickets = ticketRows,
+                Products = productRows
             };
 
             return PartialView("_ReservationDetail", vm);
         }
-
 
 
         // CANCEL GET

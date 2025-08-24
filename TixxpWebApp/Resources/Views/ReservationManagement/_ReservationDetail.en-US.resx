@@ -141,6 +141,15 @@
   <data name="_ReservationDetail.PIECE" xml:space="preserve">
     <value>Piece</value>
   </data>
+  <data name="_ReservationDetail.PRODUCTS" xml:space="preserve">
+    <value>Products</value>
+  </data>
+  <data name="_ReservationDetail.PRODUCT_NAME" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="_ReservationDetail.PRODUCT_NOT_FOUND" xml:space="preserve">
+    <value>Product Not Found</value>
+  </data>
   <data name="_ReservationDetail.RESERVATION" xml:space="preserve">
     <value>Reservation</value>
   </data>

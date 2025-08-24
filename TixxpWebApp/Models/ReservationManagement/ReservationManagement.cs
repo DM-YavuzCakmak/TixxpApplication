@@ -32,6 +32,15 @@
         public int PageSize { get; set; } = 25;
     }
 
+    public class ReservationDetailProductVm
+    {
+        public long ProductId { get; set; }
+        public string ProductName { get; set; }
+        public int Piece { get; set; }
+    }
+
+
+
     public class ReservationListItemVm
     {
         public long Id { get; set; }
@@ -69,6 +78,7 @@
 
         public ReservationInvoiceMiniVm InvoiceInfo { get; set; }
         public List<ReservationDetailTicketVm> Tickets { get; set; } = new();
+        public List<ReservationDetailProductVm> Products { get; set; } = new();
         // İstersen Product satırları da ekleyebilirsin.
     }
 

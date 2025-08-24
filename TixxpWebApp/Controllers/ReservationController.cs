@@ -23,11 +23,6 @@ namespace Tixxp.WebApp.Controllers
             return View(reservations);
         }
 
-        public IActionResult CancelReservation()
-        {
-            List<ReservationEntity> cancelledReservations = _reservationService.GetList(x => true).Data;
-            return View("CancelReservation", cancelledReservations);
-        }
 
         [HttpGet]
         public IActionResult GetById(long id)
