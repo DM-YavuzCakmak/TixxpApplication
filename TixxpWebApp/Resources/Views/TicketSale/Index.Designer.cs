@@ -124,6 +124,15 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiple currencies available. Details in the totals section above..
+        /// </summary>
+        internal static string ticketSale_INDEX_MULTIPLE_CURRENCIES {
+            get {
+                return ResourceManager.GetString("ticketSale.INDEX.MULTIPLE_CURRENCIES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Record Not Found.
         /// </summary>
         internal static string ticketSale_INDEX_NO_EVENTS {
@@ -156,6 +165,15 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         internal static string ticketSale_INDEX_SESSION {
             get {
                 return ResourceManager.GetString("ticketSale.INDEX.SESSION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Totals.
+        /// </summary>
+        internal static string ticketSale_INDEX_TOTALS {
+            get {
+                return ResourceManager.GetString("ticketSale.INDEX.TOTALS", resourceCulture);
             }
         }
         

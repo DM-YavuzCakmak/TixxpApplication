@@ -172,10 +172,10 @@
     <value>Number of Daily Reservations</value>
   </data>
   <data name="home.INDEX.MONTHLY.OF.TICKETS" xml:space="preserve">
-    <value>Number of Monthly Tickets</value>
+    <value>Number of Monthly Product Sale</value>
   </data>
   <data name="home.INDEX.DAILY.OF.TICKETS" xml:space="preserve">
-    <value>Number of Daily Tickets</value>
+    <value>Number of Daily Product Sale</value>
   </data>
   <data name="home.INDEX.SALES.GROWTH" xml:space="preserve">
     <value>Sales Growth</value>

@@ -138,6 +138,9 @@
   <data name="ticketSale.INDEX.EVENT" xml:space="preserve">
     <value>Etkinlik</value>
   </data>
+  <data name="ticketSale.INDEX.MULTIPLE_CURRENCIES" xml:space="preserve">
+    <value>Birden fazla para birimi mevcut. Ayrıntılar yukarıdaki toplamlar bölümünde.</value>
+  </data>
   <data name="ticketSale.INDEX.NO_EVENTS" xml:space="preserve">
     <value>Kayıt Bulunamadı</value>
   </data>
@@ -149,6 +152,9 @@
   </data>
   <data name="ticketSale.INDEX.SESSION" xml:space="preserve">
     <value>Seans</value>
+  </data>
+  <data name="ticketSale.INDEX.TOTALS" xml:space="preserve">
+    <value>Toplamlar</value>
   </data>
   <data name="ticketSale.INDEX.VIEW_SESSIONS" xml:space="preserve">
     <value>Seansları Görüntüle</value>

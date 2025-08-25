@@ -138,6 +138,9 @@
   <data name="ticketSale.INDEX.EVENT" xml:space="preserve">
     <value>Event</value>
   </data>
+  <data name="ticketSale.INDEX.MULTIPLE_CURRENCIES" xml:space="preserve">
+    <value>Multiple currencies available. Details in the totals section above.</value>
+  </data>
   <data name="ticketSale.INDEX.NO_EVENTS" xml:space="preserve">
     <value>Record Not Found</value>
   </data>
@@ -149,6 +152,9 @@
   </data>
   <data name="ticketSale.INDEX.SESSION" xml:space="preserve">
     <value>Session</value>
+  </data>
+  <data name="ticketSale.INDEX.TOTALS" xml:space="preserve">
+    <value>Totals</value>
   </data>
   <data name="ticketSale.INDEX.VIEW_SESSIONS" xml:space="preserve">
     <value>View Sessions</value>

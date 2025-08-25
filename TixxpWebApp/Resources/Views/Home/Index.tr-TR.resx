@@ -172,10 +172,10 @@
     <value>Günlük Rezervasyon Sayısı</value>
   </data>
   <data name="home.INDEX.MONTHLY.OF.TICKETS" xml:space="preserve">
-    <value>Aylık Bilet Sayısı</value>
+    <value>Aylık Ürün Satış Sayısı</value>
   </data>
   <data name="home.INDEX.DAILY.OF.TICKETS" xml:space="preserve">
-    <value>Günlük Bilet Sayısı</value>
+    <value>Günlük Ürün Satış Sayısı</value>
   </data>
   <data name="home.INDEX.SALES.GROWTH" xml:space="preserve">
     <value>Satış Hacmi</value>

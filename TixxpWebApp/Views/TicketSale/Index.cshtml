@@ -509,7 +509,7 @@
 
             if (totalsEl) {
               totalsEl.innerHTML = curKeys.length
-                ? 'Toplamlar: ' + curKeys.map(k => `${totals[k].total.toFixed(2)} ${totals[k].symbol}`).join(' • ')
+                ? '@Localizer["ticketSale.INDEX.TOTALS"]: ' + curKeys.map(k => `${totals[k].total.toFixed(2)} ${totals[k].symbol}`).join(' • ')
                 : '';
             }
 
@@ -520,7 +520,7 @@
                 if (note) note.textContent = '';
               } else if (curKeys.length > 1) {
                 payTotal.value = '—';
-                if (note) note.textContent = 'Birden fazla para birimi mevcut. Ayrıntılar yukarıdaki toplamlar bölümünde.';
+                if (note) note.textContent = '@Localizer["ticketSale.INDEX.MULTIPLE_CURRENCIES"]';
               } else {
                 payTotal.value = '0';
                 if (note) note.textContent = '';
