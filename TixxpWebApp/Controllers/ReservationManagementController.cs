@@ -34,7 +34,7 @@ namespace Tixxp.WebApp.Controllers
         private readonly IReservationDetailService _reservationDetailService;
         private readonly IPaymentTypeService _paymentTypeService;
         private readonly IPaymentTypeTranslationService _paymentTypeTranslationService;
-        private readonly ILanguageService _languageService;
+        private readonly ILanguageService _languageService; 
         private readonly IEventTicketPriceService _eventTicketPriceService;
         private readonly IReservationStatusTranslationService _reservationStatusTranslationService; // <-- eklendi
 

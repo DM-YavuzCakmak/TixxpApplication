@@ -2,7 +2,7 @@
 
 public class GetConfirmation
 {
-    public PersonalInformationDto PersonalInformation { get; set; }
+    public PersonalInformationDto PersonalInformation { get; set; } = new PersonalInformationDto();
     public List<TicketInformationDto> TicketInformations { get; set; } = new();
     public List<ProductInformationDto> ProductInformations { get; set; } = new(); // <-- YENİ
     public PaymentInformationDto PaymentInformation { get; set; }

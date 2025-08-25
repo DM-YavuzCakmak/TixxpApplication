@@ -201,4 +201,13 @@
   <data name="details.NO_TICKET_FOR_SESSION" xml:space="preserve">
     <value>No Ticket For Session</value>
   </data>
+  <data name="details.SELECTION_TOTAL" xml:space="preserve">
+    <value>Selection Total</value>
+  </data>
+  <data name="details.ADDITIONAL_PRODUCTS" xml:space="preserve">
+    <value>Additional Products</value>
+  </data>
+  <data name="details.SEARCH" xml:space="preserve">
+    <value>Search</value>
+  </data>
 </root>

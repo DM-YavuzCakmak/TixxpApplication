@@ -61,6 +61,15 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirmation Success.
+        /// </summary>
+        internal static string confirmation_SUCCESS {
+            get {
+                return ResourceManager.GetString("confirmation.SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Back.
         /// </summary>
         internal static string ticketSale_INDEX_BACK {

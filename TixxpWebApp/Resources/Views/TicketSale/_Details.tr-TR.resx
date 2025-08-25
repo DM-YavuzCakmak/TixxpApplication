@@ -201,4 +201,13 @@
   <data name="details.NO_TICKET_FOR_SESSION" xml:space="preserve">
     <value>Seans için bilet bulunmamaktadır.</value>
   </data>
+  <data name="details.SELECTION_TOTAL" xml:space="preserve">
+    <value>Seçim Toplamı</value>
+  </data>
+  <data name="details.ADDITIONAL_PRODUCTS" xml:space="preserve">
+    <value>Ek Ürünler</value>
+  </data>
+  <data name="details.SEARCH" xml:space="preserve">
+    <value>Ara</value>
+  </data>
 </root>

@@ -246,4 +246,10 @@
   <data name="session.INDEX.CREATE_BULK" xml:space="preserve">
     <value>Create Bulk</value>
   </data>
+  <data name="session.INDEX.START_TIME" xml:space="preserve">
+    <value>Start Time</value>
+  </data>
+  <data name="session.INDEX.END_TIME" xml:space="preserve">
+    <value>End Time</value>
+  </data>
 </root>

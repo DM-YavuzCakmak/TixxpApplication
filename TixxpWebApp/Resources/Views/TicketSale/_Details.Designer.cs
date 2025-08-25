@@ -79,6 +79,15 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Additional Products.
+        /// </summary>
+        internal static string details_ADDITIONAL_PRODUCTS {
+            get {
+                return ResourceManager.GetString("details.ADDITIONAL_PRODUCTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string details_CANCEL {
@@ -264,6 +273,24 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         internal static string details_PRODUCT {
             get {
                 return ResourceManager.GetString("details.PRODUCT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        internal static string details_SEARCH {
+            get {
+                return ResourceManager.GetString("details.SEARCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection Total.
+        /// </summary>
+        internal static string details_SELECTION_TOTAL {
+            get {
+                return ResourceManager.GetString("details.SELECTION_TOTAL", resourceCulture);
             }
         }
         

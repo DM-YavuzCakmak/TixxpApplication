@@ -61,6 +61,15 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Return to Details Page.
+        /// </summary>
+        internal static string confirmation_BACK {
+            get {
+                return ResourceManager.GetString("confirmation.BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cart Empty.
         /// </summary>
         internal static string confirmation_CART_EMPTY {

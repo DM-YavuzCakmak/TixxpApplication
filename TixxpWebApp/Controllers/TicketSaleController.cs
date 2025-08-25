@@ -386,10 +386,11 @@ public class TicketSaleController : Controller
     [HttpPost]
     public IActionResult Confirm([FromBody] GetConfirmation getConfirmation)
     {
+
         #region Reservation
         var reservationEntity = new ReservationEntity
         {
-            StatusId = Convert.ToInt64(ReservationStatusEnum.Processing),
+            StatusId = Convert.ToInt64(ReservationStatusEnum.Confirmed),
             ChannelId = 1,
             CurrencyId = 1,
             TotalPrice = getConfirmation.PaymentInformation.TotalAmount,
@@ -404,19 +405,40 @@ public class TicketSaleController : Controller
         #endregion
 
         #region Reservation Sale Invoice Info
-        if (getConfirmation.PersonalInformation != null)
+        var r = reservationNewEntity.Data;
+        var pi = getConfirmation.PersonalInformation;
+        var pay = getConfirmation.PaymentInformation;
+
+        var hasCounty = pi != null && pi.CountyId.HasValue && pi.CountyId.Value > 0;
+        var hasPersonal =
+            pi != null &&
+            !string.IsNullOrWhiteSpace(pi.FirstName) &&
+            !string.IsNullOrWhiteSpace(pi.Surname) &&
+            !string.IsNullOrWhiteSpace(pi.Email) &&
+            !string.IsNullOrWhiteSpace(pi.Phone) &&
+            hasCounty;
+
+        var hasPaymentType = pay != null && pay.PaymentTypeId > 0;
+        if (hasPersonal || hasPaymentType)
         {
-            var r = reservationNewEntity.Data;
             var inv = new ReservationSaleInvoiceInfoEntity
             {
                 ReservationId = r.Id,
-                Name = getConfirmation.PersonalInformation.FirstName,
-                Surname = getConfirmation.PersonalInformation.Surname,
-                Email = getConfirmation.PersonalInformation.Email,
-                Phone = getConfirmation.PersonalInformation.Phone,
-                CountyId = getConfirmation.PersonalInformation.CountyId,
-                CreatedBy = _currentUser.GetRequiredUserId()
+                CreatedBy = _currentUser.GetRequiredUserId(),
+                PaymentTypeId = hasPaymentType ? pay!.PaymentTypeId : (long?)null
             };
+            if (hasPersonal)
+            {
+                inv.Name = pi!.FirstName;
+                inv.Surname = pi.Surname;
+                inv.Email = pi.Email;
+                inv.Phone = pi.Phone;
+                inv.CountyId = pi.CountyId;
+            }
+
+            inv.BankId = 1;
+            inv.GuideId = 1;
+            inv.InvoiceTypeId = 1;
             _reservationSaleInvoiceInfoService.Add(inv);
         }
         #endregion

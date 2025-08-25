@@ -222,7 +222,7 @@ namespace Tixxp.WebApp.Controllers
             {
                 EventId = dto.EventId,
                 TypeId = dto.TypeId,
-                StatusId = dto.StatusId,
+                StatusId = 1,
                 SessionDate = sessionDate,
                 StartTime = startTs.Value,
                 EndTime = endTs,

@@ -246,4 +246,10 @@
   <data name="session.INDEX.CREATE_BULK" xml:space="preserve">
     <value>Toplu Ekle</value>
   </data>
+  <data name="session.INDEX.START_TIME" xml:space="preserve">
+    <value>Başlangıç Saati</value>
+  </data>
+  <data name="session.INDEX.END_TIME" xml:space="preserve">
+    <value>Bitiş Saati</value>
+  </data>
 </root>
