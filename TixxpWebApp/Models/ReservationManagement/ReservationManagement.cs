@@ -14,6 +14,7 @@
         public IEnumerable<IdNameVm> Channels { get; set; } = new List<IdNameVm>();
         public IEnumerable<IdNameVm> PaymentTypes { get; set; } = new List<IdNameVm>();
         public IEnumerable<IdNameVm> Statuses { get; set; } = new List<IdNameVm>();
+        public IEnumerable<IdNameVm> CurrencyTypes { get; set; } = new List<IdNameVm>();
     }
 
     public class ReservationListFilter
@@ -23,6 +24,8 @@
         public long? StatusId { get; set; }
         public string Email { get; set; }
         public long? ReservationId { get; set; }
+        public long? EventId { get; set; }
+        public long? CurrencyTypeId { get; set; } // varsa zaten ekli
 
         public DateTime? StartDate { get; set; }           // dahil
         public DateTime? EndDate { get; set; }             // dahil

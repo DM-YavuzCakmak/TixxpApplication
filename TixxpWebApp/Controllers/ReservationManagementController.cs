@@ -2,6 +2,8 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Tixxp.Business.Services.Abstract.CurrencyType;
+using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PaymentType;
@@ -13,6 +15,7 @@ using Tixxp.Business.Services.Abstract.ReservationProductDetail;
 using Tixxp.Business.Services.Abstract.ReservationSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.ReservationStatusTranslation; // <-- eklendi
 using Tixxp.Core.Utilities.Results.Abstract;
+using Tixxp.Entities.Events;
 using Tixxp.Entities.PaymentTypeTranslation;
 using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
@@ -27,6 +30,8 @@ namespace Tixxp.WebApp.Controllers
     public class ReservationManagementController : Controller
     {
         // === services ===
+        private readonly IEventService _eventService;
+        private readonly ICurrencyTypeService _currencyTypeService;
         private readonly IProductTranslationService _productTranslationService;
         private readonly IReservationProductDetailService _reservationProductDetailService;
         private readonly IReservationService _reservationService;
@@ -50,7 +55,9 @@ namespace Tixxp.WebApp.Controllers
             IEventTicketPriceService eventTicketPriceService,
             IReservationStatusTranslationService reservationStatusTranslationService,
             IReservationProductDetailService reservationProductDetailService,
-            IProductTranslationService productTranslationService)
+            IProductTranslationService productTranslationService,
+            ICurrencyTypeService currencyTypeService,
+            IEventService eventService)
         {
             _reservationService = reservationService;
             _invoiceInfoService = invoiceInfoService;
@@ -62,16 +69,22 @@ namespace Tixxp.WebApp.Controllers
             _reservationStatusTranslationService = reservationStatusTranslationService; // <-- eklendi
             _reservationProductDetailService = reservationProductDetailService;
             _productTranslationService = productTranslationService;
+            _currencyTypeService = currencyTypeService;
+            _eventService = eventService;
         }
 
         // INDEX
         [HttpGet]
         public IActionResult Index()
         {
+            var eventList = _eventService.GetList(x=> !x.IsDeleted);
+            ViewBag.EventList = eventList.Success && eventList.Data != null ? eventList.Data : Enumerable.Empty<EventEntity>();
+
             var lookups = BuildFilterLookups();
             ViewBag.Channels = lookups.Channels;
             ViewBag.Statuses = lookups.Statuses;      // dil bazlı
             ViewBag.PaymentTypes = lookups.PaymentTypes;  // dil bazlı
+            ViewBag.CurrencyTypes = lookups.CurrencyTypes;
             return View();
         }
 
@@ -523,11 +536,27 @@ namespace Tixxp.WebApp.Controllers
                     .ToList();
             }
 
+            List<IdNameVm> currencyTypeList = new List<IdNameVm>();
+            var currencyTypes = _currencyTypeService.GetList(x => !x.IsDeleted);
+            if (currencyTypes.Success && currencyTypes.Data != null)
+            {
+                foreach (var currencyType in currencyTypes.Data)
+                {
+                    IdNameVm currencyTypeNameVm = new IdNameVm
+                    {
+                        Id = currencyType.Id,
+                        Name = currencyType.Name
+                    };
+                    currencyTypeList.Add(currencyTypeNameVm);
+                }
+            }
+
             return new FilterLookups
             {
                 Channels = channels,
                 PaymentTypes = paymentTypes,
-                Statuses = statuses
+                Statuses = statuses,
+                CurrencyTypes = currencyTypeList
             };
         }
     }
