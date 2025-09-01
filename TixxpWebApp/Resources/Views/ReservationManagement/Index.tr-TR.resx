@@ -213,4 +213,10 @@
   <data name="reservationManagement.INDEX.RESERVATION_MANAGEMENT" xml:space="preserve">
     <value>Rezervasyon Yönetimi</value>
   </data>
+  <data name="reservationManagement.INDEX.EVENT" xml:space="preserve">
+    <value>Etkinlik</value>
+  </data>
+  <data name="reservationManagement.INDEX.CURRENCY_TYPE" xml:space="preserve">
+    <value>Para Birimi</value>
+  </data>
 </root>

@@ -174,4 +174,16 @@
   <data name="_ReservationDetail.TOTAL" xml:space="preserve">
     <value>Total</value>
   </data>
+  <data name="_ReservationDetail.TOTAL_AMOUNT" xml:space="preserve">
+    <value>Total Amount</value>
+  </data>
+  <data name="_ReservationDetail.TOTAL_ITEMS" xml:space="preserve">
+    <value>Total Items</value>
+  </data>
+  <data name="_ReservationDetail.TOTAL_PRODUCTS" xml:space="preserve">
+    <value>Total Products</value>
+  </data>
+  <data name="_ReservationDetail.TOTAL_TICKETS" xml:space="preserve">
+    <value>Total Tickets</value>
+  </data>
 </root>

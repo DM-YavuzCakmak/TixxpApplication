@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tixxp.Business.Services.Abstract;
 using Tixxp.Business.Services.Abstract.Agency;
 using Tixxp.Business.Services.Abstract.AgencyContract;
 using Tixxp.Business.Services.Abstract.BankService;
@@ -97,6 +98,7 @@ using Tixxp.Business.Services.Concrete.SessionStatus;
 using Tixxp.Business.Services.Concrete.SessionStatusTranslation;
 using Tixxp.Business.Services.Concrete.SessionType;
 using Tixxp.Business.Services.Concrete.Template;
+using Tixxp.Business.Services.Concrete.Ticket;
 using Tixxp.Business.Services.Concrete.TicketSubType;
 using Tixxp.Business.Services.Concrete.TicketType;
 
@@ -110,6 +112,7 @@ public static class BusinessServiceRegistration
 
 
         services.AddScoped<IPersonnelService, PersonnelService>();
+        services.AddScoped<ITicketService, TicketService>();
         services.AddScoped<IReservationProductDetailService, ReservationProductDetailService>();
         services.AddScoped<ILanguageService, LanguageService>();
         services.AddScoped<IPaymentTypeService, PaymentTypeService>();

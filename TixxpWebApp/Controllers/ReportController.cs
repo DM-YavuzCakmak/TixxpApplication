@@ -32,6 +32,11 @@ namespace Tixxp.WebApp.Controllers
             return View();
         }
 
+        public IActionResult ReservationReport()
+        {
+            return View("ReservationReport");
+        }
+
         public IActionResult ProductSaleReport()
         {
             var cultureCode = CultureInfo.CurrentUICulture.Name;

@@ -213,4 +213,10 @@
   <data name="reservationManagement.INDEX.RESERVATION_MANAGEMENT" xml:space="preserve">
     <value>Reservation Management</value>
   </data>
+  <data name="reservationManagement.INDEX.EVENT" xml:space="preserve">
+    <value>Event</value>
+  </data>
+  <data name="reservationManagement.INDEX.CURRENCY_TYPE" xml:space="preserve">
+    <value>Currency Type</value>
+  </data>
 </root>

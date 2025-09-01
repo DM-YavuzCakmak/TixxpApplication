@@ -132,6 +132,9 @@
   <data name="_ReservationList.CREATED_DATE" xml:space="preserve">
     <value>Created Date</value>
   </data>
+  <data name="_ReservationList.CUSTOMER" xml:space="preserve">
+    <value>Customer / Invoice Info</value>
+  </data>
   <data name="_ReservationList.DETAIL" xml:space="preserve">
     <value>Detail</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="_ReservationList.NO_RECORDS_FOUND" xml:space="preserve">
     <value>No Records Found</value>
+  </data>
+  <data name="_ReservationList.PAGE" xml:space="preserve">
+    <value>Page</value>
   </data>
   <data name="_ReservationList.PAYMENT_TYPE" xml:space="preserve">
     <value>Payment Type</value>

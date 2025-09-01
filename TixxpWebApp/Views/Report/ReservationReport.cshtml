@@ -1,0 +1,218 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Rezervasyon Raporu";
+
+    // ===== 1 Aylık Dummy Data (31 Gün) =====
+    var rnd = new Random();
+    var dailyReservations = new List<object>();
+
+    for (int day = 1; day <= 31; day++)
+    {
+        string date = $"2025-08-{day:00}";
+
+        // Onaylandı
+        dailyReservations.Add(new { Date = date, Status = "Onaylandı", Count = rnd.Next(15, 40), Revenue = rnd.Next(2000, 5000), Channel = "Web" });
+
+        // İptal
+        dailyReservations.Add(new { Date = date, Status = "İptal", Count = rnd.Next(0, 6), Revenue = 0m, Channel = "Mobil" });
+
+        // Onay Bekliyor
+        dailyReservations.Add(new { Date = date, Status = "Onay Bekliyor", Count = rnd.Next(2, 12), Revenue = rnd.Next(300, 1200), Channel = "Acenta" });
+    }
+
+    // Aylık özet (toplamlar)
+    var monthlyReservations = new[]
+    {
+        new { Date = "2025-07", Status = "Onaylandı", Count = 420, Revenue = 55000m },
+        new { Date = "2025-07", Status = "İptal", Count = 40, Revenue = 0m },
+        new { Date = "2025-07", Status = "Onay Bekliyor", Count = 60, Revenue = 8000m },
+
+        new { Date = "2025-08", Status = "Onaylandı", Count = 620, Revenue = 78000m },
+        new { Date = "2025-08", Status = "İptal", Count = 70, Revenue = 0m },
+        new { Date = "2025-08", Status = "Onay Bekliyor", Count = 95, Revenue = 11000m },
+    };
+
+    // Genel dağılım
+    var statusDistribution = new[]
+    {
+        new { Status = "Onaylandı", Count = 1040 },
+        new { Status = "İptal", Count = 110 },
+        new { Status = "Onay Bekliyor", Count = 155 },
+    };
+
+    var channelDistribution = new[]
+    {
+        new { Channel = "Web", Count = 800 },
+        new { Channel = "Mobil", Count = 350 },
+        new { Channel = "Ofis", Count = 200 },
+        new { Channel = "Acenta", Count = 150 },
+    };
+
+    var dailyJson = Newtonsoft.Json.JsonConvert.SerializeObject(dailyReservations);
+    var monthlyJson = Newtonsoft.Json.JsonConvert.SerializeObject(monthlyReservations);
+    var statusJson = Newtonsoft.Json.JsonConvert.SerializeObject(statusDistribution);
+    var channelJson = Newtonsoft.Json.JsonConvert.SerializeObject(channelDistribution);
+}
+
+<div class="page">
+    <div class="main-content app-content">
+        <div class="container-fluid">
+
+            <!-- Günlük Rezervasyon Raporu -->
+            <div class="row">
+                <div class="col-xl-12 mx-auto">
+                    <div class="card custom-card mt-4">
+                        <div class="card-header bg-success text-white">
+                            <div class="card-title text-dark">🗓️ Günlük Rezervasyon Raporu (31 Gün)</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="daily-reservationreport" style="height: 500px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aylık Rezervasyon Raporu -->
+            <div class="row">
+                <div class="col-xl-12 mx-auto">
+                    <div class="card custom-card mt-4">
+                        <div class="card-header bg-success text-white">
+                            <div class="card-title text-dark">📅 Aylık Rezervasyon Raporu</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="monthly-reservationreport" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Günlük Gelir -->
+            <div class="row">
+                <div class="col-xl-12 mx-auto">
+                    <div class="card custom-card mt-4">
+                        <div class="card-header bg-info text-white">
+                            <div class="card-title text-dark">💰 Günlük Rezervasyon Geliri</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="daily-revenue" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kanallar & Durum Dağılımı -->
+            <div class="row">
+                <div class="col-xl-6 mx-auto">
+                    <div class="card custom-card mt-4">
+                        <div class="card-header bg-primary text-white">
+                            <div class="card-title text-dark">🌐 Rezervasyon Kanalları</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="channel-distribution" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 mx-auto">
+                    <div class="card custom-card mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <div class="card-title text-dark">📌 Rezervasyon Durum Dağılımı</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="status-distribution" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    const dailyData = @Html.Raw(dailyJson);
+    const monthlyData = @Html.Raw(monthlyJson);
+    const statusData = @Html.Raw(statusJson);
+    const channelData = @Html.Raw(channelJson);
+
+    function renderStackedChart(containerId, dataSet) {
+        const categories = [...new Set(dataSet.map(d => d.Date))];
+        const statuses = [...new Set(dataSet.map(d => d.Status))];
+        const series = statuses.map(s => ({
+            name: s,
+            data: categories.map(date => {
+                const match = dataSet.find(d => d.Status === s && d.Date === date);
+                return match ? match.Count : 0;
+            })
+        }));
+
+        new ApexCharts(document.querySelector(`#${containerId}`), {
+            series: series,
+            chart: { type: 'bar', height: 400, stacked: true, stackType: '100%', toolbar: { show: true } },
+            xaxis: { categories: categories },
+            legend: { position: 'right' }
+        }).render();
+    }
+
+    function renderLineChart(containerId, dataSet) {
+        const categories = [...new Set(dataSet.map(d => d.Date))];
+        const series = [{
+            name: "Gelir",
+            data: categories.map(date => {
+                const matches = dataSet.filter(d => d.Date === date);
+                return matches.reduce((a, b) => a + b.Revenue, 0);
+            })
+        }];
+        new ApexCharts(document.querySelector(`#${containerId}`), {
+            series: series,
+            chart: { type: 'line', height: 400 },
+            xaxis: { categories: categories },
+            dataLabels: { enabled: true }
+        }).render();
+    }
+
+    function renderMonthlyRevenue(containerId, dataSet) {
+        const categories = [...new Set(dataSet.map(d => d.Date))];
+        const series = [{
+            name: "Gelir",
+            data: categories.map(date => {
+                const matches = dataSet.filter(d => d.Date === date);
+                return matches.reduce((a, b) => a + b.Revenue, 0);
+            })
+        }];
+        new ApexCharts(document.querySelector(`#${containerId}`), {
+            series: series,
+            chart: { type: 'line', height: 400 },
+            xaxis: { categories: categories },
+            dataLabels: { enabled: true }
+        }).render();
+    }
+
+    function renderPieChart(containerId, dataSet, labelField, valueField) {
+        new ApexCharts(document.querySelector(`#${containerId}`), {
+            series: dataSet.map(d => d[valueField]),
+            chart: { type: 'pie', height: 400 },
+            labels: dataSet.map(d => d[labelField])
+        }).render();
+    }
+
+    function renderDonutChart(containerId, dataSet, labelField, valueField) {
+        new ApexCharts(document.querySelector(`#${containerId}`), {
+            series: dataSet.map(d => d[valueField]),
+            chart: { type: 'donut', height: 400 },
+            labels: dataSet.map(d => d[labelField])
+        }).render();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        renderStackedChart("daily-reservationreport", dailyData);
+        renderStackedChart("monthly-reservationreport", monthlyData);
+        renderLineChart("daily-revenue", dailyData);
+        renderMonthlyRevenue("monthly-revenue", monthlyData);
+        renderPieChart("channel-distribution", channelData, "Channel", "Count");
+        renderDonutChart("status-distribution", statusData, "Status", "Count");
+    });
+</script>

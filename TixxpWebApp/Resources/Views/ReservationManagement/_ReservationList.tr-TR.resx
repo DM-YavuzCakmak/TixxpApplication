@@ -132,6 +132,9 @@
   <data name="_ReservationList.CREATED_DATE" xml:space="preserve">
     <value>Oluşturulma Tarihi</value>
   </data>
+  <data name="_ReservationList.CUSTOMER" xml:space="preserve">
+    <value>Müşteri / Fatura Bilgisi</value>
+  </data>
   <data name="_ReservationList.DETAIL" xml:space="preserve">
     <value>Detay</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="_ReservationList.NO_RECORDS_FOUND" xml:space="preserve">
     <value>Kayıt Bulunamadı</value>
+  </data>
+  <data name="_ReservationList.PAGE" xml:space="preserve">
+    <value>Sayfa</value>
   </data>
   <data name="_ReservationList.PAYMENT_TYPE" xml:space="preserve">
     <value>Ödeme Yöntemi</value>

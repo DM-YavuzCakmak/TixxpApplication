@@ -17,12 +17,28 @@
                 : "-");
 }
 
+<style>
+    .summary-card {
+        border: 1px solid #e5e5e5;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background-color: #fff;
+    }
+
+        .summary-card:hover {
+            background-color: #FFF3E6; /* açık turuncu arka plan */
+            border-color: #FF7A00 !important;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+        }
+</style>
+
 <div class="container-fluid">
     <div class="row g-3">
 
         <!-- Reservation summary -->
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 summary-card">
                 <div class="card-header fw-semibold">@Localizer["_ReservationDetail.RESERVATION"]</div>
                 <div class="card-body">
                     <dl class="row mb-0">
@@ -37,9 +53,6 @@
 
                         <dt class="col-5">@Localizer["_ReservationDetail.CHANNEL"]</dt>
                         <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.ChannelName) ? Model.ChannelName : $"#{Model.ChannelId}")</dd>
-
-                        <dt class="col-5">@Localizer["_ReservationDetail.TOTAL"]</dt>
-                        <dd class="col-7">@Model.TotalPrice.ToString("0.00")</dd>
                     </dl>
                 </div>
             </div>
@@ -47,7 +60,7 @@
 
         <!-- Invoice / Customer -->
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 summary-card">
                 <div class="card-header fw-semibold">@Localizer["_ReservationDetail.INVOICE_CUSTOMER"]</div>
                 <div class="card-body">
                     <dl class="row mb-0">
@@ -69,7 +82,7 @@
 
         <!-- Tickets -->
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm summary-card">
                 <div class="card-header fw-semibold">@Localizer["_ReservationDetail.TICKETS"]</div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -112,8 +125,9 @@
             </div>
         </div>
 
+        <!-- Products -->
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm summary-card">
                 <div class="card-header fw-semibold">@Localizer["_ReservationDetail.PRODUCTS"]</div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -150,5 +164,59 @@
             </div>
         </div>
 
+        <!-- Özet Kartlar (en altta) -->
+        <div class="col-12 mt-3">
+            <div class="row g-3">
+
+                <!-- Total Tickets -->
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center h-100 summary-card">
+                        <div class="card-body">
+                            <div class="fw-bold text-muted">🎟️ @Localizer["_ReservationDetail.TOTAL_TICKETS"]</div>
+                            <div class="fs-4 fw-semibold text-dark">
+                                @(Model.Tickets?.Sum(t => t.Piece) ?? 0)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Products -->
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center h-100 summary-card">
+                        <div class="card-body">
+                            <div class="fw-bold text-muted">📦 @Localizer["_ReservationDetail.TOTAL_PRODUCTS"]</div>
+                            <div class="fs-4 fw-semibold text-dark">
+                                @(Model.Products?.Sum(p => p.Piece) ?? 0)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Items -->
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center h-100 summary-card">
+                        <div class="card-body">
+                            <div class="fw-bold text-muted">🧾 @Localizer["_ReservationDetail.TOTAL_ITEMS"]</div>
+                            <div class="fs-4 fw-semibold text-dark">
+                                @((Model.Tickets?.Sum(t => t.Piece) ?? 0) + (Model.Products?.Sum(p => p.Piece) ?? 0))
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Amount -->
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center h-100 summary-card">
+                        <div class="card-body">
+                            <div class="fw-bold text-muted">💰 @Localizer["_ReservationDetail.TOTAL_AMOUNT"]</div>
+                            <div class="fs-4 fw-bold text-dark">
+                                @Model.TotalPrice.ToString("0.00")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
