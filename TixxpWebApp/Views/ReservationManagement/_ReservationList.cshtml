@@ -3,7 +3,6 @@
 @model Tixxp.WebApp.Models.ReservationManagement.ReservationListResultVm
 
 <style>
-    /* ==== GRID GÖRÜNÜMÜ (turuncu-siyah temaya uyumlu) ==== */
     :root {
         --rm-accent: #FF7A00;
         --rm-border: rgba(0,0,0,.25);
@@ -20,7 +19,7 @@
 
         .rm-grid table {
             margin: 0;
-            border-collapse: separate; /* ayrı tutalım ki çizgiler belirgin olsun */
+            border-collapse: separate;
             border-spacing: 0;
         }
 
@@ -28,7 +27,7 @@
             position: sticky;
             top: 0;
             z-index: 2;
-            background: #fff; /* dark tema kullanıyorsan burayı #111 yapabilirsin */
+            background: #fff;
             border-bottom: 2px solid var(--rm-accent) !important;
             font-weight: 600;
         }
@@ -41,7 +40,7 @@
             border-left: 1px solid var(--rm-border) !important;
         }
 
-        .rm-grid .table { /* Bootstrap’in varsayılanlarına ek */
+        .rm-grid .table {
             --bs-table-bg: #fff;
         }
 
@@ -68,14 +67,14 @@
             <table class="table mb-0 align-middle">
                 <thead>
                     <tr>
-                        <th class="cell-nowrap" style="width: 110px;">@Localizer["_ReservationList.ID"]</th>
-                        <th class="cell-nowrap" style="width: 160px;">@Localizer["_ReservationList.CREATED_DATE"]</th>
+                        <th style="width: 110px;" class="cell-nowrap">@Localizer["_ReservationList.ID"]</th>
+                        <th style="width: 160px;" class="cell-nowrap">@Localizer["_ReservationList.CREATED_DATE"]</th>
                         <th>@Localizer["_ReservationList.Channel"]</th>
                         <th>@Localizer["_ReservationList.CUSTOMER"]</th>
-                        <th class="cell-nowrap" style="width: 200px;">@Localizer["_ReservationList.PAYMENT_TYPE"]</th>
-                        <th class="cell-nowrap" style="width: 150px;">@Localizer["_ReservationList.STATUS"]</th>
-                        <th class="text-end cell-nowrap" style="width: 160px;">@Localizer["_ReservationList.TOTAL"]</th>
-                        <th class="text-center cell-nowrap" style="width: 160px;">@Localizer["_ReservationList.ACTIONS"]</th>
+                        <th style="width: 200px;" class="cell-nowrap">@Localizer["_ReservationList.PAYMENT_TYPE"]</th>
+                        <th style="width: 150px;" class="cell-nowrap">@Localizer["_ReservationList.STATUS"]</th>
+                        <th style="width: 160px;" class="text-end cell-nowrap">@Localizer["_ReservationList.TOTAL"]</th>
+                        <th style="width: 160px;" class="text-center cell-nowrap">@Localizer["_ReservationList.ACTIONS"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -101,34 +100,28 @@
                                 </td>
                                 <td class="cell-nowrap">@r.PaymentTypeName</td>
                                 <td class="cell-nowrap"><span class="badge @badgeClass">@r.StatusName</span></td>
-                                <td class="text-end money cell-nowrap">@r.TotalPrice.ToString("N2")</td>
+                                <td class="text-end money cell-nowrap">
+                                    @r.TotalPrice.ToString("N2") @r.CurrencySymbol
+                                </td>
                                 <td class="text-center">
                                     <div class="d-inline-flex gap-1">
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-secondary js-detail"
-                                                data-id="@r.Id"
-                                                data-bs-toggle="tooltip"
+                                        <button type="button" class="btn btn-sm btn-outline-secondary js-detail"
+                                                data-id="@r.Id" data-bs-toggle="tooltip"
                                                 title="@Localizer["_ReservationList.DETAIL"]">
                                             <i class="ti ti-list-details"></i>
                                         </button>
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-dark js-resend"
-                                                data-id="@r.Id"
-                                                data-bs-toggle="tooltip"
+                                        <button type="button" class="btn btn-sm btn-outline-dark js-resend"
+                                                data-id="@r.Id" data-bs-toggle="tooltip"
                                                 title="@Localizer["_ReservationList.RESEND_EMAIL"]">
                                             <i class="ti ti-mail-forward"></i>
                                         </button>
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-primary js-change-pay"
-                                                data-id="@r.Id"
-                                                data-bs-toggle="tooltip"
+                                        <button type="button" class="btn btn-sm btn-outline-primary js-change-pay"
+                                                data-id="@r.Id" data-bs-toggle="tooltip"
                                                 title="@Localizer["_ReservationList.CHANGE_PAYMENT"]">
                                             <i class="ti ti-tax-euro"></i>
                                         </button>
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-danger js-cancel"
-                                                data-id="@r.Id"
-                                                data-bs-toggle="tooltip"
+                                        <button type="button" class="btn btn-sm btn-outline-danger js-cancel"
+                                                data-id="@r.Id" data-bs-toggle="tooltip"
                                                 title="@Localizer["_ReservationList.CANCEL"]">
                                             <i class="ti ti-x"></i>
                                         </button>
@@ -150,7 +143,6 @@
         </div>
     </div>
 
-    @* ==== Pagination (kompakt, … ile) ==== *@
     @{
         var totalPages = (int)Math.Ceiling((Model.TotalCount * 1.0) / Math.Max(1, Model.PageSize));
         if (totalPages < 1) totalPages = 1;
@@ -161,14 +153,16 @@
     }
     <div class="d-flex justify-content-between align-items-center p-3">
         <div class="small text-muted">
-            @Localizer["_ReservationList.PAGE"] @Model.Page / @totalPages • @Localizer["_ReservationList.TOTAL"] @Model.TotalCount
+            @Localizer["_ReservationList.PAGE"] @Model.Page / @totalPages •
+            @Localizer["_ReservationList.TOTAL"] @Model.TotalCount
         </div>
         <nav>
             <ul class="pagination pagination-sm mb-0">
                 <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                    <a class="page-link js-page" href="#" data-page="@(Model.Page - 1)">@Localizer["_ReservationList.PREV"]</a>
+                    <a class="page-link js-page" href="#" data-page="@(Model.Page - 1)">
+                        @Localizer["_ReservationList.PREV"]
+                    </a>
                 </li>
-
                 @if (start > 1)
                 {
                     <li class="page-item"><a class="page-link js-page" href="#" data-page="1">1</a></li>
@@ -177,14 +171,12 @@
                         <li class="page-item disabled"><span class="page-link">…</span></li>
                     }
                 }
-
                 @for (var i = start; i <= end; i++)
                 {
                     <li class="page-item @(i == Model.Page ? "active" : "")">
                         <a class="page-link js-page" href="#" data-page="@i">@i</a>
                     </li>
                 }
-
                 @if (end < totalPages)
                 {
                     @if (end < totalPages - 1)
@@ -193,9 +185,10 @@
                     }
                     <li class="page-item"><a class="page-link js-page" href="#" data-page="@totalPages">@totalPages</a></li>
                 }
-
                 <li class="page-item @(Model.Page >= totalPages ? "disabled" : "")">
-                    <a class="page-link js-page" href="#" data-page="@(Model.Page + 1)">@Localizer["_ReservationList.NEXT"]</a>
+                    <a class="page-link js-page" href="#" data-page="@(Model.Page + 1)">
+                        @Localizer["_ReservationList.NEXT"]
+                    </a>
                 </li>
             </ul>
         </nav>

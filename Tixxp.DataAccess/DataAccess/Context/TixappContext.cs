@@ -35,6 +35,8 @@ using Tixxp.Entities.SessionStatusTranslation;
 using Tixxp.Entities.SessionType;
 using Tixxp.Entities.SessionTypeTranslation;
 using Tixxp.Entities.Ticket;
+using Tixxp.Entities.TicketStatus;
+using Tixxp.Entities.TicketStatusTranslation;
 using Tixxp.Entities.TicketSubType;
 using Tixxp.Entities.TicketType;
 
@@ -52,6 +54,14 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<TicketStatusTranslationEntity>(entity =>
+            {
+                entity.ToTable("TicketStatusTranslation", _schema);
+            });
+            modelBuilder.Entity<TicketStatusEntity>(entity =>
+            {
+                entity.ToTable("TicketStatus", _schema);
+            });
             modelBuilder.Entity<TicketEntity>(entity =>
             {
                 entity.ToTable("Ticket", _schema);
@@ -205,6 +215,8 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         public DbSet<CounterEntity> Counters { get; set; }
         public DbSet<TicketEntity> Tickets { get; set; }
+        public DbSet<TicketStatusEntity> TicketStatuses { get; set; }
+        public DbSet<TicketStatusTranslationEntity> TicketStatusTranslations { get; set; }
         public DbSet<ChannelEntity> Channels { get; set; }
         public DbSet<ReservationProductDetailEntity> ReservationProductDetails { get; set; }
         public DbSet<SessionStatusEntity> SessionStatuses { get; set; }

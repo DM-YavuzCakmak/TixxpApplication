@@ -3,7 +3,6 @@
 @model Tixxp.WebApp.Models.ReservationManagement.ReservationDetailVm
 
 @{
-    // Güvenli ad/soyad birleştirme + ödeme tipi adı fallback
     var fullName = string.Join(" ",
         new[] { Model?.InvoiceInfo?.Name, Model?.InvoiceInfo?.Surname }
             .Where(s => !string.IsNullOrWhiteSpace(s)));
@@ -26,7 +25,7 @@
     }
 
         .summary-card:hover {
-            background-color: #FFF3E6; /* açık turuncu arka plan */
+            background-color: #FFF3E6;
             border-color: #FF7A00 !important;
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
@@ -164,7 +163,7 @@
             </div>
         </div>
 
-        <!-- Özet Kartlar (en altta) -->
+        <!-- Özet Kartlar -->
         <div class="col-12 mt-3">
             <div class="row g-3">
 
@@ -210,7 +209,8 @@
                         <div class="card-body">
                             <div class="fw-bold text-muted">💰 @Localizer["_ReservationDetail.TOTAL_AMOUNT"]</div>
                             <div class="fs-4 fw-bold text-dark">
-                                @Model.TotalPrice.ToString("0.00")
+                                @Model.TotalPrice.ToString("N2") @Model.CurrencySymbol
+                                @* Örn: 1.234,00 ₺ veya 200.00 $ *@
                             </div>
                         </div>
                     </div>
@@ -218,5 +218,6 @@
 
             </div>
         </div>
+
     </div>
 </div>

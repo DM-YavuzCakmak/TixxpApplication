@@ -39,7 +39,7 @@ namespace Tixxp.WebApp.Controllers
         private readonly IReservationDetailService _reservationDetailService;
         private readonly IPaymentTypeService _paymentTypeService;
         private readonly IPaymentTypeTranslationService _paymentTypeTranslationService;
-        private readonly ILanguageService _languageService; 
+        private readonly ILanguageService _languageService;
         private readonly IEventTicketPriceService _eventTicketPriceService;
         private readonly IReservationStatusTranslationService _reservationStatusTranslationService; // <-- eklendi
 
@@ -77,7 +77,7 @@ namespace Tixxp.WebApp.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var eventList = _eventService.GetList(x=> !x.IsDeleted);
+            var eventList = _eventService.GetList(x => !x.IsDeleted);
             ViewBag.EventList = eventList.Success && eventList.Data != null ? eventList.Data : Enumerable.Empty<EventEntity>();
 
             var lookups = BuildFilterLookups();
@@ -101,7 +101,9 @@ namespace Tixxp.WebApp.Controllers
                 && (!filter.StartDate.HasValue || x.Created_Date >= filter.StartDate.Value)
                 && (!filter.EndDateExclusive.HasValue || x.Created_Date < filter.EndDateExclusive.Value)
                 && (!filter.ReservationId.HasValue || x.Id == filter.ReservationId.Value),
-                x => x.Channel);
+                x => x.Channel,
+                x => x.Currency.CurrencyType // <-- CurrencyType join eklendi
+            );
 
             var list = (baseResult.Success && baseResult.Data != null)
                 ? baseResult.Data
@@ -142,9 +144,8 @@ namespace Tixxp.WebApp.Controllers
             }
 
             var paymentTypeNames = GetPaymentTypeNames();
-            var statusNames = GetReservationStatusNames(); // <-- dil bazlı statü sözlüğü
+            var statusNames = GetReservationStatusNames();
 
-            // basit kanal isimleri (gerçek kanal servisin varsa oradan al)
             var channelNames = list
                 .Where(x => x.Channel != null)
                 .GroupBy(x => x.ChannelId)
@@ -163,11 +164,12 @@ namespace Tixxp.WebApp.Controllers
                         ChannelId = r.ChannelId,
                         ChannelName = channelNames.TryGetValue(r.ChannelId, out var cn) ? cn : $"#{r.ChannelId}",
                         TotalPrice = r.TotalPrice ?? 0,
+                        CurrencySymbol = r.Currency?.CurrencyType?.Symbol ?? "", // <-- EKLENDİ
                         PaymentTypeId = inv?.PaymentTypeId,
                         PaymentTypeName = (inv?.PaymentTypeId != null && paymentTypeNames.TryGetValue(inv.PaymentTypeId.Value, out var ptn))
                                           ? ptn : (inv?.PaymentTypeId != null ? $"#{inv.PaymentTypeId}" : "-"),
                         StatusId = r.StatusId,
-                        StatusName = ResolveStatusName(r.StatusId, statusNames), // <-- burada kullanılıyor
+                        StatusName = ResolveStatusName(r.StatusId, statusNames),
                         Email = inv?.Email,
                         FullName = FormatFullName(inv?.Name, inv?.Surname)
                     };
@@ -190,6 +192,7 @@ namespace Tixxp.WebApp.Controllers
             return PartialView("_ReservationList", vm);
         }
 
+
         [HttpGet]
         public IActionResult Detail(long id)
         {
@@ -198,8 +201,12 @@ namespace Tixxp.WebApp.Controllers
             var langRes = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
             long? languageId = langRes.Success ? langRes.Data?.Id : null;
 
-            // 2) Rezervasyon (Channel include)
-            var rDr = _reservationService.GetFirstOrDefaultWithInclude(x => x.Id == id, x => x.Channel);
+            // 2) Rezervasyon (Channel + Currency -> CurrencyType include)
+            var rDr = _reservationService.GetFirstOrDefaultWithInclude(
+                x => x.Id == id,
+                x => x.Channel,
+                x => x.Currency.CurrencyType // <-- CurrencyType join eklendi
+            );
             if (!rDr.Success || rDr.Data == null)
                 return NotFound("Reservation not found.");
 
@@ -253,14 +260,12 @@ namespace Tixxp.WebApp.Controllers
                     ? trDr.Data.ToList()
                     : new List<ProductTranslationEntity>();
 
-                // (ProductId -> Name) sözlüğü
                 var trMap = translations
                     .GroupBy(t => t.ProductId)
                     .ToDictionary(g => g.Key, g => g.First().Name);
 
                 productRows = productLines.Select(p =>
                 {
-                    // Çeviri -> Product.Code -> #Id
                     var nameFromTr = trMap.TryGetValue(p.ProductId, out var trName) ? trName : null;
                     var fallback = p.Product?.Code ?? $"#{p.ProductId}";
                     var finalName = string.IsNullOrWhiteSpace(nameFromTr) ? fallback : nameFromTr;
@@ -293,6 +298,7 @@ namespace Tixxp.WebApp.Controllers
                 ChannelId = rDr.Data.ChannelId,
                 ChannelName = rDr.Data.Channel?.Name,
                 TotalPrice = rDr.Data.TotalPrice ?? 0,
+                CurrencySymbol = rDr.Data.Currency?.CurrencyType?.Symbol ?? "", // <-- EKLENDİ
                 InvoiceInfo = new ReservationInvoiceMiniVm
                 {
                     Name = inv?.Name,
@@ -308,6 +314,7 @@ namespace Tixxp.WebApp.Controllers
 
             return PartialView("_ReservationDetail", vm);
         }
+
 
 
         // CANCEL GET

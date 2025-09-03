@@ -52,6 +52,8 @@ using Tixxp.Infrastructure.DataAccess.Abstract.SessionStatusTranslation;
 using Tixxp.Infrastructure.DataAccess.Abstract.SessionType;
 using Tixxp.Infrastructure.DataAccess.Abstract.SessionTypeTranslation;
 using Tixxp.Infrastructure.DataAccess.Abstract.Ticket;
+using Tixxp.Infrastructure.DataAccess.Abstract.TicketStatus;
+using Tixxp.Infrastructure.DataAccess.Abstract.TicketStatusTranslation;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Abstract.TicketType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Agency;
@@ -102,6 +104,8 @@ using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionStatusTran
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.SessionTypeTranslation;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.Ticket;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketStatus;
+using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketStatusTranslation;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketSubType;
 using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketType;
 using Tixxp.Infrastructure.DataAccess.Context;
@@ -134,6 +138,8 @@ public static class InfrastructureServiceRegistration
 
             return new TixappContext(optionsBuilder.Options, "dbo");
         });
+        services.AddScoped<ITicketStatusTranslationRepository, TicketStatusTranslationRepository>();
+        services.AddScoped<ITicketStatusRepository, TicketStatusRepository>();
         services.AddScoped<IPersonnelRepository, PersonnelRepository>();
         services.AddScoped<ITicketRepository, TicketRepository>();
         services.AddScoped<IReservationProductDetailRepository, ReservationProductDetailRepository>();

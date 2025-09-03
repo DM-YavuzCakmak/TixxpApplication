@@ -50,6 +50,7 @@
         public DateTime CreatedDate { get; set; }
         public long ChannelId { get; set; }
         public string ChannelName { get; set; }
+        public string CurrencySymbol { get; set; }
         public decimal TotalPrice { get; set; }
         public long? PaymentTypeId { get; set; }
         public string PaymentTypeName { get; set; }
@@ -78,7 +79,7 @@
         public long ChannelId { get; set; }
         public string ChannelName { get; set; }
         public decimal TotalPrice { get; set; }
-
+        public string CurrencySymbol { get; set; } 
         public ReservationInvoiceMiniVm InvoiceInfo { get; set; }
         public List<ReservationDetailTicketVm> Tickets { get; set; } = new();
         public List<ReservationDetailProductVm> Products { get; set; } = new();
