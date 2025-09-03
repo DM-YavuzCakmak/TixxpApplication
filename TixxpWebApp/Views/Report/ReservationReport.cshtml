@@ -8,18 +8,21 @@
     var rnd = new Random();
     var dailyReservations = new List<object>();
 
+    string[] ticketTypes = { "Tam Bilet Yabancı", "Tam Bilet Yerli", "Ücretsiz" };
+
     for (int day = 1; day <= 31; day++)
     {
         string date = $"{day:00}-08-2025";
 
-        // Onaylandı
-        dailyReservations.Add(new { Date = date, Status = "Onaylandı", Count = rnd.Next(15, 40), Revenue = rnd.Next(2000, 5000), Channel = "Web" });
-
-        // İptal
-        dailyReservations.Add(new { Date = date, Status = "İptal", Count = rnd.Next(0, 6), Revenue = 0m, Channel = "Mobil" });
-
-        // Onay Bekliyor
-        dailyReservations.Add(new { Date = date, Status = "Onay Bekliyor", Count = rnd.Next(2, 12), Revenue = rnd.Next(300, 1200), Channel = "Acenta" });
+        foreach (var tType in ticketTypes)
+        {
+            dailyReservations.Add(new
+            {
+                Date = date,
+                TicketType = tType,
+                Count = rnd.Next(5, 40) // rastgele adet
+            });
+        }
     }
 
     // Aylık özet (toplamlar)
@@ -60,12 +63,12 @@
     <div class="main-content app-content">
         <div class="container-fluid">
 
-            <!-- Günlük Rezervasyon Raporu -->
+            <!-- Günlük Rezervasyon Raporu (Ticket Type Bazlı) -->
             <div class="row">
                 <div class="col-xl-12 mx-auto">
                     <div class="card custom-card mt-4">
                         <div class="card-header bg-success text-white">
-                            <div class="card-title text-dark">🗓️ Günlük Rezervasyon Raporu (31 Gün)</div>
+                            <div class="card-title text-dark">🗓️ Günlük Rezervasyon Raporu (Ticket Type)</div>
                         </div>
                         <div class="card-body">
                             <div id="daily-reservationreport" style="height: 500px;"></div>
@@ -74,15 +77,26 @@
                 </div>
             </div>
 
-            <!-- Aylık Rezervasyon Raporu -->
-            <div class="row justify-content-start">
-                <div class="col-12 col-lg-6">
+            <!-- Aylık Rezervasyon Raporu + Rezervasyon Durum Dağılımı -->
+            <div class="row">
+                <div class="col-lg-6">
                     <div class="card custom-card mt-4">
                         <div class="card-header bg-success text-white">
                             <div class="card-title text-dark">📅 Aylık Rezervasyon Raporu</div>
                         </div>
                         <div class="card-body">
                             <div id="monthly-reservationreport" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card custom-card mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <div class="card-title text-dark">📌 Rezervasyon Durum Dağılımı</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="status-distribution" style="height: 400px;"></div>
                         </div>
                     </div>
                 </div>
@@ -111,17 +125,6 @@
                         </div>
                         <div class="card-body">
                             <div id="channel-distribution" style="height: 400px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-6 mx-auto">
-                    <div class="card custom-card mt-4">
-                        <div class="card-header bg-warning text-dark">
-                            <div class="card-title text-dark">📌 Rezervasyon Durum Dağılımı</div>
-                        </div>
-                        <div class="card-body">
-                            <div id="status-distribution" style="height: 400px;"></div>
                         </div>
                     </div>
                 </div>
@@ -191,6 +194,27 @@
         }).render();
     }
 
+        function renderTicketTypeChart(containerId, dataSet) {
+        const categories = [...new Set(dataSet.map(d => d.Date))];
+        const ticketTypes = [...new Set(dataSet.map(d => d.TicketType))];
+        const series = ticketTypes.map(tt => ({
+            name: tt,
+            data: categories.map(date => {
+                const match = dataSet.find(d => d.TicketType === tt && d.Date === date);
+                return match ? match.Count : 0;
+            })
+        }));
+
+        new ApexCharts(document.querySelector(`#${containerId}`), {
+            series: series,
+            chart: { type: 'bar', height: 500, stacked: true, toolbar: { show: true } },
+            xaxis: { categories: categories },
+            legend: { position: 'right' },
+            plotOptions: { bar: { horizontal: false } }
+        }).render();
+    }
+
+
     function renderPieChart(containerId, dataSet, labelField, valueField) {
         new ApexCharts(document.querySelector(`#${containerId}`), {
             series: dataSet.map(d => d[valueField]),
@@ -207,8 +231,8 @@
         }).render();
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        renderStackedChart("daily-reservationreport", dailyData);
+       document.addEventListener("DOMContentLoaded", function () {
+        renderTicketTypeChart("daily-reservationreport", dailyData);
         renderStackedChart("monthly-reservationreport", monthlyData);
         renderLineChart("daily-revenue", dailyData);
         renderMonthlyRevenue("monthly-revenue", monthlyData);

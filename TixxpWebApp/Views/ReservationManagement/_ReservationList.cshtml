@@ -3,11 +3,6 @@
 @model Tixxp.WebApp.Models.ReservationManagement.ReservationListResultVm
 
 <style>
-    .rm-grid table {
-        table-layout: auto !important; /* Kolonlar içeriğe göre daralsın */
-        width: 100%; /* Tablonun tamamını kullansın */
-    }
-
     :root {
         --rm-accent: #FF7A00;
         --rm-border: rgba(0,0,0,.25);
@@ -20,12 +15,13 @@
     .rm-grid {
         border: 2px solid var(--rm-accent);
         border-radius: 10px;
+        overflow: hidden; /* Köşeler birleşsin */
     }
 
         .rm-grid table {
+            width: 100%;
             margin: 0;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse; /* Kenarlar birleşsin */
         }
 
         .rm-grid thead th {
@@ -33,24 +29,21 @@
             top: 0;
             z-index: 2;
             background: #fff;
+            border: 1px solid var(--rm-border) !important;
             border-bottom: 2px solid var(--rm-accent) !important;
             font-weight: 600;
         }
 
-        .rm-grid tbody tr + tr td {
-            border-top: 1.5px solid var(--rm-border) !important;
+        .rm-grid tbody td {
+            border: 1px solid var(--rm-border) !important;
         }
 
-        .rm-grid td + td, .rm-grid th + th {
-            border-left: 1px solid var(--rm-border) !important;
+        .rm-grid tbody tr:hover td {
+            background: rgba(255,122,0,.06);
         }
 
         .rm-grid .table {
             --bs-table-bg: #fff;
-        }
-
-        .rm-grid .row-hover:hover td {
-            background: rgba(255,122,0,.06);
         }
 
         .rm-grid .badge {
@@ -65,6 +58,7 @@
             font-variant-numeric: tabular-nums;
         }
 </style>
+
 
 <div class="card-body p-0">
     <div class="rm-grid-wrap">
