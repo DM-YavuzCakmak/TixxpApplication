@@ -120,6 +120,12 @@
   <data name="_ReservationDetail.CHANNEL" xml:space="preserve">
     <value>Channel</value>
   </data>
+  <data name="_ReservationDetail.CHECKIN" xml:space="preserve">
+    <value>Check In Date</value>
+  </data>
+  <data name="_ReservationDetail.CHECKOUT" xml:space="preserve">
+    <value>Check Out Date</value>
+  </data>
   <data name="_ReservationDetail.CREATED_DATE" xml:space="preserve">
     <value>Created Date</value>
   </data>
@@ -162,8 +168,17 @@
   <data name="_ReservationDetail.SUB_TYPE" xml:space="preserve">
     <value>Sub Type</value>
   </data>
+  <data name="_ReservationDetail.TICKET.DETAILS" xml:space="preserve">
+    <value>Tickets Detail</value>
+  </data>
+  <data name="_ReservationDetail.TICKET.STATUS" xml:space="preserve">
+    <value>Ticket Status</value>
+  </data>
   <data name="_ReservationDetail.TICKETS" xml:space="preserve">
     <value>Tickets</value>
+  </data>
+  <data name="_ReservationDetail.TICKET_ID" xml:space="preserve">
+    <value>Ticket ID</value>
   </data>
   <data name="_ReservationDetail.TICKET_NOT_FOUND" xml:space="preserve">
     <value>Ticket Not Found</value>

@@ -103,6 +103,17 @@
         public string TicketSubTypeName { get; set; } = "-";
         public long TicketSubTypeId { get; set; }
         public int Piece { get; set; }
+        public List<TicketMiniVm> Tickets { get; set; } = new();
+    }
+
+    public class TicketMiniVm
+    {
+        public long TicketId { get; set; }
+        public long StatusId { get; set; }
+        public string StatusName { get; set; }
+        public DateTime? CheckInDate { get; set; }
+        public DateTime? CheckOutDate { get; set; }
+        public string QrText { get; set; }
     }
 
     // ===== Cancel =====

@@ -49,6 +49,7 @@ using Tixxp.Business.Services.Abstract.SessionStatusTranslation;
 using Tixxp.Business.Services.Abstract.SessionType;
 using Tixxp.Business.Services.Abstract.Template;
 using Tixxp.Business.Services.Abstract.TicketStatus;
+using Tixxp.Business.Services.Abstract.TicketStatusTranslation;
 using Tixxp.Business.Services.Abstract.TicketSubType;
 using Tixxp.Business.Services.Abstract.TicketType;
 using Tixxp.Business.Services.Concrete.Agency;
@@ -101,10 +102,9 @@ using Tixxp.Business.Services.Concrete.SessionType;
 using Tixxp.Business.Services.Concrete.Template;
 using Tixxp.Business.Services.Concrete.Ticket;
 using Tixxp.Business.Services.Concrete.TicketStatus;
+using Tixxp.Business.Services.Concrete.TicketStatusTranslation;
 using Tixxp.Business.Services.Concrete.TicketSubType;
 using Tixxp.Business.Services.Concrete.TicketType;
-using Tixxp.Infrastructure.DataAccess.Abstract.TicketStatusTranslation;
-using Tixxp.Infrastructure.DataAccess.Concrete.EntityFramework.TicketStatusTranslation;
 
 namespace Tixxp.Business;
 
@@ -116,7 +116,7 @@ public static class BusinessServiceRegistration
 
 
         services.AddScoped<ITicketStatusService, TicketStatusService>();
-        services.AddScoped<ITicketStatusTranslationRepository, TicketStatusTranslationRepository>();
+        services.AddScoped<ITicketStatusTranslationService, TicketStatusTranslationService>();
         services.AddScoped<IPersonnelService, PersonnelService>();
         services.AddScoped<ITicketService, TicketService>();
         services.AddScoped<IReservationProductDetailService, ReservationProductDetailService>();

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
 using Tixxp.Entities.Events;
 using Tixxp.Entities.ReservationDetail;
-using Tixxp.Entities.TicketType;
+using Tixxp.Entities.TicketStatus;
 
 namespace Tixxp.Entities.Ticket;
 
@@ -18,13 +13,22 @@ public class TicketEntity : BaseEntity
     public long ReservationDetailId { get; set; }
 
     [Column("EventId")]
-    public long EventId { get; set; }   
+    public long EventId { get; set; }
 
-    [Column("Name")]
-    public string Name { get; set; }
+    [Column("TicketStatusId")]
+    public long TicketStatusId { get; set; }
 
-    [Column("Description")]
-    public string Description { get; set; }
+    [Column("CheckInDate")]
+    public DateTime? CheckInDate { get; set; }   // Biletle giriş yaptığı an
+
+    [Column("CheckOutDate")]
+    public DateTime? CheckOutDate { get; set; }  // Biletle çıkış yaptığı an
+
+    [Column("QrText")]
+    public string QrText { get; set; }
+
+    [ForeignKey(nameof(TicketStatusId))]
+    public virtual TicketStatusEntity TicketStatus { get; set; }
 
     [ForeignKey(nameof(EventId))]
     public virtual EventEntity Event { get; set; }

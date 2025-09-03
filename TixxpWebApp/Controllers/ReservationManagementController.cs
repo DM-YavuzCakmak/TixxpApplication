@@ -14,6 +14,8 @@ using Tixxp.Business.Services.Abstract.ReservationDetail;
 using Tixxp.Business.Services.Abstract.ReservationProductDetail;
 using Tixxp.Business.Services.Abstract.ReservationSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.ReservationStatusTranslation; // <-- eklendi
+using Tixxp.Business.Services.Abstract.TicketStatus;
+using Tixxp.Business.Services.Abstract.TicketStatusTranslation;
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Entities.Events;
 using Tixxp.Entities.PaymentTypeTranslation;
@@ -23,6 +25,7 @@ using Tixxp.Entities.ReservationDetail;
 using Tixxp.Entities.ReservationProductDetail;
 using Tixxp.Entities.ReservationSaleInvoiceInfo;
 using Tixxp.Entities.ReservationStatusTranslation; // <-- gerekiyorsa (entity kullanmıyoruz ama namespace tutarlılığı için)
+using Tixxp.Entities.TicketStatusTranslation;
 using Tixxp.WebApp.Models.ReservationManagement;
 
 namespace Tixxp.WebApp.Controllers
@@ -42,6 +45,8 @@ namespace Tixxp.WebApp.Controllers
         private readonly ILanguageService _languageService;
         private readonly IEventTicketPriceService _eventTicketPriceService;
         private readonly IReservationStatusTranslationService _reservationStatusTranslationService; // <-- eklendi
+        private readonly ITicketStatusService _ticketStatusService;
+        private readonly ITicketStatusTranslationService _ticketStatusTranslationService;
 
         private const long STATUS_CANCELLED = 3; // iptal durum id’n (sende farklıysa değiştir)
 
@@ -57,7 +62,9 @@ namespace Tixxp.WebApp.Controllers
             IReservationProductDetailService reservationProductDetailService,
             IProductTranslationService productTranslationService,
             ICurrencyTypeService currencyTypeService,
-            IEventService eventService)
+            IEventService eventService,
+            ITicketStatusService ticketStatusService,
+            ITicketStatusTranslationService ticketStatusTranslationService)
         {
             _reservationService = reservationService;
             _invoiceInfoService = invoiceInfoService;
@@ -71,6 +78,8 @@ namespace Tixxp.WebApp.Controllers
             _productTranslationService = productTranslationService;
             _currencyTypeService = currencyTypeService;
             _eventService = eventService;
+            _ticketStatusService = ticketStatusService;
+            _ticketStatusTranslationService = ticketStatusTranslationService;
         }
 
         // INDEX
@@ -214,24 +223,44 @@ namespace Tixxp.WebApp.Controllers
             var invDr = _invoiceInfoService.GetFirstOrDefault(x => x.ReservationId == id);
             var inv = invDr.Success ? invDr.Data : null;
 
-            // 4) Bilet satırları (TicketType & TicketSubType include) + adlar
+            // 6) Dil bazlı Status ve PaymentType adları
+            var statusNames = GetReservationStatusNames();
+            var paymentTypeNames = GetPaymentTypeNames();
+            var ticketStatusNames = GetTicketStatusNames();
+
+            // 4) Bilet satırları (TicketType & TicketSubType include) + Tickets include
             var detDr = _reservationDetailService.GetListWithInclude(
                 x => x.ReservationId == id && !x.IsDeleted,
                 x => x.TicketSubType,
-                x => x.TicketType
+                x => x.TicketType,
+                x => x.Tickets // <-- ReservationDetail → Ticket navigation
             );
-            var ticketLines = (detDr.Success && detDr.Data != null)
-                ? detDr.Data.ToList()
-                : new List<ReservationDetailEntity>();
 
-            var ticketRows = ticketLines.Select(line => new ReservationDetailTicketVm
+            var ticketRows = new List<ReservationDetailTicketVm>();
+            if (detDr.Success && detDr.Data != null)
             {
-                TicketTypeId = line.TicketTypeId,
-                TicketTypeName = line.TicketType?.Name ?? $"#{line.TicketTypeId}",
-                TicketSubTypeId = line.TicketSubTypeId,
-                TicketSubTypeName = line.TicketSubType?.Name ?? (line.TicketSubTypeId > 0 ? $"#{line.TicketSubTypeId}" : "-"),
-                Piece = line.NumberOfTickets
-            }).ToList();
+                foreach (var line in detDr.Data)
+                {
+                    var row = new ReservationDetailTicketVm
+                    {
+                        TicketTypeId = line.TicketTypeId,
+                        TicketTypeName = line.TicketType?.Name ?? $"#{line.TicketTypeId}",
+                        TicketSubTypeId = line.TicketSubTypeId,
+                        TicketSubTypeName = line.TicketSubType?.Name ?? (line.TicketSubTypeId > 0 ? $"#{line.TicketSubTypeId}" : "-"),
+                        Piece = line.NumberOfTickets,
+                        Tickets = line.Tickets?.Select(t => new TicketMiniVm
+                        {
+                            TicketId = t.Id,
+                            StatusId = t.TicketStatusId,
+                            StatusName = ticketStatusNames.TryGetValue(t.TicketStatusId, out var tsn) ? tsn : $"#{t.TicketStatusId}",
+                            CheckInDate = t.CheckInDate,
+                            CheckOutDate = t.CheckOutDate,
+                            QrText = t.QrText
+                        }).ToList() ?? new List<TicketMiniVm>()
+                    };
+                    ticketRows.Add(row);
+                }
+            }
 
             // 5) ÜRÜN satırları (ReservationProductDetail -> Product include)
             var rpdDr = _reservationProductDetailService.GetListWithInclude(
@@ -278,10 +307,6 @@ namespace Tixxp.WebApp.Controllers
                     };
                 }).ToList();
             }
-
-            // 6) Dil bazlı Status ve PaymentType adları
-            var statusNames = GetReservationStatusNames();
-            var paymentTypeNames = GetPaymentTypeNames();
 
             string paymentTypeName =
                 (inv?.PaymentTypeId != null && paymentTypeNames.TryGetValue(inv.PaymentTypeId.Value, out var ptn))
@@ -566,5 +591,38 @@ namespace Tixxp.WebApp.Controllers
                 CurrencyTypes = currencyTypeList
             };
         }
+
+        private Dictionary<long, string> GetTicketStatusNames()
+        {
+            var map = new Dictionary<long, string>();
+
+            var cultureCode = CultureInfo.CurrentUICulture.Name;
+            var langRes = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+            long? languageId = langRes.Success ? langRes.Data?.Id : null;
+
+            // TicketStatus listesi
+            var tsList = _ticketStatusService.GetList(x => !x.IsDeleted);
+
+            // Çeviriler
+            var trList = (languageId.HasValue)
+                ? _ticketStatusTranslationService.GetList(x => !x.IsDeleted && x.LanguageId == languageId.Value)
+                : _ticketStatusTranslationService.GetList(x => !x.IsDeleted);
+
+            var translations = (trList.Success && trList.Data != null)
+                ? trList.Data.ToList()
+                : new List<TicketStatusTranslationEntity>();
+
+            if (tsList.Success && tsList.Data != null)
+            {
+                foreach (var ts in tsList.Data)
+                {
+                    var tr = translations.FirstOrDefault(t => t.TicketStatusId == ts.Id);
+                    map[ts.Id] = tr?.Name ?? $"#{ts.Id}";
+                }
+            }
+
+            return map;
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using Tixxp.Entities.Base;
 using Tixxp.Entities.Currency;
 using Tixxp.Entities.Reservation;
+using Tixxp.Entities.Ticket;
 using Tixxp.Entities.TicketSubType;
 using Tixxp.Entities.TicketType;
 namespace Tixxp.Entities.ReservationDetail;
@@ -29,4 +30,7 @@ public class ReservationDetailEntity : BaseEntity
 
     [ForeignKey(nameof(TicketSubTypeId))]
     public virtual TicketSubTypeEntity TicketSubType { get; set; }
+
+    public virtual ICollection<TicketEntity> Tickets { get; set; } = new List<TicketEntity>();
+
 }

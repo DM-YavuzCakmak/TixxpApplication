@@ -120,6 +120,12 @@
   <data name="_ReservationDetail.CHANNEL" xml:space="preserve">
     <value>Satış Kanalı</value>
   </data>
+  <data name="_ReservationDetail.CHECKIN" xml:space="preserve">
+    <value>Giriş Tarihi</value>
+  </data>
+  <data name="_ReservationDetail.CHECKOUT" xml:space="preserve">
+    <value>Çıkış Tarihi</value>
+  </data>
   <data name="_ReservationDetail.CREATED_DATE" xml:space="preserve">
     <value>Oluşturulma Tarihi</value>
   </data>
@@ -162,8 +168,17 @@
   <data name="_ReservationDetail.SUB_TYPE" xml:space="preserve">
     <value>Alt Tipi</value>
   </data>
+  <data name="_ReservationDetail.TICKET.DETAILS" xml:space="preserve">
+    <value>Bilet Detayları</value>
+  </data>
+  <data name="_ReservationDetail.TICKET.STATUS" xml:space="preserve">
+    <value>Bilet Durumu</value>
+  </data>
   <data name="_ReservationDetail.TICKETS" xml:space="preserve">
     <value>Biletler</value>
+  </data>
+  <data name="_ReservationDetail.TICKET_ID" xml:space="preserve">
+    <value>Bilet No</value>
   </data>
   <data name="_ReservationDetail.TICKET_NOT_FOUND" xml:space="preserve">
     <value>Bilet Bulunamadı</value>

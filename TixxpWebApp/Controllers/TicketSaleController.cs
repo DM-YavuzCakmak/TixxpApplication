@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using Tixxp.Business.Services.Abstract;
 using Tixxp.Business.Services.Abstract.City;
 using Tixxp.Business.Services.Abstract.CityTranslation;
 using Tixxp.Business.Services.Abstract.CountryTranslation;
@@ -25,6 +26,7 @@ using Tixxp.Business.Services.Abstract.Session;
 using Tixxp.Business.Services.Abstract.SessionEventTicketPrice;
 using Tixxp.Business.Services.Abstract.TicketSubType;
 using Tixxp.Core.Utilities.Enums.ReservationStatusEnum;
+using Tixxp.Core.Utilities.Enums.TicketStatusEnum;
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Entities.City;
 using Tixxp.Entities.CityTranslation;
@@ -41,6 +43,7 @@ using Tixxp.Entities.ReservationProductDetail;
 using Tixxp.Entities.ReservationSaleInvoiceInfo;
 using Tixxp.Entities.Session;
 using Tixxp.Entities.SessionEventTicketPrice;
+using Tixxp.Entities.Ticket;
 using Tixxp.Infrastructure.DataAccess.Abstract.SessionTypeTranslation;
 using Tixxp.WebApp.Models.ProductPrice;
 using Tixxp.WebApp.Models.TicketSale.GetConfirmation;
@@ -53,6 +56,7 @@ public class TicketSaleController : Controller
 {
     private readonly IReservationProductDetailService _reservationProductDetailService;
     private readonly ICurrentUser _currentUser;
+    private readonly ITicketService _ticketService;
 
 
     private readonly IProductService _productService;
@@ -84,7 +88,7 @@ public class TicketSaleController : Controller
     private readonly ISessionTypeTranslationRepository _sessionTypeTranslationRepository;
     private readonly ILanguageService _languageService;
 
-    public TicketSaleController(IEventService eventService, ISessionService sessionService, ILanguageService languageService, ISessionTypeTranslationRepository sessionTypeTranslationRepository, IPaymentTypeService paymentTypeService, ISessionEventTicketPriceService sessionEventTicketPriceService, IEventTicketPriceService eventTicketPriceService, IPaymentTypeTranslationService paymentTypeTranslationService, ICountryTranslationService countryTranslationService, ICityTranslationService cityTranslationService, ICityService cityService, ICountyTranslationService countyTranslationService, ICountyService countyService, IReservationSaleInvoiceInfoService reservationSaleInvoiceInfoService, IReservationService reservationService, ITicketSubTypeService ticketSubTypeService, IReservationDetailService reservationDetailService, IProductService productService, IProductPriceService productPriceService, ICurrencyTypeService currencyTypeService, IProductTranslationService productTranslationService, IReservationProductDetailService reservationProductDetailService, ICurrentUser currentUser)
+    public TicketSaleController(IEventService eventService, ISessionService sessionService, ILanguageService languageService, ISessionTypeTranslationRepository sessionTypeTranslationRepository, IPaymentTypeService paymentTypeService, ISessionEventTicketPriceService sessionEventTicketPriceService, IEventTicketPriceService eventTicketPriceService, IPaymentTypeTranslationService paymentTypeTranslationService, ICountryTranslationService countryTranslationService, ICityTranslationService cityTranslationService, ICityService cityService, ICountyTranslationService countyTranslationService, ICountyService countyService, IReservationSaleInvoiceInfoService reservationSaleInvoiceInfoService, IReservationService reservationService, ITicketSubTypeService ticketSubTypeService, IReservationDetailService reservationDetailService, IProductService productService, IProductPriceService productPriceService, ICurrencyTypeService currencyTypeService, IProductTranslationService productTranslationService, IReservationProductDetailService reservationProductDetailService, ICurrentUser currentUser, ITicketService ticketService)
     {
         _eventService = eventService;
         _sessionService = sessionService;
@@ -109,6 +113,7 @@ public class TicketSaleController : Controller
         _productTranslationService = productTranslationService;
         _reservationProductDetailService = reservationProductDetailService;
         _currentUser = currentUser;
+        _ticketService = ticketService;
     }
 
     public IActionResult Index()
@@ -386,7 +391,6 @@ public class TicketSaleController : Controller
     [HttpPost]
     public IActionResult Confirm([FromBody] GetConfirmation getConfirmation)
     {
-
         #region Reservation
         var reservationEntity = new ReservationEntity
         {
@@ -443,26 +447,6 @@ public class TicketSaleController : Controller
         }
         #endregion
 
-        #region Reservation Detail (Tickets)
-        if (getConfirmation.TicketInformations != null)
-        {
-            foreach (var ticketInformation in getConfirmation.TicketInformations)
-            {
-                var eventTicketPrice = _eventTicketPriceService.GetFirstOrDefault(x => x.Id == ticketInformation.EventTicketPriceId);
-                var ticketSubType = _ticketSubTypeService.GetFirstOrDefault(x => x.TicketTypeId == eventTicketPrice.Data.TicketTypeId);
-
-                var rd = new ReservationDetailEntity
-                {
-                    ReservationId = reservationNewEntity.Data.Id,
-                    TicketTypeId = eventTicketPrice.Data.TicketTypeId,
-                    TicketSubTypeId = ticketSubType.Data.Id,
-                    NumberOfTickets = ticketInformation.Piece
-                };
-                _reservationDetailService.AddAndReturn(rd);
-            }
-        }
-        #endregion
-
         #region Reservation Product Sales
         foreach (var p in getConfirmation.ProductInformations)
         {
@@ -475,11 +459,80 @@ public class TicketSaleController : Controller
             };
             _reservationProductDetailService.Add(line);
         }
-        return Ok();
         #endregion
 
-        #region 
-        //TODO:Ticket Add Logic
+        #region Reservation Detail (Tickets) + Ticket Add Logic
+        if (getConfirmation.TicketInformations != null)
+        {
+            foreach (var ti in getConfirmation.TicketInformations)
+            {
+                if (ti.Piece <= 0) continue;
+
+                var etpDr = _eventTicketPriceService.GetFirstOrDefault(x => x.Id == ti.EventTicketPriceId);
+                if (!etpDr.Success || etpDr.Data == null) continue;
+
+                var subTypeDr = _ticketSubTypeService.GetFirstOrDefault(x => x.TicketTypeId == etpDr.Data.TicketTypeId);
+
+                var rd = new ReservationDetailEntity
+                {
+                    ReservationId = reservationNewEntity.Data.Id,
+                    TicketTypeId = etpDr.Data.TicketTypeId,
+                    TicketSubTypeId = subTypeDr.Data?.Id ?? 0,
+                    NumberOfTickets = ti.Piece
+                };
+                var rdNew = _reservationDetailService.AddAndReturn(rd);
+                if (!rdNew.Success || rdNew.Data == null) continue;
+
+                var rdId = rdNew.Data.Id;
+
+                long eventId = 0;
+                if (etpDr.Data.GetType().GetProperty("EventId") != null)
+                {
+                    eventId = (long)(etpDr.Data.GetType().GetProperty("EventId")!.GetValue(etpDr.Data) ?? 0L);
+                }
+                if (eventId <= 0)
+                {
+                    eventId = ResolveEventIdFallback(ti.EventTicketPriceId);
+                }
+
+                // 5) Adet kadar Ticket üret
+                for (int i = 1; i <= ti.Piece; i++)
+                {
+                    var ticket = new TicketEntity
+                    {
+                        ReservationDetailId = rdId,
+                        EventId = eventId,
+                        TicketStatusId = (long)TicketStatusEnum.Active,
+                        CheckInDate = null,
+                        CheckOutDate = null,
+                        QrText = BuildQrText(reservationNewEntity.Data.Id, rdId, ti.EventTicketPriceId, i),
+                        CreatedBy = _currentUser.GetRequiredUserId()
+                    };
+
+                    _ticketService.Add(ticket); // AddRange yoksa tek tek ekle
+                }
+            }
+        }
+
+        // --- Local helpers ---
+        long ResolveEventIdFallback(long eventTicketPriceId)
+        {
+            var mapDr = _sessionEventTicketPriceService.GetFirstOrDefault(x => x.EventTicketPriceId == eventTicketPriceId && !x.IsDeleted);
+            if (mapDr.Success && mapDr.Data != null)
+            {
+                var sessDr = _sessionService.GetFirstOrDefault(x => x.Id == mapDr.Data.SessionId && !x.IsDeleted);
+                if (sessDr.Success && sessDr.Data != null)
+                    return sessDr.Data.EventId;
+            }
+            return 0;
+        }
+
+        static string BuildQrText(long reservationId, long reservationDetailId, long eventTicketPriceId, int seq)
+        {
+            return $"TXXP|R:{reservationId}|RD:{reservationDetailId}|ETP:{eventTicketPriceId}|S:{seq}|TS:{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}|{Guid.NewGuid():N}";
+        }
         #endregion
+
+        return Ok(new { ReservationId = reservationNewEntity.Data.Id });
     }
 }

@@ -30,6 +30,24 @@
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
         }
+
+    .ticket-collapse {
+        background-color: #f9f9f9;
+        border-left: 3px solid #FF7A00;
+    }
+
+    .collapse {
+        transition: height 0.35s ease, opacity 0.35s ease;
+    }
+
+        .collapse.show {
+            opacity: 1;
+        }
+
+        .collapse:not(.show) {
+            opacity: 0;
+        }
+
 </style>
 
 <div class="container-fluid">
@@ -91,6 +109,7 @@
                                     <th style="width: 240px;">@Localizer["_ReservationDetail.TICKET_TYPE"]</th>
                                     <th style="width: 240px;">@Localizer["_ReservationDetail.SUB_TYPE"]</th>
                                     <th style="width: 120px;">@Localizer["_ReservationDetail.PIECE"]</th>
+                                    <th style="width: 60px;"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -98,21 +117,62 @@
                                 {
                                     foreach (var t in Model.Tickets)
                                     {
+                                        var collapseId = $"ticket-details-{t.TicketTypeId}-{t.TicketSubTypeId}-{Guid.NewGuid():N}";
                                         <tr>
-                                            <td>@(string.IsNullOrWhiteSpace(t.TicketTypeName) ? $"#{t.TicketTypeId}" : t.TicketTypeName)</td>
+                                            <td>@t.TicketTypeName</td>
+                                            <td>@t.TicketSubTypeName</td>
+                                            <td>@t.Piece</td>
                                             <td>
-                                                @(string.IsNullOrWhiteSpace(t.TicketSubTypeName)
-                                                                                        ? (t.TicketSubTypeId > 0 ? $"#{t.TicketSubTypeId}" : "-")
-                                                                                        : t.TicketSubTypeName)
-                                    </td>
-                                    <td>@t.Piece</td>
-                                </tr>
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#@collapseId"
+                                                        aria-expanded="false"
+                                                        aria-controls="@collapseId">
+                                                    @Localizer["_ReservationDetail.TICKET.DETAILS"]
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" class="p-0">
+                                                <div class="collapse ticket-collapse" id="@collapseId">
+                                                    @if (t.Tickets.Any())
+                                                    {
+                                                        <table class="table table-sm mb-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>@Localizer["_ReservationDetail.TICKET_ID"]</th>
+                                                                    <th>@Localizer["_ReservationDetail.STATUS"]</th>
+                                                                    <th>@Localizer["_ReservationDetail.CHECKIN"]</th>
+                                                                    <th>@Localizer["_ReservationDetail.CHECKOUT"]</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var tt in t.Tickets)
+                                                                {
+                                                                    <tr>
+                                                                        <td>#@tt.TicketId</td>
+                                                                        <td><span class="badge bg-secondary">@tt.StatusName</span></td>
+                                                                        <td>@(tt.CheckInDate?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                                                        <td>@(tt.CheckOutDate?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                                                    </tr>
                                                                 }
+                                                            </tbody>
+                                                        </table>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="text-muted p-2">@Localizer["_ReservationDetail.NO_TICKETS"]</div>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
                                 }
                                 else
                                 {
                                     <tr>
-                                        <td colspan="3" class="text-center text-muted py-3">
+                                        <td colspan="4" class="text-center text-muted py-3">
                                             @Localizer["_ReservationDetail.TICKET_NOT_FOUND"]
                                         </td>
                                     </tr>
@@ -210,7 +270,6 @@
                             <div class="fw-bold text-muted">💰 @Localizer["_ReservationDetail.TOTAL_AMOUNT"]</div>
                             <div class="fs-4 fw-bold text-dark">
                                 @Model.TotalPrice.ToString("N2") @Model.CurrencySymbol
-                                @* Örn: 1.234,00 ₺ veya 200.00 $ *@
                             </div>
                         </div>
                     </div>
