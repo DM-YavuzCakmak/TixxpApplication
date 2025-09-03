@@ -3,6 +3,11 @@
 @model Tixxp.WebApp.Models.ReservationManagement.ReservationListResultVm
 
 <style>
+    .rm-grid table {
+        table-layout: auto !important; /* Kolonlar içeriğe göre daralsın */
+        width: 100%; /* Tablonun tamamını kullansın */
+    }
+
     :root {
         --rm-accent: #FF7A00;
         --rm-border: rgba(0,0,0,.25);
@@ -66,16 +71,17 @@
         <div class="rm-grid">
             <table class="table mb-0 align-middle">
                 <thead>
-                    <tr>
-                        <th style="width: 110px;" class="cell-nowrap">@Localizer["_ReservationList.ID"]</th>
-                        <th style="width: 160px;" class="cell-nowrap">@Localizer["_ReservationList.CREATED_DATE"]</th>
-                        <th>@Localizer["_ReservationList.Channel"]</th>
-                        <th>@Localizer["_ReservationList.CUSTOMER"]</th>
-                        <th style="width: 200px;" class="cell-nowrap">@Localizer["_ReservationList.PAYMENT_TYPE"]</th>
-                        <th style="width: 150px;" class="cell-nowrap">@Localizer["_ReservationList.STATUS"]</th>
-                        <th style="width: 160px;" class="text-end cell-nowrap">@Localizer["_ReservationList.TOTAL"]</th>
-                        <th style="width: 160px;" class="text-center cell-nowrap">@Localizer["_ReservationList.ACTIONS"]</th>
-                    </tr>
+                <tr>
+                    <th style="width: 110px;" class="cell-nowrap">@Localizer["_ReservationList.ID"]</th>
+                    <th style="width: 160px;" class="cell-nowrap">@Localizer["_ReservationList.CREATED_DATE"]</th>
+                    <th class="cell-nowrap">@Localizer["_ReservationList.Channel"]</th>
+                    <th>@Localizer["_ReservationList.CUSTOMER"]</th>
+                    <th class="cell-nowrap">@Localizer["_ReservationList.PAYMENT_TYPE"]</th>
+                    <th class="cell-nowrap">@Localizer["_ReservationList.STATUS"]</th>
+                    <th class="text-end cell-nowrap" style="width:120px;">@Localizer["_ReservationList.TOTAL"]</th>
+                    <th class="text-center cell-nowrap" style="width:140px;">@Localizer["_ReservationList.ACTIONS"]</th>
+
+                </tr>
                 </thead>
                 <tbody>
                     @if (Model.Items != null && Model.Items.Any())
@@ -95,8 +101,8 @@
                                 <td class="cell-nowrap">@r.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
                                 <td>@r.ChannelName</td>
                                 <td>
-                                    <div class="fw-semibold">@r.FullName</div>
-                                    <div class="small text-muted">@r.Email</div>
+                                    <div class="fw-semibold text-truncate" style="max-width:200px;" title="@r.FullName">@r.FullName</div>
+                                    <div class="small text-muted text-truncate" style="max-width:200px;" title="@r.Email">@r.Email</div>
                                 </td>
                                 <td class="cell-nowrap">@r.PaymentTypeName</td>
                                 <td class="cell-nowrap"><span class="badge @badgeClass">@r.StatusName</span></td>
