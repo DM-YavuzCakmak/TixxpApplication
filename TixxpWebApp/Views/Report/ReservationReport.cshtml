@@ -4,23 +4,42 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Rezervasyon Raporu";
 
-    // ===== 1 Aylık Dummy Data (31 Gün) =====
+    // ===== Kur Bilgileri (Dummy) =====
+    decimal usdRate = 34.0m; // Örnek USD kuru
+    decimal eurRate = 36.5m; // Örnek EUR kuru
+
+    // TicketType bazlı TL fiyatlar
+    var ticketPrices = new Dictionary<string, decimal>
+    {
+        { "Tam Bilet Yabancı", 1000m },
+        { "Tam Bilet Yerli", 750m },
+        { "Ücretsiz", 0m }
+    };
+
     var rnd = new Random();
     var dailyReservations = new List<object>();
-
     string[] ticketTypes = { "Tam Bilet Yabancı", "Tam Bilet Yerli", "Ücretsiz" };
 
+    // ===== 1 Aylık Dummy Data (31 Gün) =====
     for (int day = 1; day <= 31; day++)
     {
         string date = $"{day:00}-08-2025";
 
         foreach (var tType in ticketTypes)
         {
+            int count = rnd.Next(5, 40);
+            decimal revenueTl = ticketPrices[tType] * count;
+            decimal revenueUsd = Math.Round(revenueTl / usdRate, 2);
+            decimal revenueEur = Math.Round(revenueTl / eurRate, 2);
+
             dailyReservations.Add(new
             {
                 Date = date,
                 TicketType = tType,
-                Count = rnd.Next(5, 40) // rastgele adet
+                Count = count,
+                RevenueTL = revenueTl,
+                RevenueUSD = revenueUsd,
+                RevenueEUR = revenueEur
             });
         }
     }
@@ -106,8 +125,13 @@
             <div class="row">
                 <div class="col-xl-12 mx-auto">
                     <div class="card custom-card mt-4">
-                        <div class="card-header bg-info text-white">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                             <div class="card-title text-dark">💰 Günlük Rezervasyon Geliri</div>
+                            <select id="currency-selector" class="form-select w-auto">
+                                <option value="RevenueTL">₺ TL</option>
+                                <option value="RevenueUSD">$ USD</option>
+                                <option value="RevenueEUR">€ EUR</option>
+                            </select>
                         </div>
                         <div class="card-body">
                             <div id="daily-revenue" style="height: 400px;"></div>
@@ -116,7 +140,7 @@
                 </div>
             </div>
 
-            <!-- Kanallar & Durum Dağılımı -->
+            <!-- Kanallar -->
             <div class="row">
                 <div class="col-xl-6 mx-auto">
                     <div class="card custom-card mt-4">
@@ -160,13 +184,13 @@
         }).render();
     }
 
-    function renderLineChart(containerId, dataSet) {
+    function renderLineChart(containerId, dataSet, currencyField) {
         const categories = [...new Set(dataSet.map(d => d.Date))];
         const series = [{
             name: "Gelir",
             data: categories.map(date => {
                 const matches = dataSet.filter(d => d.Date === date);
-                return matches.reduce((a, b) => a + b.Revenue, 0);
+                return matches.reduce((a, b) => a + b[currencyField], 0);
             })
         }];
         new ApexCharts(document.querySelector(`#${containerId}`), {
@@ -194,7 +218,7 @@
         }).render();
     }
 
-        function renderTicketTypeChart(containerId, dataSet) {
+    function renderTicketTypeChart(containerId, dataSet) {
         const categories = [...new Set(dataSet.map(d => d.Date))];
         const ticketTypes = [...new Set(dataSet.map(d => d.TicketType))];
         const series = ticketTypes.map(tt => ({
@@ -214,7 +238,6 @@
         }).render();
     }
 
-
     function renderPieChart(containerId, dataSet, labelField, valueField) {
         new ApexCharts(document.querySelector(`#${containerId}`), {
             series: dataSet.map(d => d[valueField]),
@@ -231,12 +254,18 @@
         }).render();
     }
 
-       document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        let currencyField = "RevenueTL"; // varsayılan TL
         renderTicketTypeChart("daily-reservationreport", dailyData);
         renderStackedChart("monthly-reservationreport", monthlyData);
-        renderLineChart("daily-revenue", dailyData);
+        renderLineChart("daily-revenue", dailyData, currencyField);
         renderMonthlyRevenue("monthly-revenue", monthlyData);
         renderPieChart("channel-distribution", channelData, "Channel", "Count");
         renderDonutChart("status-distribution", statusData, "Status", "Count");
+
+        document.getElementById("currency-selector").addEventListener("change", e => {
+            document.querySelector("#daily-revenue").innerHTML = "";
+            renderLineChart("daily-revenue", dailyData, e.target.value);
+        });
     });
 </script>

@@ -169,7 +169,7 @@
     <value>Sub Type</value>
   </data>
   <data name="_ReservationDetail.TICKET.DETAILS" xml:space="preserve">
-    <value>Tickets Detail</value>
+    <value>-</value>
   </data>
   <data name="_ReservationDetail.TICKET.STATUS" xml:space="preserve">
     <value>Ticket Status</value>
