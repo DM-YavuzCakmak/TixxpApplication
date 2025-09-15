@@ -75,13 +75,14 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Email, user.Email),
         new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+        new Claim("ProfilePhotoPath", $"{user.ProfilePhotoPath}"),
         new Claim("FirstName", user.FirstName ?? string.Empty),
         new Claim("LastName", user.LastName ?? string.Empty),
         new Claim("CompanyIdentifier", user.CompanyIdentifier ?? SchemaConstant.Default)
     };
 
         var personnelRolesResult = _personnelRoleService
-           .GetListWithInclude(x => x.PersonnelId == user.Id && !x.IsDeleted, query => query.Role );
+           .GetListWithInclude(x => x.PersonnelId == user.Id && !x.IsDeleted, query => query.Role);
 
         var personnelRoles = personnelRolesResult?.Data?.ToList() ?? new();
 

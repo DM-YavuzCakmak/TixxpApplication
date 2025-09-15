@@ -634,7 +634,7 @@
                 <a href="javascript:void(0);" class="header-link dropdown-toggle" id="mainHeaderProfile" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                     <div>
                         <div class="me-0">
-                            <img src="../assets/images/faces/9.jpg" alt="img" width="32" height="32" class="rounded-circle">
+                            <img src="@User.FindFirst("ProfilePhotoPath")?.Value" alt="img" width="32" height="32" class="rounded-circle">
                         </div>
                     </div>
                 </a>
