@@ -13,6 +13,9 @@ public class ReservationEntity : BaseEntity
     [Column("CurrencyId")]
     public long CurrencyId { get; set; }
 
+    [Column("SessionId")]
+    public long SessionId { get; set; }
+
     [Column("StatusId")]
     public long StatusId { get; set; }
 

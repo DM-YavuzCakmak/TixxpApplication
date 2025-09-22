@@ -4,6 +4,10 @@ using Tixxp.Business.Services.Abstract.Agency;
 using Tixxp.Business.Services.Abstract.AgencyContract;
 using Tixxp.Business.Services.Abstract.BankService;
 using Tixxp.Business.Services.Abstract.Base;
+using Tixxp.Business.Services.Abstract.Campaign;
+using Tixxp.Business.Services.Abstract.CampaignAction;
+using Tixxp.Business.Services.Abstract.CampaignCondition;
+using Tixxp.Business.Services.Abstract.CampaignConditionType;
 using Tixxp.Business.Services.Abstract.Channel;
 using Tixxp.Business.Services.Abstract.City;
 using Tixxp.Business.Services.Abstract.CityTranslation;
@@ -56,6 +60,10 @@ using Tixxp.Business.Services.Concrete.Agency;
 using Tixxp.Business.Services.Concrete.AgencyContract;
 using Tixxp.Business.Services.Concrete.BankService;
 using Tixxp.Business.Services.Concrete.Base;
+using Tixxp.Business.Services.Concrete.Campaign;
+using Tixxp.Business.Services.Concrete.CampaignAction;
+using Tixxp.Business.Services.Concrete.CampaignCondition;
+using Tixxp.Business.Services.Concrete.CampaignConditionType;
 using Tixxp.Business.Services.Concrete.Channel;
 using Tixxp.Business.Services.Concrete.City;
 using Tixxp.Business.Services.Concrete.CityTranslation;
@@ -116,6 +124,10 @@ public static class BusinessServiceRegistration
 
 
         services.AddScoped<ITicketStatusService, TicketStatusService>();
+        services.AddScoped<ICampaignService, CampaignService>();
+        services.AddScoped<ICampaignActionService, CampaignActionService>();
+        services.AddScoped<ICampaignConditionService, CampaignConditionService>();
+        services.AddScoped<ICampaignConditionTypeService, CampaignConditionTypeService>();
         services.AddScoped<ITicketStatusTranslationService, TicketStatusTranslationService>();
         services.AddScoped<IPersonnelService, PersonnelService>();
         services.AddScoped<ITicketService, TicketService>();
@@ -165,8 +177,6 @@ public static class BusinessServiceRegistration
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<ICityService, CityService>();
         services.AddScoped<ICountyService, CountyService>();
-
-
 
         services.AddScoped<ICountryTranslationService, CountryTranslationService>();
         services.AddScoped<ICityTranslationService, CityTranslationService>();

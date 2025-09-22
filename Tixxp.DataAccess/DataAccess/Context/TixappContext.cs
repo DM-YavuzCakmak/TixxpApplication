@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tixxp.Entities.AgencyContract;
 using Tixxp.Entities.Bank;
+using Tixxp.Entities.Campaign;
+using Tixxp.Entities.CampaignAction;
+using Tixxp.Entities.CampaignCondition;
+using Tixxp.Entities.CampaignConditionType;
 using Tixxp.Entities.Channel;
 using Tixxp.Entities.Counter;
 using Tixxp.Entities.Currency;
@@ -54,6 +58,22 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CampaignConditionEntity>(entity =>
+            {
+                entity.ToTable("CampaignCondition", _schema);
+            });
+            modelBuilder.Entity<CampaignActionEntity>(entity =>
+            {
+                entity.ToTable("CampaignAction", _schema);
+            });
+            modelBuilder.Entity<CampaignConditionTypeEntity>(entity =>
+            {
+                entity.ToTable("CampaignConditionType", _schema);
+            });
+            modelBuilder.Entity<CampaignEntity>(entity =>
+            {
+                entity.ToTable("Campaign", _schema);
+            });
             modelBuilder.Entity<TicketStatusTranslationEntity>(entity =>
             {
                 entity.ToTable("TicketStatusTranslation", _schema);
@@ -214,6 +234,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         }
 
         public DbSet<CounterEntity> Counters { get; set; }
+        public DbSet<CampaignConditionEntity> CampaignConditions { get; set; }
+        public DbSet<CampaignConditionTypeEntity> CampaignConditionTypes { get; set; }
+        public DbSet<CampaignActionEntity> CampaignActions { get; set; }
+        public DbSet<CampaignEntity> Campaigns { get; set; }
         public DbSet<TicketEntity> Tickets { get; set; }
         public DbSet<TicketStatusEntity> TicketStatuses { get; set; }
         public DbSet<TicketStatusTranslationEntity> TicketStatusTranslations { get; set; }

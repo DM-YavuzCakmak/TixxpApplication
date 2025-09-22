@@ -2,7 +2,9 @@
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using Tixxp.Business.DataTransferObjects.Campaign;
 using Tixxp.Business.Services.Abstract;
+using Tixxp.Business.Services.Abstract.Campaign;
 using Tixxp.Business.Services.Abstract.City;
 using Tixxp.Business.Services.Abstract.CityTranslation;
 using Tixxp.Business.Services.Abstract.CountryTranslation;
@@ -58,6 +60,8 @@ public class TicketSaleController : Controller
     private readonly ICurrentUser _currentUser;
     private readonly ITicketService _ticketService;
 
+    private readonly ICampaignService _campaignService;
+
 
     private readonly IProductService _productService;
     private readonly IProductPriceService _productPriceService;
@@ -88,7 +92,7 @@ public class TicketSaleController : Controller
     private readonly ISessionTypeTranslationRepository _sessionTypeTranslationRepository;
     private readonly ILanguageService _languageService;
 
-    public TicketSaleController(IEventService eventService, ISessionService sessionService, ILanguageService languageService, ISessionTypeTranslationRepository sessionTypeTranslationRepository, IPaymentTypeService paymentTypeService, ISessionEventTicketPriceService sessionEventTicketPriceService, IEventTicketPriceService eventTicketPriceService, IPaymentTypeTranslationService paymentTypeTranslationService, ICountryTranslationService countryTranslationService, ICityTranslationService cityTranslationService, ICityService cityService, ICountyTranslationService countyTranslationService, ICountyService countyService, IReservationSaleInvoiceInfoService reservationSaleInvoiceInfoService, IReservationService reservationService, ITicketSubTypeService ticketSubTypeService, IReservationDetailService reservationDetailService, IProductService productService, IProductPriceService productPriceService, ICurrencyTypeService currencyTypeService, IProductTranslationService productTranslationService, IReservationProductDetailService reservationProductDetailService, ICurrentUser currentUser, ITicketService ticketService)
+    public TicketSaleController(IEventService eventService, ISessionService sessionService, ILanguageService languageService, ISessionTypeTranslationRepository sessionTypeTranslationRepository, IPaymentTypeService paymentTypeService, ISessionEventTicketPriceService sessionEventTicketPriceService, IEventTicketPriceService eventTicketPriceService, IPaymentTypeTranslationService paymentTypeTranslationService, ICountryTranslationService countryTranslationService, ICityTranslationService cityTranslationService, ICityService cityService, ICountyTranslationService countyTranslationService, ICountyService countyService, IReservationSaleInvoiceInfoService reservationSaleInvoiceInfoService, IReservationService reservationService, ITicketSubTypeService ticketSubTypeService, IReservationDetailService reservationDetailService, IProductService productService, IProductPriceService productPriceService, ICurrencyTypeService currencyTypeService, IProductTranslationService productTranslationService, IReservationProductDetailService reservationProductDetailService, ICurrentUser currentUser, ITicketService ticketService, ICampaignService campaignService)
     {
         _eventService = eventService;
         _sessionService = sessionService;
@@ -114,6 +118,7 @@ public class TicketSaleController : Controller
         _reservationProductDetailService = reservationProductDetailService;
         _currentUser = currentUser;
         _ticketService = ticketService;
+        _campaignService = campaignService;
     }
 
     public IActionResult Index()
@@ -391,6 +396,21 @@ public class TicketSaleController : Controller
     [HttpPost]
     public IActionResult Confirm([FromBody] GetConfirmation getConfirmation)
     {
+        long? sessionId = null;
+
+        if (getConfirmation.TicketInformations != null && getConfirmation.TicketInformations.Any())
+        {
+            var firstEtpId = getConfirmation.TicketInformations.First().EventTicketPriceId;
+            var mapDr = _sessionEventTicketPriceService.GetFirstOrDefault(
+                x => x.EventTicketPriceId == firstEtpId && !x.IsDeleted
+            );
+            if (mapDr.Success && mapDr.Data != null)
+            {
+                sessionId = mapDr.Data.SessionId;
+            }
+        }
+
+
         #region Reservation
         var reservationEntity = new ReservationEntity
         {
@@ -403,7 +423,8 @@ public class TicketSaleController : Controller
             IsInvoiced = false,
             IsDeleted = false,
             TotalTicket = getConfirmation.TicketInformations?.Sum(x => x.Piece) ?? 0,
-            CreatedBy = _currentUser.GetRequiredUserId()
+            CreatedBy = _currentUser.GetRequiredUserId(),
+            SessionId = sessionId.Value
         };
         var reservationNewEntity = _reservationService.AddAndReturn(reservationEntity);
         #endregion
@@ -513,6 +534,28 @@ public class TicketSaleController : Controller
                 }
             }
         }
+
+        decimal finalPrice = reservationNewEntity.Data.TotalPrice ?? 0;
+        var appliedCampaigns = new List<string>();
+        var sessionDr = _sessionService.GetFirstOrDefault(x => x.Id == sessionId && !x.IsDeleted);
+        if (sessionDr.Success && sessionDr.Data != null)
+        {
+            var dto = new ApplyCampaignRequestDto
+            {
+                ReservationEntity = reservationNewEntity.Data,
+                SessionEntity = sessionDr.Data
+            };
+
+            var before = finalPrice;
+            finalPrice = _campaignService.ApplyCampaigns(dto);
+
+            if (finalPrice < before)
+            {
+                // Uygulanan kampanyaları repository’den almak daha doğru ama şimdilik örnek:
+                appliedCampaigns.Add("Early Bird %25");
+            }
+        }
+
 
         // --- Local helpers ---
         long ResolveEventIdFallback(long eventTicketPriceId)
