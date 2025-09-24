@@ -19,6 +19,9 @@ public class ReservationEntity : BaseEntity
     [Column("StatusId")]
     public long StatusId { get; set; }
 
+    [Column("CampaignId")]
+    public long? CampaignId { get; set; }
+
     [Column("ChannelId")]
     public long ChannelId { get; set; }
 

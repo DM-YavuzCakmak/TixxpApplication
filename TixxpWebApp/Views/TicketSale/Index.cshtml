@@ -815,6 +815,18 @@
 
           tbody.innerHTML = rows;
           grand.textContent = window.formatMoney(total, symbol);
+
+          let lastChecked = null;
+          document.querySelectorAll('input[name="selectedCampaign"]').forEach(radio => {
+              radio.addEventListener('click', function() {
+                     if (lastChecked === this) {
+                this.checked = false;
+                lastChecked = null;
+                } else {
+                lastChecked = this;
+            }
+            });
+            });
         };
 
         // --- Popup helper'ları ---
@@ -842,10 +854,17 @@
           }
         }
 
-        window.goToConfirmation = async function () {
+               window.goToConfirmation = async function () {
           if (!document.getElementById("conf-cart-wrap")) {
             try {
-              var url = '/TicketSale/GetConfirmation';
+              // Sepet payload hazırla
+              var payload = window.buildPendingConfirmation();
+              var sessionId = (window.selectedSession && window.selectedSession.sessionId) || 0;
+              var total = payload?.PaymentInformation?.TotalAmount || 0;
+
+              // Query param ile backend'e gönder
+              var url = `/TicketSale/GetConfirmation?sessionId=${encodeURIComponent(sessionId)}&totalAmount=${encodeURIComponent(total)}`;
+
               var resp = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
               var html = await resp.text();
               var host = document.getElementById("confirmation-container");
@@ -856,12 +875,14 @@
             }
           }
 
+          // Local pending modelini doldur
           window.pendingConfirmation = window.buildPendingConfirmation();
           window.renderConfirmationView();
 
           enableTab("confirmation");
           activateTab("confirmation");
         };
+
 
         window.clearCartAndBack = function () {
           if (window.__TicketCart) window.__TicketCart.items = [];
@@ -873,40 +894,78 @@
         };
 
         window.submitConfirmation = async function () {
-          var payload = window.pendingConfirmation || window.buildPendingConfirmation();
-          var hasTickets = payload?.TicketInformations?.length > 0;
-          var hasProducts = payload?.ProductInformations?.length > 0;
+            var payload = window.buildPendingConfirmation();
 
-          if (!hasTickets && !hasProducts) {
-            alert("@Localizer["confirmation.ALERT_EMPTY_CART"]");
-            return;
-          }
+            // Kullanıcı kampanya seçtiyse payload’a ekle
+            var selected = document.querySelector('input[name="selectedCampaign"]:checked');
+            if (selected) {
+                payload.CampaignId = parseInt(selected.value, 10);
 
-          try {
-            const resp = await fetch('/TicketSale/Confirm', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-              },
-              body: JSON.stringify({
-                PersonalInformation: payload.PersonalInformation,
-                TicketInformations:  payload.TicketInformations,
-                ProductInformations: payload.ProductInformations,
-                PaymentInformation:  payload.PaymentInformation
-              })
-            });
+                if (hasSwal()) {
+                    const res = await Swal.fire({
+                        title: "@Localizer["confirmation.CAMPAIGN_CONFIRM_TITLE"]",
+                        text: "@Localizer["confirmation.CAMPAIGN_CONFIRM_MSG"]",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonText: "@Localizer["confirmation.YES"]",
+                        cancelButtonText: "@Localizer["confirmation.NO"]"
+                    });
+                    if (!res.isConfirmed) return;
+                }
+            }
 
-            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            if (!payload.TicketInformations?.length && !payload.ProductInformations?.length) {
+                alert("@Localizer["confirmation.ALERT_EMPTY_CART"]");
+                return;
+            }
 
-            // ✅ Başarılı: önce popup göster, sonra yönlendir
-            showSuccessThenRedirect('@Localizer["confirmation.SUCCESS"]', '@Url.Action("Index", "TicketSale")');
+            try {
+                const resp = await fetch('/TicketSale/Confirm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-          } catch (e) {
-            console.error(e);
-            showError('@Localizer["confirmation.ERROR"]');
-          }
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+                showSuccessThenRedirect(
+                    '@Localizer["confirmation.SUCCESS"]',
+                    '@Url.Action("Index", "TicketSale")'
+                );
+            } catch (e) {
+                showError('@Localizer["confirmation.ERROR"]');
+            }
         };
+
     </script>
+
+    <script>
+        document.addEventListener("change", function (e) {
+            if (e.target && e.target.name === "selectedCampaign") {
+                // Seçili kampanya kartını bul
+                const selectedCard = e.target.closest(".campaign-card");
+
+                // Global toplam alanlarını bul
+                const displayOriginal = document.getElementById("conf-grand-total");
+                const displayDiscount = document.getElementById("conf-discounted-total");
+
+                // Seçili kart içindeki fiyatları çek
+                const discountedEl = selectedCard?.querySelector(".fw-bold.text-success");
+                const originalEl   = selectedCard?.querySelector(".text-decoration-line-through");
+
+                // Yazıları override ETME, sadece güncelle
+                if (discountedEl && displayDiscount) {
+                    displayDiscount.textContent = discountedEl.textContent.trim();
+                }
+                if (originalEl && displayOriginal) {
+                    displayOriginal.textContent = originalEl.textContent.trim();
+                }
+            }
+        });
+    </script>
+
 }
 

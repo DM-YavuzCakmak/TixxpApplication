@@ -6,6 +6,9 @@ public class GetConfirmation
     public List<TicketInformationDto> TicketInformations { get; set; } = new();
     public List<ProductInformationDto> ProductInformations { get; set; } = new(); // <-- YENİ
     public PaymentInformationDto PaymentInformation { get; set; }
+
+    // 🔹 Kullanıcının seçtiği kampanya (opsiyonel olabilir)
+    public long? CampaignId { get; set; }
 }
 
 

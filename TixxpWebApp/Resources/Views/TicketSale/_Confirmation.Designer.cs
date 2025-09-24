@@ -70,6 +70,24 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Campaign Discounted Amount.
+        /// </summary>
+        internal static string confirmation_CAMPAIGN_TOTAL {
+            get {
+                return ResourceManager.GetString("confirmation.CAMPAIGN_TOTAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Campaigns.
+        /// </summary>
+        internal static string confirmation_CAMPAIGNS {
+            get {
+                return ResourceManager.GetString("confirmation.CAMPAIGNS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cart Empty.
         /// </summary>
         internal static string confirmation_CART_EMPTY {
@@ -102,6 +120,15 @@ namespace Tixxp.WebApp.Resources.Views.TicketSale {
         internal static string confirmation_CONFIRM_SALE {
             get {
                 return ResourceManager.GetString("confirmation.CONFIRM_SALE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Amount.
+        /// </summary>
+        internal static string confirmation_ORIGINAL_TOTAL {
+            get {
+                return ResourceManager.GetString("confirmation.ORIGINAL_TOTAL", resourceCulture);
             }
         }
         

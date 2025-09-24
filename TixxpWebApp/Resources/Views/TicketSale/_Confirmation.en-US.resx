@@ -120,6 +120,12 @@
   <data name="confirmation.BACK" xml:space="preserve">
     <value>Return to Details Page</value>
   </data>
+  <data name="confirmation.CAMPAIGNS" xml:space="preserve">
+    <value>Campaigns</value>
+  </data>
+  <data name="confirmation.CAMPAIGN_TOTAL" xml:space="preserve">
+    <value>Campaign Discounted Amount</value>
+  </data>
   <data name="confirmation.CART_EMPTY" xml:space="preserve">
     <value>Cart Empty</value>
   </data>
@@ -131,6 +137,9 @@
   </data>
   <data name="confirmation.CONFIRM_SALE" xml:space="preserve">
     <value>Confirm Sale</value>
+  </data>
+  <data name="confirmation.ORIGINAL_TOTAL" xml:space="preserve">
+    <value>Amount</value>
   </data>
   <data name="confirmation.PIECE" xml:space="preserve">
     <value>Piece</value>

@@ -1,19 +1,22 @@
 ﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.TicketSale.GetConfirmation.ConfirmationViewModel
 @{
 }
 
 <div class="card shadow-sm border-0">
-    <div class="card-header bg-dark text-white fw-semibold">
+    <div class="card-header bg-dark text-white fw-semibold py-2 px-3">
         @Localizer["confirmation.CART_SUMMARY"]
     </div>
-    <div class="card-body">
-        <div id="conf-cart-empty" class="alert alert-warning d-none">
+    <div class="card-body p-2">
+        <!-- Sepet boş uyarısı -->
+        <div id="conf-cart-empty" class="alert alert-warning d-none py-1 px-2 small">
             @Localizer["confirmation.CART_EMPTY"]
         </div>
 
+        <!-- Sepet tablosu -->
         <div id="conf-cart-wrap" class="table-responsive d-none">
-            <table class="table table-sm align-middle">
-                <thead>
+            <table class="table table-sm align-middle mb-2 cart-table">
+                <thead class="table-light">
                     <tr>
                         <th>@Localizer["confirmation.PRODUCT"]</th>
                         <th class="text-center">@Localizer["confirmation.PIECE"]</th>
@@ -25,27 +28,96 @@
                     @* JS dolduracak *@
                 </tbody>
                 <tfoot>
-                    <tr>
+                    <tr class="table-secondary">
                         <th colspan="3" class="text-end">@Localizer["confirmation.TOTAL"]</th>
-                        <th class="text-end" id="conf-grand-total">0</th>
+                        <th class="text-end" id="conf-grand-total">
+                            @Model.TotalPrice.ToString("C")
+                        </th>
                     </tr>
                 </tfoot>
             </table>
         </div>
 
-        <div class="d-flex justify-content-between mt-3">
-            <button type="button" class="btn btn-outline-secondary" onclick="goBackTo('detail')">
+
+        <!-- Kampanyalar -->
+        <div class="mt-2">
+            <h6 class="fw-semibold mb-2 text-purple small">@Localizer["confirmation.CAMPAIGNS"]</h6>
+
+            @if (Model.AvailableCampaigns?.Any() == true)
+            {
+                <div class="row g-2">
+                    @foreach (var c in Model.AvailableCampaigns)
+                    {
+                        <div class="col-md-4 col-sm-6">
+                            <input type="radio" class="btn-check" name="selectedCampaign" value="@c.CampaignId" id="camp-@c.CampaignId" autocomplete="off" />
+                            <label class="card border-2 campaign-card p-1 btn h-100 text-center" for="camp-@c.CampaignId">
+                                <h6 class="fw-bold fs-6 mb-1">@c.Name</h6>
+                                <small class="text-muted d-block mb-1">@c.Description</small>
+                                <hr class="my-1" />
+
+                                <div class="d-flex text-purple justify-content-between align-items-center small">
+                                    <span>@Localizer["confirmation.ORIGINAL_TOTAL"]</span>
+                                    <span class="text-muted text-decoration-line-through">
+                                        @c.OriginalPrice.Value.ToString("C")
+                                    </span>
+                                </div>
+
+                                <div class="d-flex text-purple justify-content-between align-items-center small mt-1">
+                                    <span>@Localizer["confirmation.CAMPAIGN_TOTAL"]</span>
+                                    <span class="fw-bold text-success">
+                                        @(c.DiscountedPrice.HasValue? c.DiscountedPrice.Value.ToString("C") : c.OriginalPrice.Value.ToString("C"))
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0 py-1 px-2 small">@Localizer["confirmation.NO_CAMPAIGN"]</div>
+            }
+        </div>
+
+        <!-- Butonlar -->
+        <div class="d-flex justify-content-between mt-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="goBackTo('detail')">
                 ← @Localizer["confirmation.BACK"]
             </button>
 
-            <div class="d-flex gap-2">
-             @*    <button type="button" class="btn btn-outline-danger" onclick="window.clearCartAndBack?.()">
-                    @Localizer["confirmation.CLEAR_CART"]
-                </button> *@
-                <button type="button" class="btn btn-primary" onclick="window.submitConfirmation?.()">
-                    @Localizer["confirmation.CONFIRM_SALE"]
-                </button>
-            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.submitConfirmation?.()">
+                @Localizer["confirmation.CONFIRM_SALE"]
+            </button>
         </div>
     </div>
 </div>
+
+<style>
+    .campaign-card {
+        cursor: pointer;
+        transition: all 0.25s ease-in-out;
+        border-color: #ddd !important;
+        font-size: 0.85rem;
+    }
+
+    .btn-check:checked + .campaign-card {
+        border-color: #ff7a00 !important;
+        box-shadow: 0 0 6px rgba(111, 66, 193, 0.3);
+        background-color: #fffaf5;
+    }
+
+    .text-purple {
+        color: #6f42c1 !important;
+    }
+
+    .cart-table th,
+    .cart-table td {
+        padding: 0.35rem 0.5rem !important; /* 🔹 Daha dar satır yüksekliği */
+        vertical-align: middle !important;
+        font-size: 0.85rem;
+    }
+
+    .cart-table thead th {
+        font-weight: 600;
+    }
+</style>

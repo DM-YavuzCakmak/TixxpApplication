@@ -40,24 +40,17 @@ namespace Tixxp.Business.Services.Concrete.Campaign
         /// <summary>
         /// Aktif kampanyaları uygular ve rezervasyonun son fiyatını hesaplar.
         /// </summary>
-        public decimal ApplyCampaigns(ApplyCampaignRequestDto requestDto)
+        public decimal ApplyCampaigns(ApplyCampaignRequestDto requestDto, CampaignEntity campaign)
         {
             if (requestDto.ReservationEntity == null || requestDto.SessionEntity == null)
                 return requestDto.ReservationEntity?.TotalPrice ?? 0;
 
-            // 🔹 Aktif ve tarih aralığı uygun kampanyaları getir
-            var campaigns = _campaignRepository
-                .GetList(x => x.IsActive && x.StartDate <= DateTime.Now && x.EndDate >= DateTime.Now)
-                .ToList();
-
             decimal finalPrice = requestDto.ReservationEntity.TotalPrice ?? 0;
 
-            foreach (var campaign in campaigns)
+
+            if (CheckConditions(campaign, requestDto))
             {
-                if (CheckConditions(campaign, requestDto))
-                {
-                    finalPrice = ApplyActions(campaign, finalPrice);
-                }
+                finalPrice = ApplyActions(campaign, finalPrice);
             }
 
             return Math.Max(finalPrice, 0); // negatif fiyat engeli
@@ -66,7 +59,7 @@ namespace Tixxp.Business.Services.Concrete.Campaign
         /// <summary>
         /// Kampanyanın tüm koşullarını kontrol eder.
         /// </summary>
-        private bool CheckConditions(CampaignEntity campaign, ApplyCampaignRequestDto dto)
+        public bool CheckConditions(CampaignEntity campaign, ApplyCampaignRequestDto dto)
         {
             var conditions = _campaignConditionRepository.GetList(x => x.CampaignId == campaign.Id);
 
