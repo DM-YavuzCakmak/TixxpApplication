@@ -142,4 +142,23 @@
   <data name="authorization.INDEX.Remember.Me" xml:space="preserve">
     <value>Remember Me</value>
   </data>
+  <data name="authorization.INDEX.RegisterAuthenticator" xml:space="preserve">
+    <value>Google Authenticator'e Kayıt Ol</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Help" xml:space="preserve">
+    <value>Google Authenticator'e nasıl kayıt olunur?</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Title" xml:space="preserve">
+    <value>Google Authenticator Kaydı</value>
+    <comment>Google Authenticator Kaydı</comment>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Step1" xml:space="preserve">
+    <value>1. Telefonunuza Google Authenticator uygulamasını indirin (iOS/Android).</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Step2" xml:space="preserve">
+    <value>2. Uygulamada 'Hesap Ekle' deyin ve QR kodu tarayın.</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Step3" xml:space="preserve">
+    <value>3. Giriş yaparken uygulamanın ürettiği 6 haneli kodu girin.</value>
+  </data>
 </root>

@@ -142,7 +142,7 @@ namespace Tixxp.WebApp.Controllers
                 model.Salt = saltBase64;
                 model.IsActive = true;
                 model.IsDeleted = false;
-                model.LoginType = 1;
+                model.LoginTypeId = 2;
                 model.Created_Date = DateTime.Now;
                 model.CreatedBy = currentUserId;
                 model.CompanyIdentifier = currentUserResult.Data.CompanyIdentifier;

@@ -18,7 +18,10 @@
 
     <!-- Background Squares -->
     <div class="square-box">
-        @for (int i = 0; i < 15; i++) { <div></div> }
+        @for (int i = 0; i < 15; i++)
+        {
+            <div></div>
+        }
     </div>
 
     <!-- Login Card -->
@@ -30,11 +33,11 @@
 
                         <div class="text-center mb-2">
                             <h1 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                       font-size: 32px;
-                       font-weight: 800;
-                       color: #5e35b1;
-                       letter-spacing: 2px;
-                       margin-bottom: 10px;">
+                               font-size: 32px;
+                               font-weight: 800;
+                               color: #5e35b1;
+                               letter-spacing: 2px;
+                               margin-bottom: 10px;">
                                 TIXXP
                             </h1>
                         </div>
@@ -43,11 +46,14 @@
                             <img src="~/assets/images/brand-logos/TixxpLogo.png" alt="Tixxp Logo" style="max-width: 120px;">
                         </div>
                         <h5 class="text-center mb-4 fw-bold">@Localizer["authorization.INDEX.LOGIN.BIG"]</h5>
+
+                        <!-- Email -->
                         <div class="mb-3">
                             <label for="signin-username" class="form-label">@Localizer["authorization.INDEX.E-Mail"]</label>
                             <input type="text" id="signin-username" class="form-control form-control-lg" placeholder="@Localizer["authorization.INDEX.E-Mail.PlaceHolder"]">
                         </div>
 
+                        <!-- Password -->
                         <div class="mb-3">
                             <label for="signin-password" class="form-label">@Localizer["authorization.INDEX.PASSWORD"]</label>
                             <div class="input-group">
@@ -65,63 +71,129 @@
                             </div>
                         </div>
 
+                        <!-- Giriş Yap Butonu -->
                         <div class="d-grid mt-4">
-                            <button id="login-btn" type="button" class="btn btn-primary btn-lg">@Localizer["authorization.INDEX.SignIn.Camel.Case"]</button>
+                            <button id="login-btn" type="button" class="btn btn-primary btn-lg">
+                                @Localizer["authorization.INDEX.SignIn.Camel.Case"]
+                            </button>
                         </div>
-                       @*  <div class="d-grid mt-2">
-                            <form action="/Authorization/Logout" method="post">
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    <i class="ri-logout-box-line"></i> Çıkış Yap
-                                </button>
-                            </form>
-                        </div> *@
+
+                        <!-- Google Authenticator Kayıt Ol Butonu -->
+                        <div class="d-grid mt-3 text-center">
+                            <button id="register-authenticator-btn" type="button"
+                                    class="btn btn-outline-success btn-lg"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#authenticatorRegisterModal"
+                                    data-bs-toggle-second="popover"
+                                    data-bs-trigger="hover focus"
+                                    data-bs-html="true"
+                                    title="@Localizer["authorization.INDEX.RegisterAuthenticator.Title"]"
+                                    data-bs-content="
+                                        <p>@Localizer["authorization.INDEX.RegisterAuthenticator.Step1"]</p>
+                                        <p>@Localizer["authorization.INDEX.RegisterAuthenticator.Step2"]</p>
+                                        <p>@Localizer["authorization.INDEX.RegisterAuthenticator.Step3"]</p>">
+                                <i class="ri-shield-keyhole-line me-2"></i>
+                                @Localizer["authorization.INDEX.RegisterAuthenticator"]
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Success Toast -->
-    <div id="solid-successToast" class="toast fade position-fixed top-0 start-0 m-3 bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
+    <!-- Authenticator Register Modal -->
+    <div class="modal fade" id="authenticatorRegisterModal" tabindex="-1" aria-labelledby="authenticatorRegisterLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="authenticatorRegisterLabel">
+                        <i class="ri-shield-keyhole-line me-2"></i>
+                        @Localizer["authorization.INDEX.RegisterAuthenticator.Title"]
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="authenticator-email" class="form-label">@Localizer["authorization.INDEX.E-Mail"]</label>
+                        <input type="email" id="authenticator-email" class="form-control" placeholder="@Localizer["authorization.INDEX.E-Mail.PlaceHolder"]">
+                    </div>
+                    <div id="authenticator-qr-wrapper" class="text-center d-none">
+                        <p>@Localizer["authorization.INDEX.RegisterAuthenticator.Scan"]</p>
+                        <img id="authenticator-qr-img" src="" alt="Authenticator QR" class="img-fluid" style="max-width:250px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="start-authenticator-btn" type="button" class="btn btn-success">
+                        @Localizer["authorization.INDEX.RegisterAuthenticator.Start"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMS OTP Modal -->
+    <div class="modal fade" id="smsOtpModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="ri-message-line me-2"></i> SMS OTP</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Telefonunuza gönderilen SMS kodunu giriniz:</p>
+                    <input type="text" id="sms-otp-input" class="form-control" maxlength="6" placeholder="******">
+                </div>
+                <div class="modal-footer">
+                    <button id="validate-sms-btn" class="btn btn-primary">Doğrula</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google OTP Modal -->
+    <div class="modal fade" id="googleOtpModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="ri-shield-keyhole-line me-2"></i> Google Authenticator</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Google Authenticator uygulamasındaki 6 haneli kodu giriniz:</p>
+                    <input type="text" id="google-otp-input" class="form-control" maxlength="6" placeholder="******">
+                </div>
+                <div class="modal-footer">
+                    <button id="validate-google-btn" class="btn btn-warning">Doğrula</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toasts -->
+    <div id="solid-successToast" class="toast fade position-fixed top-0 start-0 m-3 bg-success text-white">
         <div class="toast-header bg-success text-white">
-            <img src="@Url.Content("~/assets/images/brand-logos/toggle-white.png")" class="bd-placeholder-img rounded me-2" alt="logo">
             <strong class="me-auto">Tixxp</strong>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body" id="success-toast-message">Giriş başarılı</div>
     </div>
 
-    <!-- Error Toast -->
-    <div id="solid-dangerToast" class="toast fade position-fixed top-0 start-0 m-3 bg-danger text-white" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="solid-dangerToast" class="toast fade position-fixed top-0 start-0 m-3 bg-danger text-white">
         <div class="toast-header bg-danger text-white">
-            <img src="@Url.Content("~/assets/images/brand-logos/toggle-white.png")" class="bd-placeholder-img rounded me-2" alt="logo">
             <strong class="me-auto">Tixxp</strong>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body" id="error-toast-message">Giriş başarısız</div>
     </div>
 
     <!-- Scripts -->
     <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/assets/js/show-password.js"></script>
     <script>
-        function showToast(type, message, redirectUrl = null) {
-            const toastId = type === "success" ? "solid-successToast" : "solid-dangerToast";
-            const messageId = type === "success" ? "success-toast-message" : "error-toast-message";
-
-            document.getElementById(messageId).textContent = message;
-            const toast = new bootstrap.Toast(document.getElementById(toastId), { delay: 3000 });
-
-            if (redirectUrl) {
-                toast._element.addEventListener('hidden.bs.toast', () => {
-                    window.location.href = redirectUrl;
-                }, { once: true });
-            }
-
-            toast.show();
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
+
+            // 🔹 Login
             document.getElementById("login-btn").addEventListener("click", async (e) => {
                 e.preventDefault();
 
@@ -136,16 +208,20 @@
                 try {
                     const response = await fetch("/Authorization/Login", {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ username, password })
                     });
 
                     const result = await response.json();
 
                     if (response.ok) {
-                        showToast("success", result.message || "Giriş başarılı!", result.redirectUrl);
+                        if (result.requireSmsOtp) {
+                            new bootstrap.Modal(document.getElementById("smsOtpModal")).show();
+                        } else if (result.requireGoogleOtp) {
+                            new bootstrap.Modal(document.getElementById("googleOtpModal")).show();
+                        } else {
+                            showToast("success", result.message || "Giriş başarılı!", result.redirectUrl);
+                        }
                     } else {
                         showToast("error", result.message || "Giriş başarısız!");
                     }
@@ -155,7 +231,115 @@
                     showToast("error", "Bir hata oluştu. Lütfen tekrar deneyin.");
                 }
             });
+
+            // 🔹 Google Authenticator Register (QR kod çekme)
+            document.getElementById("start-authenticator-btn").addEventListener("click", async () => {
+                const email = document.getElementById("authenticator-email").value.trim();
+                if (!email) {
+                    showToast("error", "Lütfen email adresinizi giriniz.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/Authorization/RegisterAuthenticator", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.data) {
+                        document.getElementById("authenticator-qr-img").src = `data:image/png;base64,${result.data}`;
+                        document.getElementById("authenticator-qr-wrapper").classList.remove("d-none");
+                    } else {
+                        showToast("error", result.message || "Kayıt başarısız!");
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    showToast("error", "Bir hata oluştu.");
+                }
+            });
+
+            // 🔹 SMS OTP Doğrulama
+            document.getElementById("validate-sms-btn").addEventListener("click", async () => {
+                const otp = document.getElementById("sms-otp-input").value.trim();
+                const email = document.getElementById("signin-username").value.trim();
+
+                if (!otp) {
+                    showToast("error", "Lütfen SMS kodunu giriniz.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/Authorization/ValidateSmsOtp", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: email, otp: otp })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showToast("success", result.message || "SMS OTP doğrulandı!", result.redirectUrl);
+                    } else {
+                        showToast("error", result.message || "SMS OTP doğrulama başarısız!");
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    showToast("error", "Bir hata oluştu.");
+                }
+            });
+
+            // 🔹 Google OTP Doğrulama
+            document.getElementById("validate-google-btn").addEventListener("click", async () => {
+                const otp = document.getElementById("google-otp-input").value.trim();
+                const email = document.getElementById("signin-username").value.trim();
+
+                if (!otp) {
+                    showToast("error", "Lütfen Google OTP kodunu giriniz.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/Authorization/ValidateAuthenticator", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: email, otp: otp })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showToast("success", result.message || "Google OTP doğrulandı!", result.redirectUrl);
+                    } else {
+                        showToast("error", result.message || "OTP doğrulama başarısız!");
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    showToast("error", "Bir hata oluştu.");
+                }
+            });
         });
+
+        // 🔹 Toast helper
+        function showToast(type, message, redirectUrl = null) {
+            const toastId = type === "success" ? "solid-successToast" : "solid-dangerToast";
+            const messageId = type === "success" ? "success-toast-message" : "error-toast-message";
+            document.getElementById(messageId).textContent = message;
+
+            const toast = new bootstrap.Toast(document.getElementById(toastId), { delay: 3000 });
+            if (redirectUrl) {
+                toast._element.addEventListener("hidden.bs.toast", () => {
+                    window.location.href = redirectUrl;
+                }, { once: true });
+            }
+            toast.show();
+        }
     </script>
+
 </body>
 </html>

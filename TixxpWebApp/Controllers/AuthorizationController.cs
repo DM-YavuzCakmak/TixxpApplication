@@ -2,20 +2,28 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Threading.Tasks;
 using Tixxp.Business.DataTransferObjects.Personnel.Login;
+using Tixxp.Business.Services.Abstract.Google;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.WebApp.Models.Authorization;
 
 namespace Tixxp.WebApp.Controllers;
+
 public class AuthorizationController : Controller
 {
     private readonly IPersonnelService _personnelService;
+    private readonly IAuthenticatorService _authenticatorService;
     private readonly IStringLocalizer<AuthorizationController> _stringLocalizer;
 
-    public AuthorizationController(IPersonnelService personnelService, IStringLocalizer<AuthorizationController> stringLocalizer)
+    public AuthorizationController(
+        IPersonnelService personnelService,
+        IAuthenticatorService authenticatorService,
+        IStringLocalizer<AuthorizationController> stringLocalizer)
     {
         _personnelService = personnelService;
+        _authenticatorService = authenticatorService;
         _stringLocalizer = stringLocalizer;
     }
 
@@ -28,20 +36,49 @@ public class AuthorizationController : Controller
 
     #region Login
     [HttpPost]
+    [HttpPost]
     public async Task<IActionResult> Login([FromBody] LoginRequestModel loginRequestModel)
     {
         try
         {
-            IDataResult<LoginResponseDto> loginResult = await _personnelService.Login(new LoginRequestDto
+            var loginResult = await _personnelService.Login(new LoginRequestDto
             {
                 Email = loginRequestModel.Username,
                 Password = loginRequestModel.Password
             });
 
             if (!loginResult.Success)
-                return BadRequest(new { message = _stringLocalizer["authorizationController.LOGIN.LOGIN_FAILED"].ToString()});
+            {
+                return BadRequest(new
+                {
+                    message = _stringLocalizer["authorizationController.LOGIN.LOGIN_FAILED"].ToString()
+                });
+            }
 
+            var dto = loginResult.Data;
 
+            // LoginType’a göre yönlendir
+            if (dto.LoginTypeId == 1) // SMS OTP
+            {
+                return Ok(new
+                {
+                    message = "SMS OTP doğrulaması gerekli.",
+                    requireSmsOtp = true,
+                    email = dto.Email
+                });
+            }
+            else if (dto.LoginTypeId == 2) // Google Authenticator
+            {
+                return Ok(new
+                {
+                    message = "Google Authenticator doğrulaması gerekli.",
+                    requireGoogleOtp = true,
+                    email = dto.Email,
+                    hasSecret = !string.IsNullOrEmpty(dto.SecretKey)
+                });
+            }
+
+            // Normal login (hiç OTP istemeyenler)
             return Ok(new
             {
                 message = _stringLocalizer["authorizationController.LOGIN.LOGIN_SUCCESFUL"].ToString(),
@@ -56,6 +93,68 @@ public class AuthorizationController : Controller
                 error = ex.Message
             });
         }
+    }
+    #endregion
+
+    #region Register Authenticator
+    [HttpPost]
+    public IActionResult RegisterAuthenticator([FromBody] RegisterAuthenticatorRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request?.Email))
+        {
+            return BadRequest(new
+            {
+                message = _stringLocalizer["authorizationController.AUTHENTICATOR.EMAIL_REQUIRED"].ToString()
+            });
+        }
+
+        var qrResult = _authenticatorService.RegisterAuthenticator(request.Email);
+
+        if (!qrResult.Success || qrResult.Data == null)
+        {
+            return BadRequest(new
+            {
+                message = qrResult.Message ?? _stringLocalizer["authorizationController.AUTHENTICATOR.REGISTER_FAILED"].ToString()
+            });
+        }
+
+        string base64Qr = Convert.ToBase64String(qrResult.Data);
+
+        return Ok(new
+        {
+            message = _stringLocalizer["authorizationController.AUTHENTICATOR.REGISTER_SUCCESS"].ToString(),
+            data = base64Qr
+        });
+    }
+    #endregion
+
+
+    #region Validate Authenticator
+    [HttpPost]
+    public async Task<IActionResult> ValidateAuthenticator([FromBody] ValidateAuthenticatorRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request?.Email) || string.IsNullOrWhiteSpace(request?.Otp))
+        {
+            return BadRequest(new
+            {
+                message = _stringLocalizer["authorizationController.AUTHENTICATOR.OTP_REQUIRED"].ToString()
+            });
+        }
+        var validateResult = await _authenticatorService.ValidateOtpAsync(request.Email, request.Otp);
+        if (!validateResult.Success)
+        {
+            return BadRequest(new
+            {
+                message = validateResult.Message
+            });
+        }
+        // ✅ OTP doğrulandıktan sonra burada cookie login yapılabilir
+        // ör: _personnelService.FinalizeLogin(request.Email);
+        return Ok(new
+        {
+            message = _stringLocalizer["authorizationController.AUTHENTICATOR.OTP_SUCCESS"].ToString(),
+            redirectUrl = "/Home/Index"
+        });
     }
     #endregion
 

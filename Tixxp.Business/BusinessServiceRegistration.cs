@@ -21,6 +21,7 @@ using Tixxp.Business.Services.Abstract.Currency;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
+using Tixxp.Business.Services.Abstract.Google;
 using Tixxp.Business.Services.Abstract.Guide;
 using Tixxp.Business.Services.Abstract.InvoiceType;
 using Tixxp.Business.Services.Abstract.Language;
@@ -77,6 +78,7 @@ using Tixxp.Business.Services.Concrete.Currency;
 using Tixxp.Business.Services.Concrete.CurrencyType;
 using Tixxp.Business.Services.Concrete.Event;
 using Tixxp.Business.Services.Concrete.EventTicketPrice;
+using Tixxp.Business.Services.Concrete.Google;
 using Tixxp.Business.Services.Concrete.Guide;
 using Tixxp.Business.Services.Concrete.InvoiceType;
 using Tixxp.Business.Services.Concrete.Language;
@@ -124,6 +126,7 @@ public static class BusinessServiceRegistration
 
 
         services.AddScoped<ITicketStatusService, TicketStatusService>();
+        services.AddScoped<IAuthenticatorService, AuthenticatorService>();
         services.AddScoped<ICampaignService, CampaignService>();
         services.AddScoped<ICampaignActionService, CampaignActionService>();
         services.AddScoped<ICampaignConditionService, CampaignConditionService>();

@@ -20,6 +20,9 @@ public class PersonnelEntity : BaseEntity
     [Column("Email")]
     public string Email { get; set; }
 
+    [Column("SecretKey")]
+    public string? SecretKey { get; set; }
+
     [Column("CompanyIdentifier")]
     public string CompanyIdentifier { get; set; }
 
@@ -36,7 +39,7 @@ public class PersonnelEntity : BaseEntity
     public string? NationalIdNumber { get; set; }
 
     [Column("LoginTypeId")]
-    public long LoginType { get; set; } = 0;
+    public long LoginTypeId { get; set; } = 0;
 
 
     [Column("ParentId")]

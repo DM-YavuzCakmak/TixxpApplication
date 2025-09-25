@@ -51,8 +51,21 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         if (user.Password != computedHash)
             return new ErrorDataResult<LoginResponseDto>("Şifre hatalı.");
 
-        var claims = GenerateBaseClaims(user);
+        // LoginType kontrolü
+        if (user.LoginTypeId == 1 || user.LoginTypeId == 2)
+        {
+            // OTP gerekiyor
+            return new SuccessDataResult<LoginResponseDto>(new LoginResponseDto
+            {
+                Success = true,
+                Message = "OTP doğrulaması gerekiyor.",
+                LoginTypeId = user.LoginTypeId,
+                Email = user.Email,
+                SecretKey = user.SecretKey
+            });
+        }
 
+        var claims = GenerateBaseClaims(user);
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 
@@ -64,11 +77,13 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         return new SuccessDataResult<LoginResponseDto>(new LoginResponseDto
         {
             Success = true,
-            Message = "Giriş başarılı."
+            Message = "Giriş başarılı.",
+            LoginTypeId = user.LoginTypeId,
+            Email = user.Email
         }, "Giriş başarılı.");
     }
 
-    private List<Claim> GenerateBaseClaims(PersonnelEntity user)
+    public List<Claim> GenerateBaseClaims(PersonnelEntity user)
     {
         var claims = new List<Claim>
     {
@@ -94,6 +109,25 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         return claims;
     }
 
+    public DataResult<PersonnelEntity> UpdateAuthenticatorKey(string email, string secretKey)
+    {
+        var personnel = _personnelRepository.Get(x => x.Email == email);
+
+        if (personnel == null)
+        {
+            return new ErrorDataResult<PersonnelEntity>(
+                message: "Email'e sahip kullanıcı bulunamadı."
+            );
+        }
+
+        personnel.SecretKey = secretKey;
+        _personnelRepository.Update(personnel);
+
+        return new SuccessDataResult<PersonnelEntity>(
+            data: personnel,
+            message: "Authenticator key başarıyla güncellendi."
+        );
+    }
 
     #region Register & Hash
 
@@ -117,7 +151,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
             Salt = saltBase64,
             IsActive = true,
             IsDeleted = false,
-            LoginType = 1,
+            LoginTypeId = 2,
             CreatedBy = 5,
             Created_Date = DateTime.Now
         };
