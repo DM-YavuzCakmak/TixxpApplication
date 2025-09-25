@@ -153,10 +153,61 @@
   <data name="authorization.INDEX.RegisterAuthenticator.Step1" xml:space="preserve">
     <value>1. Telefonunuza Google Authenticator uygulamasını indirin (iOS/Android).</value>
   </data>
-  <data name="authorization.INDEX.RegisterAuthenticator.Step2" xml:space="preserve">
-    <value>2. Uygulamada 'Hesap Ekle' deyin ve QR kodu tarayın.</value>
-  </data>
   <data name="authorization.INDEX.RegisterAuthenticator.Step3" xml:space="preserve">
-    <value>3. Giriş yaparken uygulamanın ürettiği 6 haneli kodu girin.</value>
+    <value>3. Mobil Uygulamada 'Hesap Ekle' deyin ve QR kodu tarayın.</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Step4" xml:space="preserve">
+    <value>4. Giriş yaparken uygulamanın ürettiği 6 haneli kodu girin.</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Start" xml:space="preserve">
+    <value>Kayıt Ol</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Step2" xml:space="preserve">
+    <value>2. Tixxp uygulamasından Google Authenticator'e Kayıt Ol tıkla ve mail adresini yazıp kayıt ol. </value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.LOGIN" xml:space="preserve">
+    <value>Google Authenticator uygulamasındaki 6 haneli kodu giriniz.</value>
+  </data>
+  <data name="authorization.INDEX.LoginAuthenticator.VERIFY" xml:space="preserve">
+    <value>Doğrula</value>
+  </data>
+  <data name="authorization.INDEX.LoginAuthenticator.LoginSuccess" xml:space="preserve">
+    <value>Giriş başarılı</value>
+  </data>
+  <data name="authorization.INDEX.LoginAuthenticator.LoginFailed" xml:space="preserve">
+    <value>Giriş Başarısız</value>
+  </data>
+  <data name="authorization.INDEX.ENTER.EMAIL.PASSWORD" xml:space="preserve">
+    <value>Lütfen kullanıcı adı ve şifre giriniz.</value>
+  </data>
+  <data name="authorization.INDEX.PLEASE.ENTER.EMAIL" xml:space="preserve">
+    <value>Lütfen email adresinizi giriniz.</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Failed" xml:space="preserve">
+    <value>Kayıt başarısız</value>
+  </data>
+  <data name="authorization.Index.pleaseTryAgain" xml:space="preserve">
+    <value>Bir hata oluştu. Lütfen tekrar deneyin.</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.SmsCode" xml:space="preserve">
+    <value>Lütfen SMS kodunu giriniz.</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.SmsCodeVerifed" xml:space="preserve">
+    <value>SMS OTP doğrulandı!</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.SmsCodeVerifedFailed" xml:space="preserve">
+    <value>SMS OTP doğrulama başarısız!</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.GoogleOtpCode" xml:space="preserve">
+    <value>Lütfen Google OTP kodunu giriniz.</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.GoogleOtpVerfied" xml:space="preserve">
+    <value>Google OTP doğrulandı!</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.GoogleOtpVerfiedFailed" xml:space="preserve">
+    <value>OTP doğrulama başarısız!</value>
+  </data>
+  <data name="authorization.INDEX.RegisterAuthenticator.Scan" xml:space="preserve">
+    <value>Lütfen mobil uygulama ile tarayın.</value>
   </data>
 </root>

@@ -36,7 +36,6 @@ public class AuthorizationController : Controller
 
     #region Login
     [HttpPost]
-    [HttpPost]
     public async Task<IActionResult> Login([FromBody] LoginRequestModel loginRequestModel)
     {
         try
@@ -62,7 +61,7 @@ public class AuthorizationController : Controller
             {
                 return Ok(new
                 {
-                    message = "SMS OTP doğrulaması gerekli.",
+                    message = _stringLocalizer["authorizationController.Login.SmsOtpVerificationRequired"].ToString(),
                     requireSmsOtp = true,
                     email = dto.Email
                 });
@@ -71,7 +70,7 @@ public class AuthorizationController : Controller
             {
                 return Ok(new
                 {
-                    message = "Google Authenticator doğrulaması gerekli.",
+                    message = _stringLocalizer["authorizationController.Login.GoogleVerificationRequired"].ToString(),
                     requireGoogleOtp = true,
                     email = dto.Email,
                     hasSecret = !string.IsNullOrEmpty(dto.SecretKey)
@@ -104,7 +103,7 @@ public class AuthorizationController : Controller
         {
             return BadRequest(new
             {
-                message = _stringLocalizer["authorizationController.AUTHENTICATOR.EMAIL_REQUIRED"].ToString()
+                message = _stringLocalizer["authorizationController.Login.EmailRequired"].ToString()
             });
         }
 
@@ -137,7 +136,7 @@ public class AuthorizationController : Controller
         {
             return BadRequest(new
             {
-                message = _stringLocalizer["authorizationController.AUTHENTICATOR.OTP_REQUIRED"].ToString()
+                message = _stringLocalizer["authorizationController.Login.OtpCodeRequired"].ToString()
             });
         }
         var validateResult = await _authenticatorService.ValidateOtpAsync(request.Email, request.Otp);
@@ -152,7 +151,7 @@ public class AuthorizationController : Controller
         // ör: _personnelService.FinalizeLogin(request.Email);
         return Ok(new
         {
-            message = _stringLocalizer["authorizationController.AUTHENTICATOR.OTP_SUCCESS"].ToString(),
+            message = _stringLocalizer["authorizationController.LOGIN.LOGIN_SUCCESFUL"].ToString(),
             redirectUrl = "/Home/Index"
         });
     }

@@ -117,13 +117,31 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="authorizationController.AUTHENTICATOR.REGISTER_FAILED" xml:space="preserve">
+    <value>Lütfen tekrar deneyin, kayıt başarısız oldu.</value>
+  </data>
+  <data name="authorizationController.AUTHENTICATOR.REGISTER_SUCCESS" xml:space="preserve">
+    <value>Kayıt başarılı.</value>
+  </data>
+  <data name="authorizationController.Login.EmailRequired" xml:space="preserve">
+    <value>Email zorunlu.</value>
+  </data>
+  <data name="authorizationController.Login.GoogleVerificationRequired" xml:space="preserve">
+    <value>Google Authenticator doğrulaması gerekli.</value>
+  </data>
   <data name="authorizationController.LOGIN.LOGIN_FAILED" xml:space="preserve">
     <value>Giriş Başarısız</value>
   </data>
   <data name="authorizationController.LOGIN.LOGIN_SUCCESFUL" xml:space="preserve">
     <value>Giriş Başarılı</value>
   </data>
+  <data name="authorizationController.Login.OtpCodeRequired" xml:space="preserve">
+    <value>OTP kodu gerekli.</value>
+  </data>
   <data name="authorizationController.LOGIN.SERVER_ERROR" xml:space="preserve">
     <value>Sunucu Hatası</value>
+  </data>
+  <data name="authorizationController.Login.SmsOtpVerificationRequired" xml:space="preserve">
+    <value>SMS OTP doğrulaması gerekli.</value>
   </data>
 </root>
