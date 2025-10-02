@@ -138,9 +138,9 @@
 
             if (response.ok) {
                 const result = await response.json();
-                if (result.isSuccess) {
-                    window.location.href = `/ProductSaleCheckOut/Index?productSaleId=${result.productSaleId}`;
-                } else {
+                    if (result.isSuccess) {
+                    redirectWithCulture(`/ProductSaleCheckOut/Index?productSaleId=${result.productSaleId}`);
+                    } else {
                     Swal.fire({
                         icon: 'warning',
                         title: '@Localizer["productSale.INDEX.WARNING_TITLE"]',
