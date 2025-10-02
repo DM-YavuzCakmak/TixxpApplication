@@ -3,7 +3,7 @@
 @inject IViewLocalizer Localizer;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Ürün Pos Satışı";
+    ViewBag.Title = @Localizer["productSale.INDEX.PAGE_TITLE"];
 }
 
 <div class="page">
@@ -41,7 +41,9 @@
                                                         <button class="btn btn-icon btn-light input-group-text product-quantity-minus"><i class="ri-subtract-line"></i></button>
                                                         <input type="text" class="form-control text-center product-qty" value="0"
                                                                data-price="@item.Price"
-                                                               data-currency-symbol="@item.CurrencyTypeId" /><button class="btn btn-icon btn-light input-group-text product-quantity-plus"><i class="ri-add-line"></i></button>
+                                                               data-currency-id="@item.CurrencyTypeId"
+                                                               data-currency-symbol="@item.CurrencyTypeSymbol" />
+                                                        <button class="btn btn-icon btn-light input-group-text product-quantity-plus"><i class="ri-add-line"></i></button>
                                                     </div>
                                                 </td>
                                                 <td class="product-total">@item.Price</td>
@@ -93,6 +95,8 @@
 
 @section Scripts {
     <script>
+        let selectedCurrencyId = null;
+
         function calculateCart() {
             let subtotal = 0;
             document.querySelectorAll('.product-qty').forEach(function (input) {
@@ -107,14 +111,14 @@
             document.getElementById('grand-total').textContent = `${subtotal.toFixed(2)}`;
         }
 
-               function getProductData() {
+        function getProductData() {
             const data = [];
             const rows = document.querySelectorAll('tbody tr');
             rows.forEach(row => {
                 const productId = parseInt(row.getAttribute("data-product-id"));
-                const qtyInput = row.querySelector('.product-qty'); // ✅ burada tanımlıyoruz
+                const qtyInput = row.querySelector('.product-qty');
                 const price = parseFloat(qtyInput.dataset.price);
-                const currencyTypeId = parseInt(qtyInput.dataset.currencySymbol);
+                const currencyTypeId = parseInt(qtyInput.dataset.currencyId);
                 const quantity = parseInt(qtyInput.value) || 0;
 
                 if (quantity > 0) {
@@ -123,7 +127,6 @@
             });
             return data;
         }
-
 
         async function postProductData() {
             const data = getProductData();
@@ -140,41 +143,95 @@
                 } else {
                     Swal.fire({
                         icon: 'warning',
-                        title: 'Warning',
-                        html: result.message || "Bilinmeyen bir hata oluştu.",
-                        confirmButtonText: 'Tamam',
+                        title: '@Localizer["productSale.INDEX.WARNING_TITLE"]',
+                        html: result.message || "@Localizer["productSale.INDEX.UNKNOWN_ERROR"]",
+                        confirmButtonText: '@Localizer["productSale.INDEX.CONFIRM_BUTTON"]',
                     });
                 }
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Sunucu Hatası',
-                    text: 'İstek gönderilirken bir hata oluştu. Lütfen tekrar deneyin.',
-                    confirmButtonText: 'Tamam',
+                    title: '@Localizer["productSale.INDEX.SERVER_ERROR"]',
+                    text: '@Localizer["productSale.INDEX.SERVER_ERROR_TEXT"]',
+                    confirmButtonText: '@Localizer["productSale.INDEX.CONFIRM_BUTTON"]',
                 });
             }
         }
 
-
         document.addEventListener('DOMContentLoaded', function () {
+            // Artırma butonu
             document.querySelectorAll('.product-quantity-plus').forEach(btn =>
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.product-qty');
+                    const currentCurrencyId = parseInt(input.dataset.currencyId);
+
+                    // İlk ürün seçildiğinde currency fixleniyor
+                    if (selectedCurrencyId === null && parseInt(input.value) === 0) {
+                        selectedCurrencyId = currentCurrencyId;
+                    }
+
+                    // Eğer farklı currency ile ürün eklenmek istenirse engelle
+                    if (selectedCurrencyId !== null && selectedCurrencyId !== currentCurrencyId) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: '@Localizer["productSale.INDEX.CURRENCY_RESTRICTION_TITLE"]',
+                            text: '@Localizer["productSale.INDEX.CURRENCY_RESTRICTION_TEXT"]',
+                            confirmButtonText: '@Localizer["productSale.INDEX.CONFIRM_BUTTON"]',
+                        });
+                        return;
+                    }
+
                     input.value = parseInt(input.value) + 1;
                     calculateCart();
                 })
             );
 
+            // Azaltma butonu
             document.querySelectorAll('.product-quantity-minus').forEach(btn =>
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.product-qty');
                     input.value = Math.max(0, parseInt(input.value) - 1);
+
+                    const totalQty = Array.from(document.querySelectorAll('.product-qty'))
+                        .map(i => parseInt(i.value) || 0)
+                        .reduce((a, b) => a + b, 0);
+
+                    if (totalQty === 0) {
+                        selectedCurrencyId = null;
+                    }
+
                     calculateCart();
                 })
             );
 
+            // Input manuel değişiklik
             document.querySelectorAll('.product-qty').forEach(input => {
-                input.addEventListener('change', calculateCart);
+                // Sadece sayı girilmesi için
+                input.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+
+                input.addEventListener('change', function () {
+                    const qty = parseInt(this.value) || 0;
+                    const currentCurrencyId = parseInt(this.dataset.currencyId);
+
+                    if (qty > 0) {
+                        if (selectedCurrencyId === null) {
+                            selectedCurrencyId = currentCurrencyId;
+                        } else if (selectedCurrencyId !== currentCurrencyId) {
+                            this.value = 0;
+                            Swal.fire({
+                                icon: 'warning',
+                                title: '@Localizer["productSale.INDEX.CURRENCY_RESTRICTION_TITLE"]',
+                                text: '@Localizer["productSale.INDEX.CURRENCY_RESTRICTION_TEXT"]',
+                                confirmButtonText: '@Localizer["productSale.INDEX.CONFIRM_BUTTON"]',
+                            });
+                        }
+                    }
+
+                    calculateCart();
+                });
+
                 input.addEventListener('keyup', calculateCart);
             });
 
@@ -184,5 +241,3 @@
         });
     </script>
 }
-
-

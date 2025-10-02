@@ -16,6 +16,7 @@ using Tixxp.Business.Services.Abstract.ProductSaleStatusTranslation;
 using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Abstract.Reservation;
 using Tixxp.Business.Services.Abstract.RoleService;
+using Tixxp.Core.Utilities.Enums.ProductSaleStatusEnum;
 using Tixxp.Entities.Personnel;
 
 namespace Tixxp.WebApp.Controllers;
@@ -127,7 +128,7 @@ public class HomeController : Controller
 
         #region Günlük Satış Yapan Personeller
         var today = DateTime.Today;
-        var todaySales = _productSaleService.GetList(x => x.StatusId == 1 && x.Created_Date.Date == today).Data;
+        var todaySales = _productSaleService.GetList(x => x.StatusId == (long)ProductSaleStatusEnum.Completed && x.Created_Date.Date == today).Data;
         var todayPersonnelIds = todaySales.Where(x => x.CreatedBy != null).Select(x => x.CreatedBy).Distinct().ToList();
         var todayPersonnelList = _personnelService.GetList(x => todayPersonnelIds.Contains(x.Id)).Data;
 
@@ -284,7 +285,7 @@ public class HomeController : Controller
         var monthlyReservationCount = allReservations.Count(x => x.Created_Date >= firstDayOfMonth);
         var prevMonthReservationCount = allReservations.Count(x => x.Created_Date >= firstDayOfPrevMonth && x.Created_Date <= lastDayOfPrevMonth);
 
-        var allTicketSales = _productSaleService.GetList(x => x.StatusId == 1).Data;
+        var allTicketSales = _productSaleService.GetList(x => x.StatusId == (long)ProductSaleStatusEnum.Completed).Data;
 
         var dailyTicketCount = allTicketSales.Count(x => x.Created_Date.Date == today);
         var yesterdayTicketCount = allTicketSales.Count(x => x.Created_Date.Date == yesterday);
@@ -365,7 +366,7 @@ public class HomeController : Controller
             ?? new Dictionary<long, string>();
 
 
-        var salesList = _productSaleService.GetList(x => x.StatusId == 1).Data;
+        var salesList = _productSaleService.GetList(x => x.StatusId == (long)ProductSaleStatusEnum.Completed).Data;
         var saleIds = salesList.Select(x => x.Id).ToList();
         var saleDetails = _productSaleDetailService.GetList(x => saleIds.Contains(x.ProductSaleId)).Data;
         var productIds = saleDetails.Select(x => x.ProductId).Distinct().ToList();

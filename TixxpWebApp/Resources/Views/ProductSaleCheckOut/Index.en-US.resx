@@ -183,4 +183,37 @@
   <data name="productSaleCheckOut_Error_Sales_Information" xml:space="preserve">
     <value>No sales information found.</value>
   </data>
+  <data name="productSaleCheckOut_INDEX_CUSTOMER_INFO" xml:space="preserve">
+    <value>Customer Information</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_FULLNAME" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_FULLNAME_PLACEHOLDER" xml:space="preserve">
+    <value>Enter your first name</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_SURNAME" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_SURNAME_PLACEHOLDER" xml:space="preserve">
+    <value>Enter your last name</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_TCKN" xml:space="preserve">
+    <value>National ID</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_TCKN_PLACEHOLDER" xml:space="preserve">
+    <value>Enter National ID</value>
+  </data>
+  <data name="productSaleCheckOutController.CUSTOMER_REQUIRED" xml:space="preserve">
+    <value>Please fill in customer information.</value>
+  </data>
+  <data name="productSaleCheckOutController.TCKN_INVALID" xml:space="preserve">
+    <value>Invalid National ID, must be 11 digits.</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_PIECE" xml:space="preserve">
+    <value>Piece</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION" xml:space="preserve">
+    <value>Payment completed successfully</value>
+  </data>
 </root>

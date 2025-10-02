@@ -135,6 +135,28 @@
   <data name="productSale.INDEX.PROCEED_TO_CHECKOUT" xml:space="preserve">
     <value>Proceed To Checkout</value>
   </data>
+	<!-- Swal messages -->
+	<data name="productSale.INDEX.WARNING_TITLE" xml:space="preserve">
+  <value>Warning</value>
+</data>
+	<data name="productSale.INDEX.UNKNOWN_ERROR" xml:space="preserve">
+  <value>An unknown error occurred.</value>
+</data>
+	<data name="productSale.INDEX.SERVER_ERROR" xml:space="preserve">
+  <value>Server Error</value>
+</data>
+	<data name="productSale.INDEX.SERVER_ERROR_TEXT" xml:space="preserve">
+  <value>An error occurred while sending the request. Please try again.</value>
+</data>
+	<data name="productSale.INDEX.CONFIRM_BUTTON" xml:space="preserve">
+  <value>OK</value>
+</data>
+	<data name="productSale.INDEX.CURRENCY_RESTRICTION_TITLE" xml:space="preserve">
+  <value>Currency Restriction</value>
+</data>
+	<data name="productSale.INDEX.CURRENCY_RESTRICTION_TEXT" xml:space="preserve">
+  <value>You can only add products with the same currency.</value>
+</data>
   <data name="productSale.INDEX.PRODUCT_CODE" xml:space="preserve">
     <value>Product Code</value>
   </data>

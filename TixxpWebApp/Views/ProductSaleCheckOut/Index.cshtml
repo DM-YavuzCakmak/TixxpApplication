@@ -2,7 +2,7 @@
 @inject IViewLocalizer Localizer;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Ürün Satışı - Özet";
+    ViewBag.Title = Localizer["productSaleCheckOut_INDEX_PAGE_TITLE"];
 }
 <div class="page">
     <div class="main-content app-content">
@@ -14,17 +14,23 @@
                 <div class="ms-md-1 ms-0">
                     <nav>
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item text-fixed-white"><a href="javascript:void(0);" class="text-fixed-white">@Localizer["productSaleCheckOut.INDEX.SALES"]</a></li>
-                            <li class="breadcrumb-item active text-fixed-white" aria-current="page">@Localizer["productSaleCheckOut.INDEX.PRODUCT.SALES"]</li>
+                            <li class="breadcrumb-item text-fixed-white">
+                                <a href="/ProductSale/Index" class="text-fixed-white">@Localizer["productSaleCheckOut.INDEX.SALES"]</a>
+                            </li>
+                            <li class="breadcrumb-item active text-fixed-white" aria-current="page">
+                                @Localizer["productSaleCheckOut.INDEX.PRODUCT.SALES"]
+                            </li>
                         </ol>
                     </nav>
                 </div>
             </div>
-            <!-- Page Header Close -->
+            <!-- /Page Header -->
+
             <div class="row">
                 <div class="col-xl-12">
                     <div class="card custom-card">
                         <div class="card-body p-0 product-checkout">
+
                             <ul class="nav nav-tabs tab-style-2 d-sm-flex d-block border-bottom border-block-end-dashed" id="myTab1" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="order-summary" data-bs-toggle="tab"
@@ -34,7 +40,7 @@
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="delivered-tab" data-bs-toggle="tab"
+                                    <button class="nav-link disabled" id="delivered-tab" data-bs-toggle="tab"
                                             data-bs-target="#delivery-tab-pane" type="button" role="tab"
                                             aria-controls="delivered-tab" aria-selected="false">
                                         <i class="ri-checkbox-circle-line me-2 align-middle"></i>@Localizer["productSaleCheckOut.INDEX_APPROVAL"]
@@ -50,8 +56,34 @@
                                         <div class="fs-15 fw-medium d-sm-flex d-block align-items-center justify-content-between mb-3">
                                             <div>@Localizer["productSaleCheckOut_INDEX_ORDER_SUMMARY"] :</div>
                                         </div>
+
                                         <div class="row justify-content-center">
                                             <div class="col-xl-6">
+
+                                                <!-- CUSTOMER INFO (yan yana, opsiyonel) -->
+                                                <div class="card custom-card border mb-4">
+                                                    <div class="card-header">
+                                                        <div class="card-title">@Localizer["productSaleCheckOut_INDEX_CUSTOMER_INFO"]</div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="row g-3">
+                                                            <div class="col-md-4">
+                                                                <label for="customerFullName" class="form-label">@Localizer["productSaleCheckOut_INDEX_FULLNAME"]</label>
+                                                                <input type="text" id="customerFullName" class="form-control" placeholder="@Localizer["productSaleCheckOut_INDEX_FULLNAME_PLACEHOLDER"]">
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label for="customerSurname" class="form-label">@Localizer["productSaleCheckOut_INDEX_SURNAME"]</label>
+                                                                <input type="text" id="customerSurname" class="form-control" placeholder="@Localizer["productSaleCheckOut_INDEX_SURNAME_PLACEHOLDER"]">
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label for="customerTckn" class="form-label">@Localizer["productSaleCheckOut_INDEX_TCKN"]</label>
+                                                                <input type="text" id="customerTckn" maxlength="11" class="form-control" placeholder="@Localizer["productSaleCheckOut_INDEX_TCKN_PLACEHOLDER"]">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- ORDER SUMMARY -->
                                                 <div class="card custom-card border">
                                                     <div class="card-header d-flex align-items-center">
                                                         <div class="card-title me-2">@Localizer["productSaleCheckOut_INDEX_ORDER_SUMMARY"]</div>
@@ -80,7 +112,8 @@
                                                         <i class="ri-arrow-left-line me-2 align-middle d-inline-block"></i>@Localizer["productSaleCheckOut_INDEX_RETURN_TO_SALE"]
                                                     </a>
                                                     <button type="button" class="btn btn-success-light m-1" id="continue-payment-trigger">
-                                                        @Localizer["productSaleCheckOut_INDEX_MAKE_PAYMENT"]<i class="bi bi-credit-card-2-front align-middle ms-2 d-inline-block"></i>
+                                                        @Localizer["productSaleCheckOut_INDEX_MAKE_PAYMENT"]
+                                                        <i class="bi bi-credit-card-2-front align-middle ms-2 d-inline-block"></i>
                                                     </button>
                                                 </div>
 
@@ -99,11 +132,14 @@
                                         <div class="mb-5">
                                             <img src="../assets/images/ecommerce/png/product_sale.png" alt="" class="img-fluid">
                                         </div>
-                                        <a href="/ProductSale/Index" class="btn btn-success">@Localizer["productSaleCheckOut.INDEX.PRODUCT.SALES"]<i class="bi bi-cart ms-2"></i></a>
+                                        <a href="/ProductSale/Index" class="btn btn-success">
+                                            @Localizer["productSaleCheckOut.INDEX.PRODUCT.SALES"]<i class="bi bi-cart ms-2"></i>
+                                        </a>
                                     </div>
                                 </div>
                                 <!-- /Ödeme Sonuç -->
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -116,7 +152,14 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-                async function loadOrderSummary(productSaleId) {
+        // TCKN: sadece rakam girilsin
+        document.addEventListener("input", function (e) {
+            if (e.target && e.target.id === "customerTckn") {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "").slice(0, 11);
+            }
+        });
+
+        async function loadOrderSummary(productSaleId) {
             try {
                 const response = await fetch(`/ProductSaleCheckOut/GetOrderSummary?productSaleId=${productSaleId}`);
                 if (!response.ok) throw new Error();
@@ -132,7 +175,7 @@
 
                 let subtotal = 0;
                 let itemCount = 0;
-                let currencySymbol = ""; // İlk üründen sembolü alacağız
+                let currencySymbol = "";
 
                 data.forEach(item => {
                     const qty = Number(item.quantity) || 0;
@@ -141,7 +184,6 @@
                     subtotal += itemTotal;
                     itemCount += qty;
 
-                    // Eğer currencyTypeSymbol varsa al
                     if (!currencySymbol && item.currencyTypeSymbol) {
                         currencySymbol = item.currencyTypeSymbol;
                     }
@@ -156,8 +198,8 @@
                                 </span>
                             </div>
                             <div class="flex-fill">
-                                <p class="mb-0 fw-medium">${item.productName || 'Ürün'}</p>
-                                <p class="mb-0 text-muted fs-12">Adet: ${qty}</p>
+                                <p class="mb-0 fw-medium">${item.productName || ''}</p>
+                                <p class="mb-0 text-muted fs-12">${"@Localizer["productSaleCheckOut_INDEX_PIECE"]"}: ${qty}</p>
                             </div>
                             <div>
                                 <p class="mb-0 fs-16 fw-medium">${itemTotal.toFixed(2)} ${item.currencyTypeSymbol || ''}</p>
@@ -170,32 +212,69 @@
                 subtotalSpan.textContent = `${subtotal.toFixed(2)} ${currencySymbol}`;
                 totalSpan.textContent = `${subtotal.toFixed(2)} ${currencySymbol}`;
             } catch {
-                Swal.fire("Hata", "Sipariş özeti alınamadı.", "error");
+                Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", "@Localizer["productSaleCheckOut_INDEX_ORDER_SUMMARY_FAILED"]", "error");
             }
         }
 
         document.addEventListener("DOMContentLoaded", function () {
             const productSaleId = new URLSearchParams(window.location.search).get("productSaleId") || "@(ViewBag.ProductSaleId ?? "")";
             if (!productSaleId) {
-                Swal.fire("Hata", "Satış bilgisi bulunamadı.", "error");
+                Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", "@Localizer["productSaleCheckOut_INDEX_SALE_NOT_FOUND"]", "error");
                 return;
             }
 
             // Sayfa açılır açılmaz özet yüklensin
             loadOrderSummary(productSaleId);
 
-            // Ödeme simülasyonu
+            // Make Payment -> SubmitWithCustomer
             const paymentButton = document.getElementById("continue-payment-trigger");
-            paymentButton.addEventListener("click", function () {
-                Swal.fire({
-                    icon: 'success',
-                    title: '@Localizer["productSaleCheckOut_INDEX_PAYMENT_SUCCESS"]!',
-                    text: '@Localizer["productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCIRIPTION"]',
-                    confirmButtonText: '@Localizer["productSaleCheckOut_INDEX_OK"]',
-                }).then(() => {
-                    const nextTab = document.querySelector('#delivered-tab');
-                    new bootstrap.Tab(nextTab).show();
-                });
+            paymentButton.addEventListener("click", async function () {
+                const fullName = document.getElementById("customerFullName").value.trim();
+                const surname = document.getElementById("customerSurname").value.trim();
+                const tckn = document.getElementById("customerTckn").value.trim();
+
+                // Customer Info opsiyonel -> boş bırakılırsa direkt null gönderiyoruz
+                const customerInfo = (!fullName && !surname && !tckn) ? null : {
+                    fullName: fullName,
+                    surname: surname,
+                    tckn: tckn
+                };
+
+                const payload = {
+                    productSaleId: Number(productSaleId),
+                    customerInfo: customerInfo,
+                    items: [] // opsiyonel, sepeti göndermek istersen burayı doldurabilirsin
+                };
+
+                try {
+                    const resp = await fetch("/ProductSaleCheckOut/SubmitWithCustomer", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await resp.json();
+
+                    if (result && result.isSuccess) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '@Localizer["productSaleCheckOut_INDEX_PAYMENT_SUCCESS"]!',
+                            text: '@Localizer["productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION"]',
+                            confirmButtonText: '@Localizer["productSaleCheckOut_INDEX_OK"]',
+                        }).then(() => {
+                             const approvalTab = document.getElementById("delivered-tab");
+        approvalTab.classList.remove("disabled");
+        approvalTab.removeAttribute("tabindex");
+
+        // Approval tabına geçiş yap
+        new bootstrap.Tab(approvalTab).show();
+                        });
+                    } else {
+                        Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", (result && result.message) || "@Localizer["productSaleCheckOut_INDEX_UNKNOWN_ERROR"]", "error");
+                    }
+                } catch {
+                    Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", "@Localizer["productSaleCheckOut_INDEX_NETWORK_ERROR"]", "error");
+                }
             });
         });
     </script>

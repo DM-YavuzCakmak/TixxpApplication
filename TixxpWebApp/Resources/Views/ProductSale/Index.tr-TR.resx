@@ -135,6 +135,28 @@
   <data name="productSale.INDEX.PROCEED_TO_CHECKOUT" xml:space="preserve">
     <value>Sipariş Özetine devam et</value>
   </data>
+	<!-- Swal mesajları -->
+	<data name="productSale.INDEX.WARNING_TITLE" xml:space="preserve">
+  <value>Uyarı</value>
+</data>
+	<data name="productSale.INDEX.UNKNOWN_ERROR" xml:space="preserve">
+  <value>Bilinmeyen bir hata oluştu.</value>
+</data>
+	<data name="productSale.INDEX.SERVER_ERROR" xml:space="preserve">
+  <value>Sunucu Hatası</value>
+</data>
+	<data name="productSale.INDEX.SERVER_ERROR_TEXT" xml:space="preserve">
+  <value>İstek gönderilirken bir hata oluştu. Lütfen tekrar deneyin.</value>
+</data>
+	<data name="productSale.INDEX.CONFIRM_BUTTON" xml:space="preserve">
+  <value>Tamam</value>
+</data>
+	<data name="productSale.INDEX.CURRENCY_RESTRICTION_TITLE" xml:space="preserve">
+  <value>Para Birimi Kısıtlaması</value>
+</data>
+	<data name="productSale.INDEX.CURRENCY_RESTRICTION_TEXT" xml:space="preserve">
+  <value>Sadece aynı para biriminde ürün ekleyebilirsiniz.</value>
+</data>
 	<data name="productSale.INDEX.WARNING" xml:space="preserve">
   <value>Uyarı</value>
 </data>

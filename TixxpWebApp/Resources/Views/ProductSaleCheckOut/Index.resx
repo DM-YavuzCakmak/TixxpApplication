@@ -183,4 +183,10 @@
   <data name="productSaleCheckOut_Error_Sales_Information" xml:space="preserve">
     <value>No sales information found.</value>
   </data>
+  <data name="productSaleCheckOut_INDEX_PIECE" xml:space="preserve">
+    <value>Piece</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION" xml:space="preserve">
+    <value>Payment completed successfully</value>
+  </data>
 </root>

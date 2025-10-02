@@ -5,8 +5,10 @@ using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
+using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Extension;
+using Tixxp.Core.Utilities.Enums.ProductSaleStatusEnum;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.WebApp.Models.ProductSaleCheckOut;
@@ -16,6 +18,7 @@ namespace Tixxp.WebApp.Controllers
     public class ProductSaleCheckOutController : Controller
     {
         private readonly IProductSaleService _productSaleService;
+        private readonly IProductSaleInvoiceInfoService _productSaleInvoiceInfoService;
         private readonly IProductTranslationService _productTranslationService;
         private readonly ILanguageService _languageService;
         private readonly IProductPriceService _productPriceService;
@@ -30,7 +33,8 @@ namespace Tixxp.WebApp.Controllers
             IProductPriceService productPriceService,
             IStringLocalizer<ProductSaleCheckOutController> stringLocalizer,
             IProductTranslationService productTranslationService,
-            ILanguageService languageService)
+            ILanguageService languageService,
+            IProductSaleInvoiceInfoService productSaleInvoiceInfoService)
         {
             _productSaleService = productSaleService;
             _productSaleDetailService = productSaleDetailService;
@@ -38,6 +42,7 @@ namespace Tixxp.WebApp.Controllers
             _stringLocalizer = stringLocalizer;
             _productTranslationService = productTranslationService;
             _languageService = languageService;
+            _productSaleInvoiceInfoService = productSaleInvoiceInfoService;
         }
 
 
@@ -133,7 +138,6 @@ namespace Tixxp.WebApp.Controllers
             if (items == null || items.Count == 0)
                 return Json(new { isSuccess = false, message = _stringLocalizer["productSaleCheckOutController.PRODUCT_SELECTION"].ToString() });
 
-            // Tüm kalemlerde aynı para birimi olmalı
             var currencyTypeIds = items.Select(x => x.CurrencyTypeId).Distinct().ToList();
             if (currencyTypeIds.Count > 1)
             {
@@ -146,6 +150,8 @@ namespace Tixxp.WebApp.Controllers
 
             var productSale = new ProductSaleEntity
             {
+                InvoiceTypeId = 1,
+                StatusId = (long)ProductSaleStatusEnum.Pending,
                 CounterId = DefaultCounterId,
                 CreatedBy = User.GetUserId().GetValueOrDefault()
             };
@@ -175,5 +181,32 @@ namespace Tixxp.WebApp.Controllers
 
             return Json(new { isSuccess = true, productSaleId = saleId });
         }
+
+
+        [HttpPost]
+        public JsonResult SubmitWithCustomer([FromBody] ProductSaleCheckOutSubmitModel model)
+        {
+            if (model == null)
+                return Json(new { isSuccess = false, message = _stringLocalizer["productSaleCheckOutController.CUSTOMER_REQUIRED"].ToString() });
+
+            if (model.CustomerInfo != null)
+            {
+                _productSaleInvoiceInfoService.Add(new Entities.ProductSaleInvoiceInfo.ProductSaleInvoiceInfoEntity
+                {
+                    InvoiceTypeId = 1,
+                    ProductSaleId = model.ProductSaleId,
+                    FirstName = model.CustomerInfo?.FullName,
+                    LastName = model.CustomerInfo?.Surname,
+                    IdentityNumber = model.CustomerInfo?.Tckn
+                });
+            }
+
+            var productSale = _productSaleService.GetFirstOrDefault(x => x.Id == model.ProductSaleId);
+            productSale.Data.StatusId = (long)ProductSaleStatusEnum.Completed;
+            _productSaleService.Update(productSale.Data);
+
+            return Json(new { isSuccess = true, productSaleId = model.ProductSaleId });
+        }
+
     }
 }

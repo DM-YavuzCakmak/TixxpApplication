@@ -13,6 +13,12 @@ public class ProductSaleInvoiceInfoEntity : BaseEntity
     [Column("InvoiceTypeId")]
     public long InvoiceTypeId { get; set; }
 
+    [Column("FirstName")]
+    public string? FirstName { get; set; }
+
+    [Column("LastName")]
+    public string? LastName { get; set; }
+
     [Column("IdentityNumber")]
     public string? IdentityNumber { get; set; }
 
