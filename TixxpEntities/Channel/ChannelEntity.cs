@@ -7,6 +7,5 @@ namespace Tixxp.Entities.Channel;
 [Table("Channel")]
 public class ChannelEntity : BaseEntity
 {
-    [Column("Name")]
-    public string Name { get; set; }
+
 }

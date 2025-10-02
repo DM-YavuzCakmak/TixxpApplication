@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Tixxp.Business.Services.Abstract.ChannelTranslation;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
@@ -35,6 +36,7 @@ namespace Tixxp.WebApp.Controllers
         // === services ===
         private readonly IEventService _eventService;
         private readonly ICurrencyTypeService _currencyTypeService;
+        private readonly IChannelTranslationService _channelTranslationService;
         private readonly IProductTranslationService _productTranslationService;
         private readonly IReservationProductDetailService _reservationProductDetailService;
         private readonly IReservationService _reservationService;
@@ -64,7 +66,8 @@ namespace Tixxp.WebApp.Controllers
             ICurrencyTypeService currencyTypeService,
             IEventService eventService,
             ITicketStatusService ticketStatusService,
-            ITicketStatusTranslationService ticketStatusTranslationService)
+            ITicketStatusTranslationService ticketStatusTranslationService,
+            IChannelTranslationService channelTranslationService)
         {
             _reservationService = reservationService;
             _invoiceInfoService = invoiceInfoService;
@@ -80,6 +83,7 @@ namespace Tixxp.WebApp.Controllers
             _eventService = eventService;
             _ticketStatusService = ticketStatusService;
             _ticketStatusTranslationService = ticketStatusTranslationService;
+            _channelTranslationService = channelTranslationService;
         }
 
         // INDEX
@@ -103,6 +107,10 @@ namespace Tixxp.WebApp.Controllers
         {
             NormalizeFilter(ref filter);
 
+            var cultureCode = CultureInfo.CurrentUICulture.Name;
+            var langRes = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+            long? languageId = langRes.Success ? langRes.Data?.Id : null;
+
             var baseResult = _reservationService.GetListWithInclude(x =>
                 !x.IsDeleted
                 && (!filter.ChannelId.HasValue || x.ChannelId == filter.ChannelId.Value)
@@ -111,7 +119,7 @@ namespace Tixxp.WebApp.Controllers
                 && (!filter.EndDateExclusive.HasValue || x.Created_Date < filter.EndDateExclusive.Value)
                 && (!filter.ReservationId.HasValue || x.Id == filter.ReservationId.Value),
                 x => x.Channel,
-                x => x.Currency.CurrencyType // <-- CurrencyType join eklendi
+                x => x.Currency.CurrencyType
             );
 
             var list = (baseResult.Success && baseResult.Data != null)
@@ -125,6 +133,7 @@ namespace Tixxp.WebApp.Controllers
                 ? invResult.Data
                 : new List<ReservationSaleInvoiceInfoEntity>();
 
+            // 🔍 Email filtresi
             if (!string.IsNullOrWhiteSpace(filter.Email))
             {
                 var q = filter.Email.Trim().ToLowerInvariant();
@@ -139,6 +148,7 @@ namespace Tixxp.WebApp.Controllers
                 invoiceList = invoiceList.Where(i => reservationIds.Contains(i.ReservationId)).ToList();
             }
 
+            // 🔍 PaymentType filtresi
             if (filter.PaymentTypeId.HasValue)
             {
                 var hitIds = invoiceList
@@ -155,11 +165,15 @@ namespace Tixxp.WebApp.Controllers
             var paymentTypeNames = GetPaymentTypeNames();
             var statusNames = GetReservationStatusNames();
 
-            var channelNames = list
-                .Where(x => x.Channel != null)
-                .GroupBy(x => x.ChannelId)
-                .Select(g => g.First())
-                .ToDictionary(x => x.ChannelId, x => x.Channel.Name);
+            // ✅ ChannelTranslation ile isimlendirme
+            var channelIds = list.Where(x => x.ChannelId != null).Select(x => x.ChannelId).Distinct().ToList();
+            var channelTranslations = (languageId.HasValue)
+                ? _channelTranslationService.GetList(x => channelIds.Contains(x.ChannelId) && x.LanguageId == languageId.Value)
+                : _channelTranslationService.GetList(x => channelIds.Contains(x.ChannelId));
+
+            var channelTrMap = (channelTranslations.Success && channelTranslations.Data != null)
+                ? channelTranslations.Data.ToDictionary(ct => ct.ChannelId, ct => ct.Name)
+                : new Dictionary<long, string>();
 
             var rows = list
                 .OrderByDescending(r => r.Created_Date)
@@ -171,9 +185,10 @@ namespace Tixxp.WebApp.Controllers
                         Id = r.Id,
                         CreatedDate = r.Created_Date,
                         ChannelId = r.ChannelId,
-                        ChannelName = channelNames.TryGetValue(r.ChannelId, out var cn) ? cn : $"#{r.ChannelId}",
+                        ChannelName = (r.ChannelId != null && channelTrMap.TryGetValue(r.ChannelId, out var cn))
+                                      ? cn : $"#{r.ChannelId}",
                         TotalPrice = r.TotalPrice ?? 0,
-                        CurrencySymbol = r.Currency?.CurrencyType?.Symbol ?? "", // <-- EKLENDİ
+                        CurrencySymbol = r.Currency?.CurrencyType?.Symbol ?? "",
                         PaymentTypeId = inv?.PaymentTypeId,
                         PaymentTypeName = (inv?.PaymentTypeId != null && paymentTypeNames.TryGetValue(inv.PaymentTypeId.Value, out var ptn))
                                           ? ptn : (inv?.PaymentTypeId != null ? $"#{inv.PaymentTypeId}" : "-"),
@@ -202,6 +217,7 @@ namespace Tixxp.WebApp.Controllers
         }
 
 
+
         [HttpGet]
         public IActionResult Detail(long id)
         {
@@ -214,7 +230,7 @@ namespace Tixxp.WebApp.Controllers
             var rDr = _reservationService.GetFirstOrDefaultWithInclude(
                 x => x.Id == id,
                 x => x.Channel,
-                x => x.Currency.CurrencyType // <-- CurrencyType join eklendi
+                x => x.Currency.CurrencyType
             );
             if (!rDr.Success || rDr.Data == null)
                 return NotFound("Reservation not found.");
@@ -223,17 +239,30 @@ namespace Tixxp.WebApp.Controllers
             var invDr = _invoiceInfoService.GetFirstOrDefault(x => x.ReservationId == id);
             var inv = invDr.Success ? invDr.Data : null;
 
-            // 6) Dil bazlı Status ve PaymentType adları
+            // 4) Status & PaymentType & TicketStatus çevirileri
             var statusNames = GetReservationStatusNames();
             var paymentTypeNames = GetPaymentTypeNames();
             var ticketStatusNames = GetTicketStatusNames();
 
-            // 4) Bilet satırları (TicketType & TicketSubType include) + Tickets include
+            // 5) ✅ ChannelTranslation (dil bazlı)
+            string channelName = "-";
+            if (rDr.Data.ChannelId > 0)
+            {
+                var ctDr = (languageId.HasValue)
+                    ? _channelTranslationService.GetFirstOrDefault(x => x.ChannelId == rDr.Data.ChannelId && x.LanguageId == languageId.Value)
+                    : null;
+
+                channelName = (ctDr != null && ctDr.Success && ctDr.Data != null)
+                    ? ctDr.Data.Name
+                    : ($"#{rDr.Data.ChannelId}");
+            }
+
+            // 6) Bilet satırları (ReservationDetail → TicketSubType, TicketType, Tickets)
             var detDr = _reservationDetailService.GetListWithInclude(
                 x => x.ReservationId == id && !x.IsDeleted,
                 x => x.TicketSubType,
                 x => x.TicketType,
-                x => x.Tickets // <-- ReservationDetail → Ticket navigation
+                x => x.Tickets
             );
 
             var ticketRows = new List<ReservationDetailTicketVm>();
@@ -262,7 +291,7 @@ namespace Tixxp.WebApp.Controllers
                 }
             }
 
-            // 5) ÜRÜN satırları (ReservationProductDetail -> Product include)
+            // 7) Ürün satırları (ReservationProductDetail → Product + ProductTranslation)
             var rpdDr = _reservationProductDetailService.GetListWithInclude(
                 x => x.ReservationId == id && !x.IsDeleted,
                 x => x.Product
@@ -271,15 +300,10 @@ namespace Tixxp.WebApp.Controllers
                 ? rpdDr.Data.ToList()
                 : new List<ReservationProductDetailEntity>();
 
-            // 5.a) ProductTranslation’dan dil bazlı adları çek
             var productRows = new List<ReservationDetailProductVm>();
             if (productLines.Any())
             {
-                var productIds = productLines
-                    .Where(p => p.ProductId > 0)
-                    .Select(p => p.ProductId)
-                    .Distinct()
-                    .ToList();
+                var productIds = productLines.Where(p => p.ProductId > 0).Select(p => p.ProductId).Distinct().ToList();
 
                 var trDr = (languageId.HasValue)
                     ? _productTranslationService.GetList(x => !x.IsDeleted && x.LanguageId == languageId.Value && productIds.Contains(x.ProductId))
@@ -289,9 +313,7 @@ namespace Tixxp.WebApp.Controllers
                     ? trDr.Data.ToList()
                     : new List<ProductTranslationEntity>();
 
-                var trMap = translations
-                    .GroupBy(t => t.ProductId)
-                    .ToDictionary(g => g.Key, g => g.First().Name);
+                var trMap = translations.GroupBy(t => t.ProductId).ToDictionary(g => g.Key, g => g.First().Name);
 
                 productRows = productLines.Select(p =>
                 {
@@ -308,12 +330,13 @@ namespace Tixxp.WebApp.Controllers
                 }).ToList();
             }
 
+            // 8) PaymentTypeName
             string paymentTypeName =
                 (inv?.PaymentTypeId != null && paymentTypeNames.TryGetValue(inv.PaymentTypeId.Value, out var ptn))
                     ? ptn
                     : (inv?.PaymentTypeId != null ? $"#{inv.PaymentTypeId}" : "-");
 
-            // 7) ViewModel
+            // 9) ViewModel
             var vm = new ReservationDetailVm
             {
                 ReservationId = rDr.Data.Id,
@@ -321,9 +344,9 @@ namespace Tixxp.WebApp.Controllers
                 StatusId = rDr.Data.StatusId,
                 StatusName = ResolveStatusName(rDr.Data.StatusId, statusNames),
                 ChannelId = rDr.Data.ChannelId,
-                ChannelName = rDr.Data.Channel?.Name,
+                ChannelName = channelName, // ✅ Translation’dan geliyor
                 TotalPrice = rDr.Data.TotalPrice ?? 0,
-                CurrencySymbol = rDr.Data.Currency?.CurrencyType?.Symbol ?? "", // <-- EKLENDİ
+                CurrencySymbol = rDr.Data.Currency?.CurrencyType?.Symbol ?? "",
                 InvoiceInfo = new ReservationInvoiceMiniVm
                 {
                     Name = inv?.Name,
@@ -339,6 +362,7 @@ namespace Tixxp.WebApp.Controllers
 
             return PartialView("_ReservationDetail", vm);
         }
+
 
 
 
@@ -486,7 +510,6 @@ namespace Tixxp.WebApp.Controllers
 
             foreach (var tr in trList)
             {
-                // ReservationStatusId -> Name
                 map[tr.ReservationStatusId] = tr.Name;
             }
 
@@ -527,6 +550,10 @@ namespace Tixxp.WebApp.Controllers
 
         private FilterLookups BuildFilterLookups()
         {
+            var cultureCode = CultureInfo.CurrentUICulture.Name;
+            var langRes = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+            long? languageId = langRes.Success ? langRes.Data?.Id : null;
+
             var baseRes = _reservationService.GetListWithInclude(
                 x => !x.IsDeleted,
                 x => x.Channel
@@ -535,12 +562,23 @@ namespace Tixxp.WebApp.Controllers
             var channels = new List<IdNameVm>();
             if (baseRes.Success && baseRes.Data != null)
             {
-                channels = baseRes.Data
-                    .Where(r => r.Channel != null)
-                    .GroupBy(r => r.ChannelId)
-                    .Select(g => g.First().Channel)
+                var channelIds = baseRes.Data.Where(r => r.ChannelId != null).Select(r => r.ChannelId).Distinct().ToList();
+
+                var channelTranslations = (languageId.HasValue)
+                    ? _channelTranslationService.GetList(x => channelIds.Contains(x.ChannelId) && x.LanguageId == languageId.Value)
+                    : _channelTranslationService.GetList(x => channelIds.Contains(x.ChannelId));
+
+                var trMap = (channelTranslations.Success && channelTranslations.Data != null)
+                    ? channelTranslations.Data.ToDictionary(ct => ct.ChannelId, ct => ct.Name)
+                    : new Dictionary<long, string>();
+
+                channels = channelIds
+                    .Select(id => new IdNameVm
+                    {
+                        Id = id,
+                        Name = trMap.TryGetValue(id, out var trName) ? trName : $"#{id}"
+                    })
                     .OrderBy(c => c.Name)
-                    .Select(c => new IdNameVm { Id = c.Id, Name = c.Name })
                     .ToList();
             }
 
@@ -550,23 +588,11 @@ namespace Tixxp.WebApp.Controllers
                 .OrderBy(x => x.Name)
                 .ToList();
 
-            // DİL BAZLI status lookupları
             var statusNames = GetReservationStatusNames();
             var statuses = statusNames
                 .Select(kv => new IdNameVm { Id = kv.Key, Name = kv.Value })
                 .OrderBy(x => x.Name)
                 .ToList();
-
-            // çeviri yoksa eldeki verilerden fallback
-            if (!statuses.Any() && baseRes.Success && baseRes.Data != null)
-            {
-                statuses = baseRes.Data
-                    .Select(r => r.StatusId)
-                    .Distinct()
-                    .OrderBy(id => id)
-                    .Select(id => new IdNameVm { Id = id, Name = $"#{id}" })
-                    .ToList();
-            }
 
             List<IdNameVm> currencyTypeList = new List<IdNameVm>();
             var currencyTypes = _currencyTypeService.GetList(x => !x.IsDeleted);
@@ -574,12 +600,11 @@ namespace Tixxp.WebApp.Controllers
             {
                 foreach (var currencyType in currencyTypes.Data)
                 {
-                    IdNameVm currencyTypeNameVm = new IdNameVm
+                    currencyTypeList.Add(new IdNameVm
                     {
                         Id = currencyType.Id,
                         Name = currencyType.Name
-                    };
-                    currencyTypeList.Add(currencyTypeNameVm);
+                    });
                 }
             }
 
@@ -591,6 +616,7 @@ namespace Tixxp.WebApp.Controllers
                 CurrencyTypes = currencyTypeList
             };
         }
+
 
         private Dictionary<long, string> GetTicketStatusNames()
         {

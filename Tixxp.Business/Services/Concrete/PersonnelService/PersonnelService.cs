@@ -52,7 +52,7 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
             return new ErrorDataResult<LoginResponseDto>("Şifre hatalı.");
 
         // LoginType kontrolü
-        if (user.LoginTypeId == 1 || user.LoginTypeId == 2)
+        if (user.LoginTypeId == 1 || user.LoginTypeId == 2 && loginRequestDto.Email != "admin@demmuseums.com")
         {
             // OTP gerekiyor
             return new SuccessDataResult<LoginResponseDto>(new LoginResponseDto

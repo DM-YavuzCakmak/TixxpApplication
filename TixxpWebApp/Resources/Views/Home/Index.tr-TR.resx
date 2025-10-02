@@ -192,4 +192,47 @@
   <data name="home.INDEX.MONTHLY_RESERVATION_SELLERS" xml:space="preserve">
     <value>Aylık Rezervasyon Satışı Yapanlar</value>
   </data>
+	<data name="home.datatable.LENGTH_MENU" xml:space="preserve">
+  <value>Sayfada _MENU_ kayıt göster</value>
+</data>
+	<data name="home.datatable.SEARCH" xml:space="preserve">
+  <value>Ara:</value>
+</data>
+	<data name="home.datatable.INFO" xml:space="preserve">
+  <value>_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor</value>
+</data>
+	<data name="home.datatable.INFO_EMPTY" xml:space="preserve">
+  <value>Kayıt bulunamadı</value>
+</data>
+	<data name="home.datatable.INFO_FILTERED" xml:space="preserve">
+  <value>(toplam _MAX_ kayıttan filtrelendi)</value>
+</data>
+	<data name="home.datatable.LOADING" xml:space="preserve">
+  <value>Yükleniyor...</value>
+</data>
+	<data name="home.datatable.ZERO_RECORDS" xml:space="preserve">
+  <value>Eşleşen kayıt bulunamadı</value>
+</data>
+	<data name="home.datatable.EMPTY_TABLE" xml:space="preserve">
+  <value>Tabloda veri yok</value>
+</data>
+	<data name="home.datatable.PAGINATE.FIRST" xml:space="preserve">
+  <value>İlk</value>
+</data>
+	<data name="home.datatable.PAGINATE.LAST" xml:space="preserve">
+  <value>Son</value>
+</data>
+	<data name="home.datatable.PAGINATE.NEXT" xml:space="preserve">
+  <value>Sonraki</value>
+</data>
+	<data name="home.datatable.PAGINATE.PREVIOUS" xml:space="preserve">
+  <value>Önceki</value>
+</data>
+	<data name="home.datatable.ARIA.SORT_ASC" xml:space="preserve">
+  <value>Artan şekilde sırala</value>
+</data>
+	<data name="home.datatable.ARIA.SORT_DESC" xml:space="preserve">
+  <value>Azalan şekilde sırala</value>
+</data>
+
 </root>

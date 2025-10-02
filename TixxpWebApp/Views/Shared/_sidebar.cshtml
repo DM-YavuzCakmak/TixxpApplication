@@ -31,16 +31,16 @@
                             <i class="fe fe-chevron-right side-menu__angle"></i>
                         </a>
                         <ul class="slide-menu child1">
+                            @if (User.IsInRole("TIXXP_TICKET_SALE_BOOTH") || User.IsInRole("TIXXP_TICKET_SALE_WEB"))
+                            {
+                                <li class="slide">
+                                    <a href="/TicketSale/Index" class="side-menu__item">Sell Ticket</a>
+                                </li>
+                            }
                             @if (User.IsInRole("TIXXP_PRODUCT_SALE"))
                             {
                                 <li class="slide">
                                     <a href="/ProductSale/Index" class="side-menu__item">Product Sale</a>
-                                </li>
-                            }
-                            @if (User.IsInRole("TIXXP_TICKET_SALE_BOOTH") || User.IsInRole("TIXXP_TICKET_SALE_WEB"))
-                            {
-                                <li class="slide">
-                                    <a href="/TicketSale/Index" class="side-menu__item">Ticket Sale</a>
                                 </li>
                             }
                         </ul>

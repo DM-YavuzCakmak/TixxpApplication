@@ -6,7 +6,9 @@ using Tixxp.Entities.CampaignAction;
 using Tixxp.Entities.CampaignCondition;
 using Tixxp.Entities.CampaignConditionType;
 using Tixxp.Entities.Channel;
+using Tixxp.Entities.ChannelTranslation;
 using Tixxp.Entities.Counter;
+using Tixxp.Entities.CounterTranslation;
 using Tixxp.Entities.Currency;
 using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.Events;
@@ -22,6 +24,8 @@ using Tixxp.Entities.ProductPrice;
 using Tixxp.Entities.ProductSale;
 using Tixxp.Entities.ProductSaleDetail;
 using Tixxp.Entities.ProductSaleInvoiceInfo;
+using Tixxp.Entities.ProductSaleStatus;
+using Tixxp.Entities.ProductSaleStatusTranslation;
 using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
 using Tixxp.Entities.ReservationDetail;
@@ -58,6 +62,22 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ProductSaleStatusTranslationEntity>(entity =>
+            {
+                entity.ToTable("ProductSaleStatusTranslation", _schema);
+            });
+            modelBuilder.Entity<ProductSaleStatusEntity>(entity =>
+            {
+                entity.ToTable("ProductSaleStatus", _schema);
+            });
+            modelBuilder.Entity<CounterTranslationEntity>(entity =>
+            {
+                entity.ToTable("CounterTranslation", _schema);
+            });
+            modelBuilder.Entity<ChannelTranslationEntity>(entity =>
+            {
+                entity.ToTable("ChannelTranslation", _schema);
+            });
             modelBuilder.Entity<CampaignConditionEntity>(entity =>
             {
                 entity.ToTable("CampaignCondition", _schema);
@@ -235,6 +255,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
 
         public DbSet<CounterEntity> Counters { get; set; }
         public DbSet<CampaignConditionEntity> CampaignConditions { get; set; }
+        public DbSet<ProductSaleStatusEntity> ProductSaleStatuses { get; set; }
+        public DbSet<ProductSaleStatusTranslationEntity> ProductSaleStatusTranslations { get; set; }
+        public DbSet<CounterTranslationEntity> CounterTranslations { get; set; }
+        public DbSet<ChannelTranslationEntity> ChannelTranslations { get; set; }
         public DbSet<CampaignConditionTypeEntity> CampaignConditionTypes { get; set; }
         public DbSet<CampaignActionEntity> CampaignActions { get; set; }
         public DbSet<CampaignEntity> Campaigns { get; set; }

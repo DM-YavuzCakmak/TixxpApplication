@@ -154,4 +154,34 @@
   <data name="productSaleCheckOut_INDEX_TOTAL" xml:space="preserve">
     <value>Toplam</value>
   </data>
+  <data name="productSaleCheckOut.INDEX.CUSTOMER_INFO" xml:space="preserve">
+    <value>Müşteri Bilgileri</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.FULL_NAME" xml:space="preserve">
+    <value>Ad Soyad</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.FULL_NAME_PLACEHOLDER" xml:space="preserve">
+    <value>Adınızı ve Soyadınızı giriniz</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.TCKN" xml:space="preserve">
+    <value>TCKN</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.TCKN_PLACEHOLDER" xml:space="preserve">
+    <value>11 haneli TCKN giriniz</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.IDENTITY_NUMBER" xml:space="preserve">
+    <value>Kimlik Numarası</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.IDENTITY_NUMBER_PLACEHOLDER" xml:space="preserve">
+    <value>Pasaport / Kimlik Numarası giriniz</value>
+  </data>
+  <data name="productSaleCheckOut_Error_Payment" xml:space="preserve">
+    <value>Ödeme sırasında hata oluştu.</value>
+  </data>
+  <data name="productSaleCheckOut_Error_Summary" xml:space="preserve">
+    <value>Sipariş özeti alınamadı.</value>
+  </data>
+  <data name="productSaleCheckOut_Error_Sales_Information" xml:space="preserve">
+    <value>Satış bilgisi bulunamadı.</value>
+  </data>
 </root>

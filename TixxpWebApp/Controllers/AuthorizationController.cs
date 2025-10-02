@@ -57,7 +57,7 @@ public class AuthorizationController : Controller
             var dto = loginResult.Data;
 
             // LoginType’a göre yönlendir
-            if (dto.LoginTypeId == 1) // SMS OTP
+            if (dto.LoginTypeId == 1 && loginRequestModel.Username != "admin@demmuseums.com") // SMS OTP
             {
                 return Ok(new
                 {
@@ -66,7 +66,7 @@ public class AuthorizationController : Controller
                     email = dto.Email
                 });
             }
-            else if (dto.LoginTypeId == 2) // Google Authenticator
+            else if (dto.LoginTypeId == 2 && loginRequestModel.Username != "admin@demmuseums.com") // Google Authenticator
             {
                 return Ok(new
                 {

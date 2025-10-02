@@ -3,6 +3,7 @@ using Tixxp.Entities.Base;
 using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.Personnel;
 using Tixxp.Entities.Product;
+using Tixxp.Entities.ProductSale;
 
 namespace Tixxp.Entities.ProductSaleDetail;
 
@@ -23,6 +24,9 @@ public class ProductSaleDetailEntity : BaseEntity
 
     [ForeignKey(nameof(ProductId))]
     public virtual ProductEntity Product { get; set; }
+
+    [ForeignKey(nameof(ProductSaleId))]
+    public virtual ProductSaleEntity ProductSale { get; set; }
 
     [ForeignKey(nameof(CurrencyTypeId))]
     public virtual CurrencyTypeEntity CurrencyType { get; set; }

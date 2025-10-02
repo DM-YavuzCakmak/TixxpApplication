@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Security.Claims;
+using Tixxp.Business.Services.Abstract.CounterTranslation;
 using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
@@ -10,6 +11,8 @@ using Tixxp.Business.Services.Abstract.Product;
 using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
+using Tixxp.Business.Services.Abstract.ProductSaleStatus;
+using Tixxp.Business.Services.Abstract.ProductSaleStatusTranslation;
 using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Abstract.Reservation;
 using Tixxp.Business.Services.Abstract.RoleService;
@@ -24,11 +27,15 @@ public class HomeController : Controller
     private readonly IPersonnelRoleService _personnelRoleService;
     private readonly IProductService _productService;
     private readonly IProductSaleService _productSaleService;
+    private readonly ICounterTranslationService _counterTranslationService;
     private readonly IProductPriceService _productPriceService;
     private readonly IProductSaleDetailService _productSaleDetailService;
     private readonly IProductTranslationService _productTranslationService;
     private readonly IReservationService _reservationService;
     private readonly ILanguageService _languageService;
+    private readonly IProductSaleStatusService _productSaleStatusService;
+    private readonly IProductSaleStatusTranslationService _productSaleStatusTranslationService;
+
 
     public HomeController(
         IPersonnelService personnelService,
@@ -40,7 +47,10 @@ public class HomeController : Controller
         IRoleService roleService,
         IProductTranslationService productTranslationService,
         ILanguageService languageService,
-        IReservationService reservationService)
+        IReservationService reservationService,
+        ICounterTranslationService counterTranslationService,
+        IProductSaleStatusService productSaleStatusService,
+        IProductSaleStatusTranslationService productSaleStatusTranslationService)
     {
         _personnelService = personnelService;
         _productSaleService = productSaleService;
@@ -52,6 +62,9 @@ public class HomeController : Controller
         _productTranslationService = productTranslationService;
         _languageService = languageService;
         _reservationService = reservationService;
+        _counterTranslationService = counterTranslationService;
+        _productSaleStatusService = productSaleStatusService;
+        _productSaleStatusTranslationService = productSaleStatusTranslationService;
     }
 
     public async Task<IActionResult> Index()
@@ -84,21 +97,37 @@ public class HomeController : Controller
         #endregion
 
         #region Gişe Satışları
-        var productSalesResult = _productSaleService.GetListWithInclude(x => x.Status == 1, x => x.Counter);
+        var productSalesResult = _productSaleService.GetListWithInclude(x => x.StatusId == 1, x => x.Counter);
+        var counterIds = productSalesResult.Data
+            .Where(x => x.CounterId != null)
+            .Select(x => x.CounterId)
+            .Distinct()
+            .ToList();
+
+        var counterTranslations = _counterTranslationService
+            .GetList(x => counterIds.Contains(x.CounterId) && x.LanguageId == languageId)
+            .Data;
+
         var salesGroupedByCounter = productSalesResult.Data
-            .Where(x => x.Counter != null)
-            .GroupBy(x => x.Counter.CounterName)
-            .Select(g => new
+            .Where(x => x.CounterId != null)
+            .GroupBy(x => x.CounterId)
+            .Select(g =>
             {
-                CounterName = g.Key,
-                TotalSales = g.Count()
+                var translation = counterTranslations.FirstOrDefault(ct => ct.CounterId == g.Key);
+                return new
+                {
+                    CounterName = translation?.Name ?? "Unknown Counter",
+                    TotalSales = g.Count()
+                };
             }).ToList();
+
         ViewBag.CounterSales = salesGroupedByCounter;
         #endregion
 
+
         #region Günlük Satış Yapan Personeller
         var today = DateTime.Today;
-        var todaySales = _productSaleService.GetList(x => x.Status == 1 && x.Created_Date.Date == today).Data;
+        var todaySales = _productSaleService.GetList(x => x.StatusId == 1 && x.Created_Date.Date == today).Data;
         var todayPersonnelIds = todaySales.Where(x => x.CreatedBy != null).Select(x => x.CreatedBy).Distinct().ToList();
         var todayPersonnelList = _personnelService.GetList(x => todayPersonnelIds.Contains(x.Id)).Data;
 
@@ -133,7 +162,7 @@ public class HomeController : Controller
         #region Aylık Satış Yapan Personeller
         var now = DateTime.Now;
         var monthlySales = _productSaleService
-            .GetList(x => x.Status == 1 &&
+            .GetList(x => x.StatusId == 1 &&
                           x.Created_Date.Year == now.Year &&
                           x.Created_Date.Month == now.Month).Data;
 
@@ -255,7 +284,7 @@ public class HomeController : Controller
         var monthlyReservationCount = allReservations.Count(x => x.Created_Date >= firstDayOfMonth);
         var prevMonthReservationCount = allReservations.Count(x => x.Created_Date >= firstDayOfPrevMonth && x.Created_Date <= lastDayOfPrevMonth);
 
-        var allTicketSales = _productSaleService.GetList(x => x.Status == 1).Data;
+        var allTicketSales = _productSaleService.GetList(x => x.StatusId == 1).Data;
 
         var dailyTicketCount = allTicketSales.Count(x => x.Created_Date.Date == today);
         var yesterdayTicketCount = allTicketSales.Count(x => x.Created_Date.Date == yesterday);
@@ -326,10 +355,30 @@ public class HomeController : Controller
         string sortDirection = Request.Query["order[0][dir]"];
         string searchValue = Request.Query["search[value]"];
 
-        var salesList = _productSaleService.GetList(x => x.Status == 1).Data;
+        var statusTranslations = (languageId.HasValue)
+            ? _productSaleStatusTranslationService.GetList(x => x.LanguageId == languageId.Value).Data
+            : _productSaleStatusTranslationService.GetList(x => true).Data;
+
+        var statusDict = statusTranslations?
+            .GroupBy(st => st.ProductSaleStatusId)
+            .ToDictionary(g => g.Key, g => g.First().Name)
+            ?? new Dictionary<long, string>();
+
+
+        var salesList = _productSaleService.GetList(x => x.StatusId == 1).Data;
         var saleIds = salesList.Select(x => x.Id).ToList();
         var saleDetails = _productSaleDetailService.GetList(x => saleIds.Contains(x.ProductSaleId)).Data;
         var productIds = saleDetails.Select(x => x.ProductId).Distinct().ToList();
+
+        var counterIds = salesList
+            .Where(x => x.CounterId != null)
+            .Select(x => x.CounterId)
+            .Distinct()
+            .ToList();
+
+        var counterTranslations = _counterTranslationService
+            .GetList(x => counterIds.Contains(x.CounterId) && x.LanguageId == languageId)
+            .Data;
 
         var productTranslations = _productTranslationService
             .GetList(x => productIds.Contains(x.ProductId) && x.LanguageId == languageId).Data;
@@ -362,21 +411,26 @@ public class HomeController : Controller
                 });
             }
 
+            var counterTranslation = counterTranslations.FirstOrDefault(ct => ct.CounterId == sale.CounterId);
+            var paymentMethod = counterTranslation?.Name ?? "Unknown Counter";
+
             return new
             {
                 CustomerName = $"{person?.FirstName} {person?.LastName}",
                 Avatar = person?.ProfilePhotoPath ?? "/assets/images/faces/default.jpg",
                 OrderId = sale.Id,
                 OrderIdFormatted = $"#{sale.Id}",
-                Date = sale.Created_Date,
+                Date = sale.Created_Date.ToString("dd.MM.yyyy HH:mm"),
                 DateFormatted = sale.Created_Date.ToString("dd.MM.yyyy"),
                 TotalPriceRaw = totalPrice,
                 TotalPrice = $"{totalPrice:0.00} ₺",
-                PaymentMethod = "Gişe",
-                Status = sale.Status == 1 ? "Satıldı" : "Bekliyor",
+                PaymentMethod = paymentMethod,
+                Status = statusDict.ContainsKey(sale.StatusId) ? statusDict[sale.StatusId] : $"#Unknown",
                 Details = detailList
             };
         }).ToList();
+
+
 
         ViewBag.RecentSales = salesData;
 

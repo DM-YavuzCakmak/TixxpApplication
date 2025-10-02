@@ -153,4 +153,34 @@
   <data name="productSaleCheckOut_INDEX_TOTAL" xml:space="preserve">
     <value>Total</value>
   </data>
+  <data name="productSaleCheckOut.INDEX.CUSTOMER_INFO" xml:space="preserve">
+    <value>Customer Information</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.FULL_NAME" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.FULL_NAME_PLACEHOLDER" xml:space="preserve">
+    <value>Enter your full name</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.TCKN" xml:space="preserve">
+    <value>National ID</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.TCKN_PLACEHOLDER" xml:space="preserve">
+    <value>Enter 11-digit National ID</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.IDENTITY_NUMBER" xml:space="preserve">
+    <value>Identity Number</value>
+  </data>
+  <data name="productSaleCheckOut.INDEX.IDENTITY_NUMBER_PLACEHOLDER" xml:space="preserve">
+    <value>Enter Passport / Identity Number</value>
+  </data>
+  <data name="productSaleCheckOut_Error_Payment" xml:space="preserve">
+    <value>An error occurred during payment.</value>
+  </data>
+  <data name="productSaleCheckOut_Error_Summary" xml:space="preserve">
+    <value>The order summary could not be retrieved.</value>
+  </data>
+  <data name="productSaleCheckOut_Error_Sales_Information" xml:space="preserve">
+    <value>No sales information found.</value>
+  </data>
 </root>

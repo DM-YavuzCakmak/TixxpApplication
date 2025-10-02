@@ -156,4 +156,19 @@
   <data name="productSale.INDEX.TOTAL_PRICE" xml:space="preserve">
     <value>Total Price</value>
   </data>
+  <data name="productSale.INDEX.WARNING" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="productSale.INDEX.UNKNOWN_ERROR" xml:space="preserve">
+    <value>An unknown error has occurred.</value>
+  </data>
+  <data name="productSale.INDEX.SERVER_ERROR" xml:space="preserve">
+    <value>Server Error</value>
+  </data>
+  <data name="productSale.INDEX.REQUEST_FAILED" xml:space="preserve">
+    <value>An error occurred while sending the request. Please try again.</value>
+  </data>
+  <data name="productSale.INDEX.CONFIRM" xml:space="preserve">
+    <value>OK</value>
+  </data>
 </root>

@@ -338,9 +338,26 @@
                     paging: true,
                     scrollY: "400px",
                     scrollCollapse: true,
-                    language: {
-                        url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
-                    },
+                                language: {
+                lengthMenu: "@Localizer["home.datatable.LENGTH_MENU"]",
+                search: "@Localizer["home.datatable.SEARCH"]",
+                info: "@Localizer["home.datatable.INFO"]",
+                infoEmpty: "@Localizer["home.datatable.INFO_EMPTY"]",
+                infoFiltered: "@Localizer["home.datatable.INFO_FILTERED"]",
+                loadingRecords: "@Localizer["home.datatable.LOADING"]",
+                zeroRecords: "@Localizer["home.datatable.ZERO_RECORDS"]",
+                emptyTable: "@Localizer["home.datatable.EMPTY_TABLE"]",
+                paginate: {
+                    first: "@Localizer["home.datatable.PAGINATE.FIRST"]",
+                    last: "@Localizer["home.datatable.PAGINATE.LAST"]",
+                    next: "@Localizer["home.datatable.PAGINATE.NEXT"]",
+                    previous: "@Localizer["home.datatable.PAGINATE.PREVIOUS"]"
+                },
+                aria: {
+                    sortAscending: "@Localizer["home.datatable.ARIA.SORT_ASC"]",
+                    sortDescending: "@Localizer["home.datatable.ARIA.SORT_DESC"]"
+                }
+            },
                     ajax: {
                         url: '@Url.Action("GetSalesTable", "Home")',
                         type: 'GET',

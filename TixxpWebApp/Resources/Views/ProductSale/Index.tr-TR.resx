@@ -135,7 +135,23 @@
   <data name="productSale.INDEX.PROCEED_TO_CHECKOUT" xml:space="preserve">
     <value>Sipariş Özetine devam et</value>
   </data>
-  <data name="productSale.INDEX.PRODUCT_CODE" xml:space="preserve">
+	<data name="productSale.INDEX.WARNING" xml:space="preserve">
+  <value>Uyarı</value>
+</data>
+	<data name="productSale.INDEX.UNKNOWN_ERROR" xml:space="preserve">
+  <value>Bilinmeyen bir hata oluştu.</value>
+</data>
+	<data name="productSale.INDEX.SERVER_ERROR" xml:space="preserve">
+  <value>Sunucu Hatası</value>
+</data>
+	<data name="productSale.INDEX.REQUEST_FAILED" xml:space="preserve">
+  <value>İstek gönderilirken bir hata oluştu. Lütfen tekrar deneyin.</value>
+</data>
+	<data name="productSale.INDEX.CONFIRM" xml:space="preserve">
+  <value>Tamam</value>
+</data>
+
+	<data name="productSale.INDEX.PRODUCT_CODE" xml:space="preserve">
     <value>Ürün Kodu</value>
   </data>
   <data name="productSale.INDEX.PRODUCT_NAME" xml:space="preserve">

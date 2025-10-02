@@ -192,4 +192,46 @@
   <data name="home.INDEX.MONTHLY_RESERVATION_SELLERS" xml:space="preserve">
     <value>Monthly Reservation Sellers</value>
   </data>
+  <data name="home.datatable.LENGTH_MENU" xml:space="preserve">
+    <value>Show _MENU_ entries</value>
+  </data>
+  <data name="home.datatable.SEARCH" xml:space="preserve">
+    <value>Search:</value>
+  </data>
+  <data name="home.datatable.INFO" xml:space="preserve">
+    <value>Showing _START_ to _END_ of _TOTAL_ entries</value>
+  </data>
+  <data name="home.datatable.INFO_EMPTY" xml:space="preserve">
+    <value>No records available</value>
+  </data>
+  <data name="home.datatable.INFO_FILTERED" xml:space="preserve">
+    <value>(filtered from _MAX_ total entries)</value>
+  </data>
+  <data name="home.datatable.LOADING" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="home.datatable.ZERO_RECORDS" xml:space="preserve">
+    <value>No matching records found</value>
+  </data>
+  <data name="home.datatable.EMPTY_TABLE" xml:space="preserve">
+    <value>No data available in table</value>
+  </data>
+  <data name="home.datatable.PAGINATE.FIRST" xml:space="preserve">
+    <value>First</value>
+  </data>
+  <data name="home.datatable.PAGINATE.LAST" xml:space="preserve">
+    <value>Last</value>
+  </data>
+  <data name="home.datatable.PAGINATE.NEXT" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="home.datatable.PAGINATE.PREVIOUS" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="home.datatable.ARIA.SORT_ASC" xml:space="preserve">
+    <value>Activate to sort column ascending</value>
+  </data>
+  <data name="home.datatable.ARIA.SORT_DESC" xml:space="preserve">
+    <value>Activate to sort column ascending</value>
+  </data>
 </root>

@@ -6,9 +6,6 @@ namespace Tixxp.Entities.Counter;
 [Table("Counter")]
 public class CounterEntity : BaseEntity
 {
-    [Column("CounterName")]
-    public string CounterName { get; set; }
-
     [Column("IsOKCIntegrated")]
     public bool IsOkcIntegrated { get; set; }
 
