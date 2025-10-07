@@ -120,4 +120,7 @@
   <data name="productSaleReport.DAILY_PRODUCT_SALES_REPORT" xml:space="preserve">
     <value>Günlük Ürün Satış Raporu</value>
   </data>
+  <data name="productSaleReport.MONTHLY_PRODUCT_SALES_REPORT" xml:space="preserve">
+    <value>Aylık Ürün Satış Raporu</value>
+  </data>
 </root>
