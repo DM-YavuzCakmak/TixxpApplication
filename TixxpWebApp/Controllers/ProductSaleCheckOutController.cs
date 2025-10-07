@@ -45,13 +45,18 @@ namespace Tixxp.WebApp.Controllers
             _productSaleInvoiceInfoService = productSaleInvoiceInfoService;
         }
 
-
-        public IActionResult Index(long productSaleId)
+        // 🔥 Artık kampanya ve tutar bilgileri de alınıyor
+        public IActionResult Index(long productSaleId, long? campaignId = null, decimal? subTotal = null, decimal? discount = null, decimal? finalTotal = null)
         {
             if (productSaleId <= 0)
                 return RedirectToAction("Index", "ProductSale");
 
             ViewBag.ProductSaleId = productSaleId;
+            ViewBag.CampaignId = campaignId;
+            ViewBag.SubTotal = subTotal ?? 0;
+            ViewBag.Discount = discount ?? 0;
+            ViewBag.FinalTotal = finalTotal ?? 0;
+
             return View();
         }
 
@@ -61,12 +66,10 @@ namespace Tixxp.WebApp.Controllers
             if (productSaleId <= 0)
                 return Ok(Enumerable.Empty<ProductSaleSummaryDto>());
 
-            // Geçerli dil bilgisi
             var cultureCode = CultureInfo.CurrentUICulture.Name;
             var languageResult = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
             var languageId = languageResult.Success ? languageResult.Data?.Id : null;
 
-            // Satış detaylarını (ürün dahil) tek seferde al
             var saleDetailsResult = _productSaleDetailService
                 .GetListWithInclude(x => x.ProductSaleId == productSaleId, x => x.Product, a => a.CurrencyType);
 
@@ -75,14 +78,12 @@ namespace Tixxp.WebApp.Controllers
 
             var details = saleDetailsResult.Data;
 
-            // Tekil ürün Id listesi
             var productIds = details
                 .Where(d => d.ProductId > 0)
                 .Select(d => d.ProductId)
                 .Distinct()
                 .ToList();
 
-            // Toplu çeviri (varsa)
             var translationByProductId = new Dictionary<long, string>();
             if (languageId.HasValue)
             {
@@ -115,9 +116,7 @@ namespace Tixxp.WebApp.Controllers
             foreach (var detail in details)
             {
                 var pid = detail.ProductId;
-                var name =
-                    (translationByProductId.TryGetValue(pid, out var translated) ? translated : null)
-                    ?? "Product";
+                var name = (translationByProductId.TryGetValue(pid, out var translated) ? translated : null) ?? "Product";
 
                 summaries.Add(new ProductSaleSummaryDto
                 {
@@ -132,13 +131,14 @@ namespace Tixxp.WebApp.Controllers
             return Ok(summaries);
         }
 
+        // 🔥 Artık indirimli tutarları da kaydeder
         [HttpPost]
-        public JsonResult Submit([FromBody] List<ProductSaleCheckOutItem> items)
+        public JsonResult Submit([FromBody] ProductSaleCheckOutSubmitModel model)
         {
-            if (items == null || items.Count == 0)
+            if (model == null || model.Items == null || model.Items.Count == 0)
                 return Json(new { isSuccess = false, message = _stringLocalizer["productSaleCheckOutController.PRODUCT_SELECTION"].ToString() });
 
-            var currencyTypeIds = items.Select(x => x.CurrencyTypeId).Distinct().ToList();
+            var currencyTypeIds = model.Items.Select(x => x.CurrencyTypeId).Distinct().ToList();
             if (currencyTypeIds.Count > 1)
             {
                 return Json(new
@@ -148,11 +148,16 @@ namespace Tixxp.WebApp.Controllers
                 });
             }
 
+            // 🔥 Kampanya + indirimli tutar kayıt
             var productSale = new ProductSaleEntity
             {
                 InvoiceTypeId = 1,
                 StatusId = (long)ProductSaleStatusEnum.Pending,
                 CounterId = DefaultCounterId,
+                CampaignId = model.CampaignId,
+                //SubTotal = model.SubTotal,
+                //DiscountAmount = model.DiscountAmount,
+                //FinalTotal = model.FinalTotal,
                 CreatedBy = User.GetUserId().GetValueOrDefault()
             };
 
@@ -162,13 +167,13 @@ namespace Tixxp.WebApp.Controllers
 
             var saleId = saleResult.Data.Id;
 
-            foreach (var item in items)
+            foreach (var item in model.Items)
             {
                 var detail = new ProductSaleDetailEntity
                 {
                     ProductSaleId = saleId,
                     ProductId = item.ProductId,
-                    CurrencyTypeId = items.Select(x => x.CurrencyTypeId).FirstOrDefault(),
+                    CurrencyTypeId = model.Items.Select(x => x.CurrencyTypeId).FirstOrDefault(),
                     Quantity = item.Quantity
                 };
 
@@ -179,9 +184,16 @@ namespace Tixxp.WebApp.Controllers
                 }
             }
 
-            return Json(new { isSuccess = true, productSaleId = saleId });
+            // JSON geri dönüşte de indirimli tutarlar gelsin
+            return Json(new
+            {
+                isSuccess = true,
+                productSaleId = saleId,
+                subTotal = model.SubTotal,
+                discount = model.DiscountAmount,
+                finalTotal = model.FinalTotal
+            });
         }
-
 
         [HttpPost]
         public JsonResult SubmitWithCustomer([FromBody] ProductSaleCheckOutSubmitModel model)
@@ -202,11 +214,13 @@ namespace Tixxp.WebApp.Controllers
             }
 
             var productSale = _productSaleService.GetFirstOrDefault(x => x.Id == model.ProductSaleId);
-            productSale.Data.StatusId = (long)ProductSaleStatusEnum.Completed;
-            _productSaleService.Update(productSale.Data);
+            if (productSale.Success && productSale.Data != null)
+            {
+                productSale.Data.StatusId = (long)ProductSaleStatusEnum.Completed;
+                _productSaleService.Update(productSale.Data);
+            }
 
             return Json(new { isSuccess = true, productSaleId = model.ProductSaleId });
         }
-
     }
 }

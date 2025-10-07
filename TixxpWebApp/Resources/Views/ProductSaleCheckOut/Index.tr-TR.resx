@@ -184,6 +184,12 @@
   <data name="productSaleCheckOut_Error_Sales_Information" xml:space="preserve">
     <value>Satış bilgisi bulunamadı.</value>
   </data>
+  <data name="productSaleCheckOut_INDEX_PIECE" xml:space="preserve">
+    <value>Adet</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION" xml:space="preserve">
+    <value>Ödeme başarıyla tamamlandı.</value>
+  </data>
   <data name="productSaleCheckOut_INDEX_CUSTOMER_INFO" xml:space="preserve">
     <value>Müşteri Bilgileri</value>
   </data>
@@ -211,10 +217,7 @@
   <data name="productSaleCheckOutController.TCKN_INVALID" xml:space="preserve">
     <value>Geçersiz TCKN, 11 haneli olmalıdır.</value>
   </data>
-  <data name="productSaleCheckOut_INDEX_PIECE" xml:space="preserve">
-    <value>Adet</value>
-  </data>
-  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION" xml:space="preserve">
-    <value>Ödeme başarıyla tamamlandı.</value>
+  <data name="productSaleCheckOut_INDEX_DISCOUNT" xml:space="preserve">
+    <value>İndirim</value>
   </data>
 </root>

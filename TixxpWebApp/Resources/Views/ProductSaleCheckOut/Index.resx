@@ -189,4 +189,7 @@
   <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION" xml:space="preserve">
     <value>Payment completed successfully</value>
   </data>
+  <data name="productSaleCheckOut_INDEX_DISCOUNT" xml:space="preserve">
+    <value>Discount</value>
+  </data>
 </root>

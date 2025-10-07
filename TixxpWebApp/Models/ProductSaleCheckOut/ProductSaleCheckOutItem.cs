@@ -22,5 +22,9 @@
         public long ProductSaleId { get; set; }  // Hangi satışa ait
         public CustomerInfo CustomerInfo { get; set; }  // Müşteri bilgileri
         public List<ProductSaleCheckOutItem> Items { get; set; } // Sepet ürünleri
+
+        public decimal SubTotal { get; set; }     // Kuponsuz toplam
+        public decimal DiscountAmount { get; set; } // İndirim miktarı
+        public decimal FinalTotal { get; set; }   // Net ödenecek tutar
     }
 }

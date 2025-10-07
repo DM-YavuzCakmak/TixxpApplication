@@ -3,7 +3,13 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = Localizer["productSaleCheckOut_INDEX_PAGE_TITLE"];
+
+    var campaignId = ViewBag.CampaignId ?? 0;
+    var subTotal = ViewBag.SubTotal ?? 0M;
+    var discount = ViewBag.Discount ?? 0M;
+    var finalTotal = ViewBag.FinalTotal ?? 0M;
 }
+
 <div class="page">
     <div class="main-content app-content">
         <div class="container-fluid">
@@ -60,7 +66,7 @@
                                         <div class="row justify-content-center">
                                             <div class="col-xl-6">
 
-                                                <!-- CUSTOMER INFO (yan yana, opsiyonel) -->
+                                                <!-- CUSTOMER INFO -->
                                                 <div class="card custom-card border mb-4">
                                                     <div class="card-header">
                                                         <div class="card-title">@Localizer["productSaleCheckOut_INDEX_CUSTOMER_INFO"]</div>
@@ -93,15 +99,20 @@
                                                         <ul class="list-group mb-0 border-0 rounded-0" id="order-summary-list"></ul>
 
                                                         <div class="p-3 border-bottom border-block-end-dashed">
-                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="d-flex align-items-center justify-content-between mb-2">
                                                                 <div class="text-muted">@Localizer["productSaleCheckOut_INDEX_SUB_TOTAL"]</div>
-                                                                <div class="fw-medium fs-14" id="subtotal-amount">₺0</div>
+                                                                <div class="fw-medium fs-14" id="subtotal-amount">@subTotal.ToString("N2")</div>
+                                                            </div>
+                                                            <div class="d-flex align-items-center justify-content-between mb-2" id="discount-row" style="@(discount > 0 ? "display:flex;" : "display:none;")">
+                                                                <div class="text-muted text-success">@Localizer["productSaleCheckOut_INDEX_DISCOUNT"]</div>
+                                                                <div class="fw-medium fs-14 text-success" id="discount-amount">-@discount.ToString("N2")</div>
                                                             </div>
                                                         </div>
+
                                                         <div class="p-3">
                                                             <div class="d-flex align-items-center justify-content-between">
                                                                 <div class="fs-15">@Localizer["productSaleCheckOut_INDEX_TOTAL"] :</div>
-                                                                <div class="fw-medium fs-18 text-dark" id="total-amount">₺0</div>
+                                                                <div class="fw-medium fs-18 text-dark" id="total-amount">@finalTotal.ToString("N2")</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -121,7 +132,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- /Sipariş Özeti -->
+
                                 <!-- Ödeme Sonuç -->
                                 <div class="tab-pane fade border-0 p-0" id="delivery-tab-pane" role="tabpanel"
                                      aria-labelledby="delivered-tab" tabindex="0">
@@ -137,7 +148,6 @@
                                         </a>
                                     </div>
                                 </div>
-                                <!-- /Ödeme Sonuç -->
                             </div>
 
                         </div>
@@ -152,7 +162,6 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // TCKN: sadece rakam girilsin
         document.addEventListener("input", function (e) {
             if (e.target && e.target.id === "customerTckn") {
                 e.target.value = e.target.value.replace(/[^0-9]/g, "").slice(0, 11);
@@ -165,16 +174,17 @@
                 if (!response.ok) throw new Error();
 
                 const data = await response.json();
-
                 const listContainer = document.getElementById("order-summary-list");
-                const subtotalSpan = document.getElementById("subtotal-amount");
-                const totalSpan = document.getElementById("total-amount");
                 const countBadge = document.getElementById("summary-count");
+                const subtotalSpan = document.getElementById("subtotal-amount");
+                const discountRow = document.getElementById("discount-row");
+                const discountSpan = document.getElementById("discount-amount");
+                const totalSpan = document.getElementById("total-amount");
 
                 listContainer.innerHTML = "";
 
-                let subtotal = 0;
                 let itemCount = 0;
+                let subtotal = 0;
                 let currencySymbol = "";
 
                 data.forEach(item => {
@@ -184,9 +194,8 @@
                     subtotal += itemTotal;
                     itemCount += qty;
 
-                    if (!currencySymbol && item.currencyTypeSymbol) {
+                    if (!currencySymbol && item.currencyTypeSymbol)
                         currencySymbol = item.currencyTypeSymbol;
-                    }
 
                     const li = document.createElement("li");
                     li.className = "list-group-item border-top-0 border-start-0 border-end-0";
@@ -208,32 +217,53 @@
                     listContainer.appendChild(li);
                 });
 
-                countBadge.textContent = String(itemCount).padStart(2,'0');
-                subtotalSpan.textContent = `${subtotal.toFixed(2)} ${currencySymbol}`;
-                totalSpan.textContent = `${subtotal.toFixed(2)} ${currencySymbol}`;
+                // 🔥 ViewBag değerleri
+                const discount = parseFloat("@(ViewBag.Discount ?? 0)") || 0;
+                const finalTotal = parseFloat("@(ViewBag.FinalTotal ?? 0)") || 0;
+                const subTotalFromView = parseFloat("@(ViewBag.SubTotal ?? 0)") || 0;
+
+                // 🔥 Para birimi kullanımı
+                const subtotalDisplay = subTotalFromView > 0 ? subTotalFromView : subtotal;
+                subtotalSpan.textContent = `${subtotalDisplay.toFixed(2)} ${currencySymbol}`;
+
+                if (discount > 0) {
+                    discountRow.style.display = "flex";
+                    discountSpan.textContent = `- ${discount.toFixed(2)} ${currencySymbol}`;
+                } else {
+                    discountRow.style.display = "none";
+                }
+
+                const totalDisplay = finalTotal > 0 ? finalTotal : (subtotalDisplay - discount);
+                totalSpan.textContent = `${totalDisplay.toFixed(2)} ${currencySymbol}`;
+                countBadge.textContent = String(itemCount).padStart(2, '0');
+
             } catch {
-                Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", "@Localizer["productSaleCheckOut_INDEX_ORDER_SUMMARY_FAILED"]", "error");
+                Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]",
+                          "@Localizer["productSaleCheckOut_INDEX_ORDER_SUMMARY_FAILED"]",
+                          "error");
             }
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            const productSaleId = new URLSearchParams(window.location.search).get("productSaleId") || "@(ViewBag.ProductSaleId ?? "")";
-            if (!productSaleId) {
-                Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", "@Localizer["productSaleCheckOut_INDEX_SALE_NOT_FOUND"]", "error");
+            const productSaleId = "@(ViewBag.ProductSaleId ?? 0)";
+            const campaignId = "@(ViewBag.CampaignId ?? 0)";
+
+            if (!productSaleId || productSaleId === "0") {
+                Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]",
+                          "@Localizer["productSaleCheckOut_INDEX_SALE_NOT_FOUND"]",
+                          "error");
                 return;
             }
 
-            // Sayfa açılır açılmaz özet yüklensin
+            // 🔥 Sipariş özetini yükle
             loadOrderSummary(productSaleId);
 
-            // Make Payment -> SubmitWithCustomer
-            const paymentButton = document.getElementById("continue-payment-trigger");
-            paymentButton.addEventListener("click", async function () {
+            // 🔥 Ödeme butonu
+            document.getElementById("continue-payment-trigger").addEventListener("click", async function () {
                 const fullName = document.getElementById("customerFullName").value.trim();
                 const surname = document.getElementById("customerSurname").value.trim();
                 const tckn = document.getElementById("customerTckn").value.trim();
 
-                // Customer Info opsiyonel -> boş bırakılırsa direkt null gönderiyoruz
                 const customerInfo = (!fullName && !surname && !tckn) ? null : {
                     fullName: fullName,
                     surname: surname,
@@ -242,8 +272,9 @@
 
                 const payload = {
                     productSaleId: Number(productSaleId),
+                    campaignId: Number(campaignId) || null,
                     customerInfo: customerInfo,
-                    items: [] // opsiyonel, sepeti göndermek istersen burayı doldurabilirsin
+                    items: []
                 };
 
                 try {
@@ -262,20 +293,23 @@
                             text: '@Localizer["productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION"]',
                             confirmButtonText: '@Localizer["productSaleCheckOut_INDEX_OK"]',
                         }).then(() => {
-                             const approvalTab = document.getElementById("delivered-tab");
-        approvalTab.classList.remove("disabled");
-        approvalTab.removeAttribute("tabindex");
-
-        // Approval tabına geçiş yap
-        new bootstrap.Tab(approvalTab).show();
+                            const approvalTab = document.getElementById("delivered-tab");
+                            approvalTab.classList.remove("disabled");
+                            approvalTab.removeAttribute("tabindex");
+                            new bootstrap.Tab(approvalTab).show();
                         });
                     } else {
-                        Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", (result && result.message) || "@Localizer["productSaleCheckOut_INDEX_UNKNOWN_ERROR"]", "error");
+                        Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]",
+                                  (result && result.message) || "@Localizer["productSaleCheckOut_INDEX_UNKNOWN_ERROR"]",
+                                  "error");
                     }
                 } catch {
-                    Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]", "@Localizer["productSaleCheckOut_INDEX_NETWORK_ERROR"]", "error");
+                    Swal.fire("@Localizer["productSaleCheckOut_INDEX_ERROR"]",
+                              "@Localizer["productSaleCheckOut_INDEX_NETWORK_ERROR"]",
+                              "error");
                 }
             });
         });
     </script>
 }
+

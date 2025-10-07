@@ -183,6 +183,12 @@
   <data name="productSaleCheckOut_Error_Sales_Information" xml:space="preserve">
     <value>No sales information found.</value>
   </data>
+  <data name="productSaleCheckOut_INDEX_PIECE" xml:space="preserve">
+    <value>Piece</value>
+  </data>
+  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION" xml:space="preserve">
+    <value>Payment completed successfully</value>
+  </data>
   <data name="productSaleCheckOut_INDEX_CUSTOMER_INFO" xml:space="preserve">
     <value>Customer Information</value>
   </data>
@@ -210,10 +216,7 @@
   <data name="productSaleCheckOutController.TCKN_INVALID" xml:space="preserve">
     <value>Invalid National ID, must be 11 digits.</value>
   </data>
-  <data name="productSaleCheckOut_INDEX_PIECE" xml:space="preserve">
-    <value>Piece</value>
-  </data>
-  <data name="productSaleCheckOut_INDEX_PAYMENT_SUCCESS_DESCRIPTION" xml:space="preserve">
-    <value>Payment completed successfully</value>
+  <data name="productSaleCheckOut_INDEX_DISCOUNT" xml:space="preserve">
+    <value>Discount</value>
   </data>
 </root>

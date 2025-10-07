@@ -96,6 +96,7 @@
     <script>
         let selectedCurrencyId = null;
         let currentDiscount = 0;
+        window.selectedCampaignId = null;
 
         function calculateCart() {
             let subtotal = 0;
@@ -107,7 +108,6 @@
                 subtotal += total;
             });
 
-            // indirimi uygula
             let finalTotal = subtotal - currentDiscount;
             if (finalTotal < 0) finalTotal = 0;
 
@@ -125,7 +125,6 @@
                 const price = parseFloat(qtyInput.dataset.price);
                 const currencyTypeId = parseInt(qtyInput.dataset.currencyId);
                 const quantity = parseInt(qtyInput.value) || 0;
-
                 if (quantity > 0) {
                     data.push({ productId, price, quantity, currencyTypeId });
                 }
@@ -135,16 +134,30 @@
 
         async function postProductData() {
             const data = getProductData();
+            const campaignId = window.selectedCampaignId || null;
+
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent) || 0;
+            const discount = currentDiscount || 0;
+            const finalTotal = parseFloat(document.getElementById('grand-total').textContent) || subtotal;
+
+            const payload = {
+                campaignId: campaignId,
+                subTotal: subtotal,
+                discountAmount: discount,
+                finalTotal: finalTotal,
+                items: data
+            };
+
             const response = await fetch('/ProductSaleCheckOut/Submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {
                 const result = await response.json();
                 if (result.isSuccess) {
-                    redirectWithCulture(`/ProductSaleCheckOut/Index?productSaleId=${result.productSaleId}`);
+                    redirectWithCulture(`/ProductSaleCheckOut/Index?productSaleId=${result.productSaleId}&campaignId=${campaignId || ''}&subTotal=${subtotal}&discount=${discount}&finalTotal=${finalTotal}`);
                 } else {
                     Swal.fire({
                         icon: 'warning',
@@ -198,10 +211,12 @@
                     const result = await response.json();
                     if (result.isSuccess) {
                         currentDiscount = result.discount || 0;
+                        window.selectedCampaignId = result.campaignId || null;
                         document.getElementById('coupon-description').textContent = result.message;
                         document.getElementById('coupon-description').classList.remove("d-none");
                     } else {
                         currentDiscount = 0;
+                        window.selectedCampaignId = null;
                         document.getElementById('coupon-description').textContent = "";
                         document.getElementById('coupon-description').classList.add("d-none");
                         Swal.fire({
