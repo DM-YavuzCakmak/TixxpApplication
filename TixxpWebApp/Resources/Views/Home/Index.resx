@@ -154,7 +154,7 @@
     <value>Sales</value>
   </data>
   <data name="home.INDEX.SHOW" xml:space="preserve">
-    <value>Show</value>
+    <value>Detail</value>
   </data>
   <data name="home.INDEX.STATUS" xml:space="preserve">
     <value>Status</value>
@@ -233,5 +233,23 @@
   </data>
   <data name="home.datatable.ARIA.SORT_DESC" xml:space="preserve">
     <value>Activate to sort column ascending</value>
+  </data>
+  <data name="home.INDEX.ProductSALE_DETAIL_MODAL_TITLE" xml:space="preserve">
+    <value>Product Sale Detail</value>
+  </data>
+  <data name="productSale.DETAIL.CANCEL_SALE" xml:space="preserve">
+    <value>Cancel Sale</value>
+  </data>
+  <data name="productSale.DETAIL.CANCEL_CONFIRM_TITLE" xml:space="preserve">
+    <value>Cancel Sale</value>
+  </data>
+  <data name="productSale.DETAIL.CANCEL_CONFIRM_TEXT" xml:space="preserve">
+    <value>Are you sure you want to cancel this sale?</value>
+  </data>
+  <data name="productSale.DETAIL.CONFIRM_YES" xml:space="preserve">
+    <value>Yes, cancel</value>
+  </data>
+  <data name="productSale.DETAIL.CONFIRM_NO" xml:space="preserve">
+    <value>No, Keep</value>
   </data>
 </root>

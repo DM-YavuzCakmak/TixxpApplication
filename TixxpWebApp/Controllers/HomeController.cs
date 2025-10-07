@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Globalization;
 using System.Security.Claims;
+using Tixxp.Business.DataTransferObjects.Campaign;
+using Tixxp.Business.Services.Abstract.Campaign;
+using Tixxp.Business.Services.Abstract.CampaignCondition;
 using Tixxp.Business.Services.Abstract.CounterTranslation;
 using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
@@ -11,13 +15,16 @@ using Tixxp.Business.Services.Abstract.Product;
 using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductSale;
 using Tixxp.Business.Services.Abstract.ProductSaleDetail;
+using Tixxp.Business.Services.Abstract.ProductSaleInvoiceInfo;
 using Tixxp.Business.Services.Abstract.ProductSaleStatus;
 using Tixxp.Business.Services.Abstract.ProductSaleStatusTranslation;
 using Tixxp.Business.Services.Abstract.ProductTranslation;
 using Tixxp.Business.Services.Abstract.Reservation;
 using Tixxp.Business.Services.Abstract.RoleService;
+using Tixxp.Business.Services.Concrete.CampaignCondition;
 using Tixxp.Core.Utilities.Enums.ProductSaleStatusEnum;
 using Tixxp.Entities.Personnel;
+using Tixxp.WebApp.Models.Home.GetProductSaleDetail;
 
 namespace Tixxp.WebApp.Controllers;
 
@@ -35,7 +42,12 @@ public class HomeController : Controller
     private readonly IReservationService _reservationService;
     private readonly ILanguageService _languageService;
     private readonly IProductSaleStatusService _productSaleStatusService;
+    private readonly IProductSaleInvoiceInfoService _productSaleInvoiceInfoService;
     private readonly IProductSaleStatusTranslationService _productSaleStatusTranslationService;
+    private readonly ICampaignService _campaignService;
+    private readonly ICampaignConditionService _campaignConditionService;
+
+    private readonly IStringLocalizer<HomeController> _localizer;
 
 
     public HomeController(
@@ -51,7 +63,11 @@ public class HomeController : Controller
         IReservationService reservationService,
         ICounterTranslationService counterTranslationService,
         IProductSaleStatusService productSaleStatusService,
-        IProductSaleStatusTranslationService productSaleStatusTranslationService)
+        IProductSaleStatusTranslationService productSaleStatusTranslationService,
+        IProductSaleInvoiceInfoService productSaleInvoiceInfoService,
+        ICampaignService campaignService,
+        ICampaignConditionService campaignConditionService,
+        IStringLocalizer<HomeController> localizer)
     {
         _personnelService = personnelService;
         _productSaleService = productSaleService;
@@ -66,6 +82,10 @@ public class HomeController : Controller
         _counterTranslationService = counterTranslationService;
         _productSaleStatusService = productSaleStatusService;
         _productSaleStatusTranslationService = productSaleStatusTranslationService;
+        _productSaleInvoiceInfoService = productSaleInvoiceInfoService;
+        _campaignService = campaignService;
+        _campaignConditionService = campaignConditionService;
+        _localizer = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -489,4 +509,224 @@ public class HomeController : Controller
         });
     }
 
+    [HttpGet]
+    public IActionResult GetProductSaleDetail(long productSaleId)
+    {
+        if (productSaleId <= 0)
+            return PartialView("_ProductSaleDetail", null);
+
+        var cultureCode = CultureInfo.CurrentUICulture.Name;
+        var languageResult = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+        long? languageId = languageResult.Success ? languageResult.Data?.Id : null;
+
+        // Ana satış
+        var saleResult = _productSaleService.GetFirstOrDefault(x => x.Id == productSaleId);
+        if (!saleResult.Success || saleResult.Data == null)
+            return PartialView("_ProductSaleDetail", null);
+
+        var sale = saleResult.Data;
+
+        // Satış yapan personel
+        var personnel = (sale.CreatedBy != null)
+            ? _personnelService.GetFirstOrDefault(x => x.Id == sale.CreatedBy).Data
+            : null;
+
+        // Gişe bilgisi
+        string counterName = "Unknown Counter";
+        if (sale.CounterId != null)
+        {
+            var counterTranslation = _counterTranslationService.GetFirstOrDefault(
+                x => x.CounterId == sale.CounterId && x.LanguageId == languageId
+            );
+            if (counterTranslation.Success && counterTranslation.Data != null)
+                counterName = counterTranslation.Data.Name;
+        }
+
+        // Satış durumu
+        var statusTranslation = _productSaleStatusTranslationService.GetFirstOrDefault(
+            x => x.ProductSaleStatusId == sale.StatusId && x.LanguageId == languageId
+        );
+        string statusName = statusTranslation.Success ? statusTranslation.Data?.Name ?? "Unknown" : "Unknown";
+
+        // Fatura / müşteri bilgisi
+        var invoiceInfo = _productSaleInvoiceInfoService
+            .GetFirstOrDefault(x => x.ProductSaleId == productSaleId).Data;
+
+        // Ürün detayları
+        var saleDetailsResult = _productSaleDetailService.GetListWithInclude(
+            x => x.ProductSaleId == productSaleId,
+            x => x.Product,
+            x => x.CurrencyType
+        );
+
+        if (!saleDetailsResult.Success || saleDetailsResult.Data == null)
+            return PartialView("_ProductSaleDetail", null);
+
+        var saleDetails = saleDetailsResult.Data;
+        var productIds = saleDetails.Select(d => d.ProductId).Distinct().ToList();
+
+        var productTranslations = (languageId.HasValue)
+            ? _productTranslationService.GetList(x =>
+                productIds.Contains(x.ProductId) && x.LanguageId == languageId.Value).Data
+            : new List<Tixxp.Entities.ProductTranslation.ProductTranslationEntity>();
+
+        var productPrices = _productPriceService.GetList(x => productIds.Contains(x.ProductId)).Data;
+
+        decimal subTotal = 0;
+        string currencySymbol = "₺";
+        var productList = new List<ProductSaleDetailItemVm>();
+
+        foreach (var detail in saleDetails)
+        {
+            var product = detail.Product;
+            var translation = productTranslations.FirstOrDefault(t => t.ProductId == detail.ProductId);
+            var priceInfo = productPrices.FirstOrDefault(p => p.ProductId == detail.ProductId);
+            var unitPrice = priceInfo?.Price ?? 0m;
+            var lineTotal = Math.Round(unitPrice * detail.Quantity, 2);
+
+            if (detail.CurrencyType != null && !string.IsNullOrWhiteSpace(detail.CurrencyType.Symbol))
+                currencySymbol = detail.CurrencyType.Symbol;
+
+            subTotal += lineTotal;
+
+            productList.Add(new ProductSaleDetailItemVm
+            {
+                ProductId = detail.ProductId,
+                ProductName = translation?.Name ?? product?.Code ?? "Unnamed Product",
+                ProductCode = product?.Code,
+                Quantity = detail.Quantity,
+                UnitPrice = unitPrice,
+                LineTotal = lineTotal,
+                CurrencySymbol = currencySymbol,
+                Image = product?.ImageFilePath
+            });
+        }
+
+        // 🔥 Kampanya kontrolü
+        decimal finalTotal = subTotal;
+        decimal discountAmount = 0;
+        string campaignName = "";
+
+        if (sale.CampaignId.HasValue)
+        {
+            var campaignResult = _campaignService.GetById(sale.CampaignId.Value);
+            if (campaignResult.Success && campaignResult.Data != null)
+            {
+                campaignName = campaignResult.Data.Name;
+
+                var campaignConditionEntity = _campaignConditionService.GetFirstOrDefault(x => x.CampaignId == sale.CampaignId).Data;
+
+                var applyDto = new ApplyCampaignForProductRequestDto
+                {
+                    CouponCode = campaignConditionEntity?.Value1 ?? ""
+                };
+
+                foreach (var item in productList)
+                {
+                    applyDto.Products.Add(new CartItemDto
+                    {
+                        ProductId = item.ProductId,
+                        Price = item.UnitPrice,
+                        Quantity = item.Quantity,
+                        CurrencyTypeId = productPrices.FirstOrDefault(p => p.ProductId == item.ProductId)?.CurrencyTypeId ?? 0
+                    });
+                }
+
+                var appliedPrice = _campaignService.ApplyCampaignsForProduct(applyDto, campaignResult.Data);
+                if (appliedPrice < applyDto.SubTotal)
+                {
+                    discountAmount = Math.Round(applyDto.SubTotal - appliedPrice, 2);
+                    finalTotal = Math.Round(appliedPrice, 2);
+                }
+            }
+        }
+
+        // 🔹 ViewModel
+        var vm = new ProductSaleDetailVm
+        {
+            SaleId = sale.Id,
+            StatusName = statusName,
+            CounterName = counterName,
+            CampaignName = campaignName,
+            CreatedDate = sale.Created_Date,
+            CreatedByName = personnel != null ? $"{personnel.FirstName} {personnel.LastName}" : "Unknown",
+            CreatedByPhoto = personnel?.ProfilePhotoPath ?? "/assets/images/faces/default.jpg",
+            CustomerFullName = $"{invoiceInfo?.FirstName} {invoiceInfo?.LastName}",
+            CustomerIdentityNumber = invoiceInfo?.IdentityNumber,
+            Products = productList,
+            TotalPrice = finalTotal,
+            OriginalTotalPrice = subTotal,
+            DiscountAmount = discountAmount,
+            CurrencySymbol = currencySymbol
+        };
+
+        return PartialView("_ProductSaleDetail", vm);
+    }
+
+    [HttpPost]
+    public IActionResult CancelSale(long saleId)
+    {
+        try
+        {
+            if (saleId <= 0)
+                return Json(new
+                {
+                    success = false,
+                    message = _localizer["homeController.CANCEL.INVALID_SALE_ID"].ToString()
+                });
+
+            // 🔍 Satışı getir
+            var saleResult = _productSaleService.GetFirstOrDefault(x => x.Id == saleId);
+            if (!saleResult.Success || saleResult.Data == null)
+                return Json(new
+                {
+                    success = false,
+                    message = _localizer["homeController.CANCEL.SALE_NOT_FOUND"].ToString()
+                });
+
+            var sale = saleResult.Data;
+
+            // ⛔ Zaten iptal edilmişse
+            if (sale.StatusId == (long)ProductSaleStatusEnum.Cancelled)
+                return Json(new
+                {
+                    success = false,
+                    message = _localizer["homeController.CANCEL.ALREADY_CANCELLED"].ToString()
+                });
+
+            // ✅ Satışı iptal et
+            sale.StatusId = (long)ProductSaleStatusEnum.Cancelled;
+            sale.Updated_Date = DateTime.Now;
+
+            // 🧑‍💼 Güncelleyen kullanıcıyı yaz
+            var personnelIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (personnelIdClaim != null)
+                sale.Updated_By = Convert.ToInt64(personnelIdClaim.Value);
+
+            // 💾 Veritabanında güncelle
+            var updateResult = _productSaleService.Update(sale);
+            if (!updateResult.Success)
+                return Json(new
+                {
+                    success = false,
+                    message = _localizer["homeController.CANCEL.FAILED"].ToString()
+                });
+
+            return Json(new
+            {
+                success = true,
+                message = _localizer["homeController.CANCEL.SUCCESS"].ToString(),
+                saleId = sale.Id
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = _localizer["homeController.CANCEL.EXCEPTION"].ToString(),
+                error = ex.Message
+            });
+        }
+    }
 }

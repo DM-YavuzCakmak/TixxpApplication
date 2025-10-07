@@ -117,139 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="home.INDEX.AMOUNT" xml:space="preserve">
-    <value>Tutar</value>
+  <data name="homeController.CANCEL.INVALID_SALE_ID" xml:space="preserve">
+    <value>Geçersiz satış numarası.</value>
   </data>
-  <data name="home.INDEX.COMPANY.USER" xml:space="preserve">
-    <value>Şirket Kullanıcıs</value>
+  <data name="homeController.CANCEL.SALE_NOT_FOUND" xml:space="preserve">
+    <value>Satış kaydı bulunamadı.</value>
   </data>
-  <data name="home.INDEX.DAILY_PRODUCT_SELLERS" xml:space="preserve">
-    <value>Günlük Ürün Satışı Yapanlar</value>
+  <data name="homeController.CANCEL.ALREADY_CANCELLED" xml:space="preserve">
+    <value>Bu satış zaten iptal edilmiş.</value>
   </data>
-  <data name="home.INDEX.DATE" xml:space="preserve">
-    <value>Tarih</value>
+  <data name="homeController.CANCEL.FAILED" xml:space="preserve">
+    <value>Satış iptali başarısız oldu.</value>
   </data>
-  <data name="home.INDEX.HOMEPAGE" xml:space="preserve">
-    <value>Ana Sayfa</value>
+  <data name="homeController.CANCEL.SUCCESS" xml:space="preserve">
+    <value>Satış başarıyla iptal edildi.</value>
   </data>
-  <data name="home.INDEX.LOGGED.IN.USER" xml:space="preserve">
-    <value>Giriş Yapan Kullanıcı</value>
-  </data>
-  <data name="home.INDEX.ORDER.NO" xml:space="preserve">
-    <value>Sipariş No</value>
-  </data>
-  <data name="home.INDEX.MONTHLY.OF.RESERVATION" xml:space="preserve">
-    <value>Aylık Rezervasyon Sayısı</value>
-  </data>
-  <data name="home.INDEX.PAYMENT.PLACE" xml:space="preserve">
-    <value>Ödeme Yeri</value>
-  </data>
-  <data name="home.INDEX.PRODUCT.SALES" xml:space="preserve">
-    <value>Ürün Satışları</value>
-  </data>
-  <data name="home.INDEX.PRODUCT_DETAIL" xml:space="preserve">
-    <value>Detay</value>
-  </data>
-  <data name="home.INDEX.SALES" xml:space="preserve">
-    <value>Ürün Satışları</value>
-  </data>
-  <data name="home.INDEX.SHOW" xml:space="preserve">
-    <value>Detail</value>
-  </data>
-  <data name="home.INDEX.STATUS" xml:space="preserve">
-    <value>Durum</value>
-  </data>
-  <data name="home.INDEX.TOTAL.SALES" xml:space="preserve">
-    <value>Toplam Satış</value>
-  </data>
-  <data name="home.INDEX.USER" xml:space="preserve">
-    <value>Kullanıcı</value>
-  </data>
-  <data name="home.INDEX.USERS" xml:space="preserve">
-    <value>Kullanıcılar</value>
-  </data>
-  <data name="home.INDEX.DAILY.NUMBER.RESERVATION" xml:space="preserve">
-    <value>Günlük Rezervasyon Sayısı</value>
-  </data>
-  <data name="home.INDEX.MONTHLY.OF.TICKETS" xml:space="preserve">
-    <value>Aylık Ürün Satış Sayısı</value>
-  </data>
-  <data name="home.INDEX.DAILY.OF.TICKETS" xml:space="preserve">
-    <value>Günlük Ürün Satış Sayısı</value>
-  </data>
-  <data name="home.INDEX.SALES.GROWTH" xml:space="preserve">
-    <value>Satış Hacmi</value>
-  </data>
-  <data name="home.INDEX.ORDERS.STATISTICS" xml:space="preserve">
-    <value>Sipariş İstatistikleri</value>
-  </data>
-  <data name="home.INDEX.MONTHLY_PRODUCT_SELLERS" xml:space="preserve">
-    <value>Aylık Ürün Satışı Yapanlar</value>
-  </data>
-  <data name="home.INDEX.DAILY_RESERVATION_SELLERS" xml:space="preserve">
-    <value>Günlük Rezervasyon Satışı Yapanlar</value>
-  </data>
-  <data name="home.INDEX.MONTHLY_RESERVATION_SELLERS" xml:space="preserve">
-    <value>Aylık Rezervasyon Satışı Yapanlar</value>
-  </data>
-  <data name="home.datatable.LENGTH_MENU" xml:space="preserve">
-    <value>Sayfada _MENU_ kayıt göster</value>
-  </data>
-  <data name="home.datatable.SEARCH" xml:space="preserve">
-    <value>Ara:</value>
-  </data>
-  <data name="home.datatable.INFO" xml:space="preserve">
-    <value>_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor</value>
-  </data>
-  <data name="home.datatable.INFO_EMPTY" xml:space="preserve">
-    <value>Kayıt bulunamadı</value>
-  </data>
-  <data name="home.datatable.INFO_FILTERED" xml:space="preserve">
-    <value>(toplam _MAX_ kayıttan filtrelendi)</value>
-  </data>
-  <data name="home.datatable.LOADING" xml:space="preserve">
-    <value>Yükleniyor...</value>
-  </data>
-  <data name="home.datatable.ZERO_RECORDS" xml:space="preserve">
-    <value>Eşleşen kayıt bulunamadı</value>
-  </data>
-  <data name="home.datatable.EMPTY_TABLE" xml:space="preserve">
-    <value>Tabloda veri yok</value>
-  </data>
-  <data name="home.datatable.PAGINATE.FIRST" xml:space="preserve">
-    <value>İlk</value>
-  </data>
-  <data name="home.datatable.PAGINATE.LAST" xml:space="preserve">
-    <value>Son</value>
-  </data>
-  <data name="home.datatable.PAGINATE.NEXT" xml:space="preserve">
-    <value>Sonraki</value>
-  </data>
-  <data name="home.datatable.PAGINATE.PREVIOUS" xml:space="preserve">
-    <value>Önceki</value>
-  </data>
-  <data name="home.datatable.ARIA.SORT_ASC" xml:space="preserve">
-    <value>Artan şekilde sırala</value>
-  </data>
-  <data name="home.datatable.ARIA.SORT_DESC" xml:space="preserve">
-    <value>Azalan şekilde sırala</value>
-  </data>
-  <data name="home.INDEX.ProductSALE_DETAIL_MODAL_TITLE" xml:space="preserve">
-    <value>Ürün Satış Detayı</value>
-  </data>
-  <data name="productSale.DETAIL.CANCEL_SALE" xml:space="preserve">
-    <value>İptal Et</value>
-  </data>
-  <data name="productSale.DETAIL.CANCEL_CONFIRM_TITLE" xml:space="preserve">
-    <value>Satışı İptal Et</value>
-  </data>
-  <data name="productSale.DETAIL.CANCEL_CONFIRM_TEXT" xml:space="preserve">
-    <value>Bu satışı iptal etmek istediğinize emin misiniz?</value>
-  </data>
-  <data name="productSale.DETAIL.CONFIRM_YES" xml:space="preserve">
-    <value>Evet, İptal Et</value>
-  </data>
-  <data name="productSale.DETAIL.CONFIRM_NO" xml:space="preserve">
-    <value>Hayır, Vazgeç</value>
+  <data name="homeController.CANCEL.EXCEPTION" xml:space="preserve">
+    <value>Satış iptali sırasında bir hata oluştu.</value>
   </data>
 </root>

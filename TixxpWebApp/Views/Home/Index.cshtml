@@ -19,6 +19,17 @@
     .personal-goals-list:hover::-webkit-scrollbar-thumb {
         background: #999999;
     }
+
+    .btn-outline-danger {
+        border-color: #dc3545 !important;
+        color: #dc3545 !important;
+        transition: all 0.25s ease;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545 !important;
+            color: #fff !important;
+        }
 </style>
 
 <!-- Start::app-content -->
@@ -325,10 +336,93 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="saleDetailModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title text-white">@Localizer["home.INDEX.ProductSALE_DETAIL_MODAL_TITLE"]</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div id="saleDetailContainer" class="p-3 text-center text-muted">
+                            <div class="spinner-border text-warning" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 @section Scripts {
         <script>
+
+               function cancelSale(saleId) {
+                Swal.fire({
+                    title: '@Localizer["productSale.DETAIL.CANCEL_CONFIRM_TITLE"]',
+                    text: '@Localizer["productSale.DETAIL.CANCEL_CONFIRM_TEXT"]',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '@Localizer["productSale.DETAIL.CONFIRM_YES"]',
+                    cancelButtonText: '@Localizer["productSale.DETAIL.CONFIRM_NO"]'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const culture = new URLSearchParams(window.location.search).get("culture") || "tr-TR";
+                        const uiCulture = new URLSearchParams(window.location.search).get("ui-culture") || culture;
+
+                        $.ajax({
+                            url: `/Home/CancelSale?saleId=${saleId}&culture=${culture}&ui-culture=${uiCulture}`,
+                            type: 'POST',
+                            success: function (res) {
+                                Swal.fire({
+                                    icon: res.success ? 'success' : 'error',
+                                    title: res.message
+                                });
+                                if (res.success) {
+                                    $('#recent-sales-table').DataTable().ajax.reload();
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: '@Localizer["home.INDEX.ERROR_LOADING_SALE_DETAIL"]'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+
+
+                function showSaleDetail(productSaleId) {
+                const modalBody = $("#saleDetailContainer");
+                modalBody.html(`<div class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></div>`);
+                $("#saleDetailModal").modal("show");
+
+                // 🌍 Aktif kültür (dil) bilgisini al
+                const culture = new URLSearchParams(window.location.search).get("culture") || "tr-TR";
+                const uiCulture = new URLSearchParams(window.location.search).get("ui-culture") || culture;
+
+                // 🧭 URL'e kültür parametrelerini ekle
+                const url = `/Home/GetProductSaleDetail?productSaleId=${productSaleId}&culture=${culture}&ui-culture=${uiCulture}`;
+
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    success: function (html) {
+                        modalBody.html(html);
+                    },
+                    error: function () {
+                        modalBody.html(`<div class="alert alert-danger m-3">
+                                            @Localizer["home.INDEX.ERROR_LOADING_SALE_DETAIL"]
+                                        </div>`);
+                    }
+                });
+            }
+
             document.addEventListener("DOMContentLoaded", function () {
                 $('#recent-sales-table').DataTable({
                     responsive: true,
@@ -358,16 +452,21 @@
                     sortDescending: "@Localizer["home.datatable.ARIA.SORT_DESC"]"
                 }
             },
-                    ajax: {
-                        url: '@Url.Action("GetSalesTable", "Home")',
-                        type: 'GET',
-                        data: function (d) {
-                            return d;
-                        },
-                        dataSrc: function (json) {
-                            return json.data;
-                        }
-                    },
+              ajax: {
+                url: (function () {
+                    const culture = new URLSearchParams(window.location.search).get("culture") || "tr-TR";
+                    const uiCulture = new URLSearchParams(window.location.search).get("ui-culture") || culture;
+                    return '@Url.Action("GetSalesTable", "Home")' + `?culture=${culture}&ui-culture=${uiCulture}`;
+                })(),
+                type: 'GET',
+                data: function (d) {
+                    return d;
+                },
+                dataSrc: function (json) {
+                    return json.data;
+                }
+            }
+            ,
                     columns: [
                         {
                             data: 'customerName',
@@ -386,18 +485,23 @@
                                 return `<span class="badge bg-success-transparent text-success">${data}</span>`;
                             }
                         },
-                        {
-                            data: 'details',
-                            orderable: false,
-                            searchable: false,
-                            render: function (details) {
-                                if (!details || details.length === 0) return "-";
-                                const content = details.map(d => `<div><strong>${d.productName}</strong> x ${d.quantity}</div>`).join('');
-                                return `<button class="btn btn-sm btn-outline-primary" tabindex="0" data-bs-toggle="popover" data-bs-html="true" data-bs-content='${content}' data-bs-trigger="focus" data-bs-placement="left">
-                                        <i class="fe fe-eye"></i> ${"@Localizer["home.INDEX.SHOW"]"}
-                                        </button>`;
-                            }
-                        }
+                                                {
+                data: 'orderId',
+                orderable: false,
+                searchable: false,
+                render: function (orderId) {
+                    return `
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="showSaleDetail(${orderId})">
+                                <i class="fe fe-eye"></i> ${"@Localizer["home.INDEX.SHOW"]"}
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="cancelSale(${orderId})">
+                                <i class="fe fe-x-circle"></i> ${"@Localizer["productSale.DETAIL.CANCEL_SALE"]"}
+                            </button>
+                        </div>
+                    `;
+                }
+            }
                     ],
                     drawCallback: function () {
                         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));

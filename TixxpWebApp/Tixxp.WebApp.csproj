@@ -57,6 +57,15 @@
     <EmbeddedResource Update="Resources\Views\Counter\Index.en-US.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\Home\_ProductSaleDetail.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\Home\_ProductSaleDetail.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\Home\_ProductSaleDetail.tr-TR.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\TicketSale\_Confirmation.tr-TR.resx">
       <LastGenOutput>_Confirmation.tr-TR.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>

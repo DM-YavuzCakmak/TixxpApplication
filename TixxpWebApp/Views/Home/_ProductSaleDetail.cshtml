@@ -1,0 +1,259 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Tixxp.WebApp.Models.Home.GetProductSaleDetail
+@inject IViewLocalizer Localizer
+@model ProductSaleDetailVm
+
+<style>
+    /* --- Genel kart görünümü --- */
+    .summary-card {
+        border: 1px solid #e5e5e5;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background-color: #fff;
+        border-radius: 10px;
+    }
+
+        .summary-card:hover {
+            background-color: #FFF3E6;
+            border-color: #FF7A00 !important;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+        }
+
+    /* --- Modal başlığı (mor degrade) --- */
+    .modal-header {
+        background: linear-gradient(90deg, #6936D3 0%, #8B4DFD 100%);
+        color: #fff !important;
+        font-weight: 600;
+        border-bottom: none;
+    }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+    /* --- Tablo hizalamaları --- */
+    .table th,
+    .table td {
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    /* --- Ürün ve Toplam kartları yan yana --- */
+    .summary-row {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .summary-half {
+        flex: 1;
+        min-width: 300px;
+    }
+    /* --- Fiyat özet alanı --- */
+    .price-summary.compact {
+        text-align: left;
+        padding: 15px 25px;
+        width: 100%;
+    }
+
+    .price-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+        .price-line .label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .price-line .value {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+            .price-line .value.original {
+                text-decoration: line-through;
+                color: #a1a1a1;
+            }
+
+            .price-line .value.discount {
+                color: #dc3545;
+                font-weight: 700;
+            }
+
+        .price-line.final-line .value.final {
+            color: #198754;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+</style>
+
+@if (Model == null)
+{
+    <div class="alert alert-warning text-center mt-3">
+        @Localizer["productSale.DETAIL.NOT_FOUND"]
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-semibold text-dark mb-0">@Localizer["productSale.DETAIL.SALE_DETAIL_TITLE"]</h5>
+        </div>
+
+        <div class="row g-3">
+            <!-- Sale Summary -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 summary-card">
+                    <div class="card-header fw-semibold">@Localizer["productSale.DETAIL.SALE_INFO"]</div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-5">@Localizer["productSale.DETAIL.SALE_ID"]</dt>
+                            <dd class="col-7">#@Model.SaleId</dd>
+
+                            <dt class="col-5">@Localizer["productSale.DETAIL.STATUS"]</dt>
+                            <dd class="col-7">@Model.StatusName</dd>
+
+                            <dt class="col-5">@Localizer["productSale.DETAIL.COUNTER"]</dt>
+                            <dd class="col-7">@Model.CounterName</dd>
+
+                            <dt class="col-5">@Localizer["productSale.DETAIL.CREATED_DATE"]</dt>
+                            <dd class="col-7">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Info -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 summary-card">
+                    <div class="card-header fw-semibold">@Localizer["productSale.DETAIL.CUSTOMER"]</div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-5">@Localizer["productSale.DETAIL.NAME"]</dt>
+                            <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.CustomerFullName) ? Model.CustomerFullName : "-")</dd>
+
+                            <dt class="col-5">@Localizer["productSale.DETAIL.IDENTITY_NUMBER"]</dt>
+                            <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.CustomerIdentityNumber) ? Model.CustomerIdentityNumber : "-")</dd>
+
+                            <dt class="col-5">@Localizer["productSale.DETAIL.CAMPAIGN"]</dt>
+                            <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.CampaignName) ? Model.CampaignName : "-")</dd>
+
+                            <dt class="col-5">@Localizer["productSale.DETAIL.PERSONNEL"]</dt>
+                            <dd class="col-7">@Model.CreatedByName</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products & Total Amount -->
+            <div class="col-12 mt-3">
+                <div class="summary-row">
+                    <!-- Product List -->
+                    <div class="summary-half">
+                        <div class="card border-0 shadow-sm summary-card">
+                            <div class="card-header fw-semibold">@Localizer["productSale.DETAIL.PRODUCTS"]</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>@Localizer["productSale.DETAIL.PRODUCT_NAME"]</th>
+                                                <th style="width: 100px;">@Localizer["productSale.DETAIL.QUANTITY"]</th>
+                                                <th style="width: 120px;">@Localizer["productSale.DETAIL.UNIT_PRICE"]</th>
+                                                <th style="width: 120px;">@Localizer["productSale.DETAIL.TOTAL"]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.Products.Any())
+                                            {
+                                                foreach (var p in Model.Products)
+                                                {
+                                                    <tr>
+                                                        <td>@p.ProductName</td>
+                                                        <td>@p.Quantity</td>
+                                                        <td>
+                                                            @if (p.DiscountedUnitPrice.HasValue && p.DiscountedUnitPrice.Value < p.UnitPrice)
+                                                            {
+                                                                <span class="original">@p.UnitPrice.ToString("N2") @p.CurrencySymbol</span>
+                                                
+                                                                <br />
+                                                                <span class="discount">@p.DiscountedUnitPrice.Value.ToString("N2") @p.CurrencySymbol</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                @p.UnitPrice.ToString("N2") @p.CurrencySymbol
+                                                            }
+                                                        </td>
+                                                        <td class="fw-semibold">
+                                                            @if (p.DiscountedLineTotal.HasValue && p.DiscountedLineTotal.Value < p.LineTotal)
+                                                            {
+                                                                <span class="original">@p.LineTotal.ToString("N2") @p.CurrencySymbol</span>
+                                                
+                                                                <br />
+                                                                <span class="final">@p.DiscountedLineTotal.Value.ToString("N2") @p.CurrencySymbol</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                @p.LineTotal.ToString("N2") @p.CurrencySymbol
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted py-3">
+                                                        @Localizer["productSale.DETAIL.NO_PRODUCTS"]
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Amount -->
+                    <!-- Total Amount -->
+                    <div class="summary-half">
+                        <div class="card border-0 shadow-sm summary-card h-100 d-flex align-items-center justify-content-center">
+                            <div class="card-body price-summary compact">
+                                @if (!string.IsNullOrWhiteSpace(Model.CampaignName) && Model.DiscountAmount > 0)
+                                {
+                                    <div class="price-line">
+                                        <span class="label">@Localizer["productSale.DETAIL.ORIGINAL_PRICE"]</span>
+                                        <span class="value original">@Model.OriginalTotalPrice?.ToString("N2") @Model.CurrencySymbol</span>
+                                    </div>
+                                    <div class="price-line">
+                                        <span class="label">@Localizer["productSale.DETAIL.DISCOUNT_AMOUNT"]</span>
+                                        <span class="value discount">-@Model.DiscountAmount?.ToString("N2") @Model.CurrencySymbol</span>
+                                    </div>
+                                    <hr class="my-2" />
+                                    <div class="price-line final-line">
+                                        <span class="label">@Localizer["productSale.DETAIL.TOTAL_AFTER_DISCOUNT"]</span>
+                                        <span class="value final">@Model.TotalPrice.ToString("N2") @Model.CurrencySymbol</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="price-line final-line">
+                                        <span class="label">@Localizer["productSale.DETAIL.TOTAL_AMOUNT"]</span>
+                                        <span class="value final">@Model.TotalPrice.ToString("N2") @Model.CurrencySymbol</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
