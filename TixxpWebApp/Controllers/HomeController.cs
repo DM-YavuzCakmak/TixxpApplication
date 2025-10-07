@@ -701,7 +701,7 @@ public class HomeController : Controller
             // 🧑‍💼 Güncelleyen kullanıcıyı yaz
             var personnelIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (personnelIdClaim != null)
-                sale.Updated_By = Convert.ToInt64(personnelIdClaim.Value);
+                sale.UpdatedBy = Convert.ToInt64(personnelIdClaim.Value);
 
             // 💾 Veritabanında güncelle
             var updateResult = _productSaleService.Update(sale);
