@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using Tixxp.Business.DataTransferObjects.Campaign;
+using Tixxp.Business.Services.Abstract.Campaign;
 using Tixxp.Business.Services.Abstract.CurrencyType;
+using Tixxp.Business.Services.Abstract.Language; // bunu da ekle
 using Tixxp.Business.Services.Abstract.Product;
 using Tixxp.Business.Services.Abstract.ProductPrice;
 using Tixxp.Business.Services.Abstract.ProductTranslation; // bunu ekle
-using Tixxp.Business.Services.Abstract.Language; // bunu da ekle
 using Tixxp.WebApp.Models.ProductPrice;
+using Tixxp.WebApp.Models.ProductSale;
 
 namespace Tixxp.WebApp.Controllers
 {
@@ -16,19 +19,23 @@ namespace Tixxp.WebApp.Controllers
         private readonly ICurrencyTypeService _currencyTypeService;
         private readonly IProductTranslationService _productTranslationService;
         private readonly ILanguageService _languageService;
+        private readonly ICampaignService _campaignService; // 🔥 eklendi
+
 
         public ProductSaleController(
             IProductService productService,
             IProductPriceService productPriceService,
             ICurrencyTypeService currencyTypeService,
             IProductTranslationService productTranslationService,
-            ILanguageService languageService)
+            ILanguageService languageService,
+            ICampaignService campaignService)
         {
             _productService = productService;
             _productPriceService = productPriceService;
             _currencyTypeService = currencyTypeService;
             _productTranslationService = productTranslationService;
             _languageService = languageService;
+            _campaignService = campaignService;
         }
 
         public IActionResult Index()
@@ -77,5 +84,58 @@ namespace Tixxp.WebApp.Controllers
 
             return View(new List<ProductWithPriceViewModel>());
         }
+
+
+        [HttpPost]
+        public IActionResult ValidateCoupon([FromBody] CouponRequestDto dto)
+        {
+            if (dto == null || dto.Products == null || !dto.Products.Any())
+                return Json(new { isSuccess = false, message = "Sepet boş. Önce ürün ekleyiniz." });
+
+            if (string.IsNullOrWhiteSpace(dto.CouponCode))
+                return Json(new { isSuccess = false, message = "Kupon kodu boş olamaz." });
+
+            var campaigns = _campaignService.GetList(x => x.IsActive && !x.IsDeleted);
+            if (!campaigns.Data.Any())
+                return Json(new { isSuccess = false, message = "Geçerli kampanya bulunamadı." });
+
+            var applyDto = new ApplyCampaignForProductRequestDto
+            {
+                CouponCode = dto.CouponCode
+            };
+            if (dto.Products.Any())
+            {
+                foreach (var cartItemDto in dto.Products)
+                {
+                    applyDto.Products.Add(new Business.DataTransferObjects.Campaign.CartItemDto
+                    {
+                        ProductId = cartItemDto.ProductId,
+                        Price = cartItemDto.Price,
+                        Quantity = cartItemDto.Quantity,
+                        CurrencyTypeId = cartItemDto.CurrencyTypeId
+                    });
+                }
+            }
+
+            foreach (var campaign in campaigns.Data)
+            {
+                var finalPrice = _campaignService.ApplyCampaignsForProduct(applyDto, campaign);
+
+                if (finalPrice < applyDto.SubTotal) // indirim uygulanmış
+                {
+                    return Json(new
+                    {
+                        isSuccess = true,
+                        message = campaign.Description,
+                        discount = applyDto.SubTotal - finalPrice,
+                        subTotal = applyDto.SubTotal,
+                        finalPrice
+                    });
+                }
+            }
+
+            return Json(new { isSuccess = false, message = "Geçersiz veya süresi dolmuş kupon kodu." });
+        }
+
     }
 }

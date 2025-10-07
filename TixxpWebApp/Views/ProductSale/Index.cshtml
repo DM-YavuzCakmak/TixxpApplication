@@ -17,7 +17,6 @@
                             <div class="card-title">@Localizer["productSale.INDEX.PRODUCT_ON_SALE"]</div>
                         </div>
                         <div class="card-body">
-
                             <div class="table-responsive">
                                 <table class="table table-bordered text-nowrap">
                                     <thead>
@@ -46,7 +45,7 @@
                                                         <button class="btn btn-icon btn-light input-group-text product-quantity-plus"><i class="ri-add-line"></i></button>
                                                     </div>
                                                 </td>
-                                                <td class="product-total">@item.Price</td>
+                                                <td class="product-total">0.00</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -62,10 +61,10 @@
                         <div class="card-body p-0">
                             <div class="p-3 border-bottom border-block-end-dashed">
                                 <div class="input-group mb-1">
-                                    <input type="text" class="form-control form-control-sm" placeholder="@Localizer["productSale.INDEX.COUPON_CODE"]">
-                                    <button class="btn btn-primary input-group-text">@Localizer["productSale.INDEX.APPLY"]</button>
+                                    <input id="coupon-code" type="text" class="form-control form-control-sm" placeholder="@Localizer["productSale.INDEX.COUPON_CODE"]">
+                                    <button id="apply-coupon" class="btn btn-primary input-group-text">@Localizer["productSale.INDEX.APPLY"]</button>
                                 </div>
-                                <a href="javascript:void(0);" class="fs-12 text-success">@Localizer["productSale.INDEX.DISCOUNT_APPLIED"]</a>
+                                <a id="coupon-description" href="javascript:void(0);" class="fs-12 text-success d-none"></a>
                             </div>
 
                             <div class="p-3 border-bottom border-block-end-dashed">
@@ -75,7 +74,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between mb-3">
                                     <span class="text-muted">@Localizer["productSale.INDEX.DISCOUNT"]</span>
-                                    <span class="text-success fw-medium">- 0.00</span>
+                                    <span id="discount" class="text-success fw-medium">- 0.00</span>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <span class="text-muted">@Localizer["productSale.INDEX.AMOUNT_TO_BE_PAID"]</span>
@@ -96,6 +95,7 @@
 @section Scripts {
     <script>
         let selectedCurrencyId = null;
+        let currentDiscount = 0;
 
         function calculateCart() {
             let subtotal = 0;
@@ -107,8 +107,13 @@
                 subtotal += total;
             });
 
+            // indirimi uygula
+            let finalTotal = subtotal - currentDiscount;
+            if (finalTotal < 0) finalTotal = 0;
+
             document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)}`;
-            document.getElementById('grand-total').textContent = `${subtotal.toFixed(2)}`;
+            document.getElementById('discount').textContent = `- ${currentDiscount.toFixed(2)}`;
+            document.getElementById('grand-total').textContent = `${finalTotal.toFixed(2)}`;
         }
 
         function getProductData() {
@@ -138,9 +143,9 @@
 
             if (response.ok) {
                 const result = await response.json();
-                    if (result.isSuccess) {
+                if (result.isSuccess) {
                     redirectWithCulture(`/ProductSaleCheckOut/Index?productSaleId=${result.productSaleId}`);
-                    } else {
+                } else {
                     Swal.fire({
                         icon: 'warning',
                         title: '@Localizer["productSale.INDEX.WARNING_TITLE"]',
@@ -159,18 +164,67 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Artırma butonu
+            // Apply coupon
+            document.getElementById('apply-coupon').addEventListener('click', async function () {
+                const data = getProductData();
+                if (data.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '@Localizer["productSale.INDEX.WARNING_TITLE"]',
+                        text: '@Localizer["productSale.INDEX.EMPTY_CART_COUPON"]',
+                        confirmButtonText: '@Localizer["productSale.INDEX.CONFIRM_BUTTON"]',
+                    });
+                    return;
+                }
+
+                const couponCode = document.getElementById('coupon-code').value.trim();
+                if (!couponCode) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '@Localizer["productSale.INDEX.WARNING_TITLE"]',
+                        text: '@Localizer["productSale.INDEX.EMPTY_COUPON"]',
+                        confirmButtonText: '@Localizer["productSale.INDEX.CONFIRM_BUTTON"]',
+                    });
+                    return;
+                }
+
+                const response = await fetch('/ProductSale/ValidateCoupon', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ couponCode, products: data })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.isSuccess) {
+                        currentDiscount = result.discount || 0;
+                        document.getElementById('coupon-description').textContent = result.message;
+                        document.getElementById('coupon-description').classList.remove("d-none");
+                    } else {
+                        currentDiscount = 0;
+                        document.getElementById('coupon-description').textContent = "";
+                        document.getElementById('coupon-description').classList.add("d-none");
+                        Swal.fire({
+                            icon: 'warning',
+                            title: '@Localizer["productSale.INDEX.WARNING_TITLE"]',
+                            text: result.message,
+                            confirmButtonText: '@Localizer["productSale.INDEX.CONFIRM_BUTTON"]',
+                        });
+                    }
+                    calculateCart();
+                }
+            });
+
+            // Quantity events
             document.querySelectorAll('.product-quantity-plus').forEach(btn =>
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.product-qty');
                     const currentCurrencyId = parseInt(input.dataset.currencyId);
 
-                    // İlk ürün seçildiğinde currency fixleniyor
                     if (selectedCurrencyId === null && parseInt(input.value) === 0) {
                         selectedCurrencyId = currentCurrencyId;
                     }
 
-                    // Eğer farklı currency ile ürün eklenmek istenirse engelle
                     if (selectedCurrencyId !== null && selectedCurrencyId !== currentCurrencyId) {
                         Swal.fire({
                             icon: 'warning',
@@ -186,7 +240,6 @@
                 })
             );
 
-            // Azaltma butonu
             document.querySelectorAll('.product-quantity-minus').forEach(btn =>
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.product-qty');
@@ -204,9 +257,7 @@
                 })
             );
 
-            // Input manuel değişiklik
             document.querySelectorAll('.product-qty').forEach(input => {
-                // Sadece sayı girilmesi için
                 input.addEventListener('input', function () {
                     this.value = this.value.replace(/[^0-9]/g, '');
                 });

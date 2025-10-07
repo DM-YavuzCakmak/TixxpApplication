@@ -6,5 +6,7 @@ namespace Tixxp.Business.Services.Abstract.Campaign;
 public interface ICampaignService : IBaseService<CampaignEntity>
 {
     public decimal ApplyCampaigns(ApplyCampaignRequestDto requestDto, CampaignEntity campaign);
+    public decimal ApplyCampaignsForProduct(ApplyCampaignForProductRequestDto requestDto, CampaignEntity campaign);
+
     public bool CheckConditions(CampaignEntity campaign, ApplyCampaignRequestDto dto);
 }

@@ -10,5 +10,7 @@ namespace Tixxp.Business.DataTransferObjects.Campaign
     {
         public SessionEntity? SessionEntity { get; set; }
         public ReservationEntity? ReservationEntity { get; set; }
+        public string CouponCode { get; set; }
     }
+
 }

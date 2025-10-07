@@ -75,6 +75,59 @@ namespace Tixxp.Business.Services.Concrete.Campaign
             return true;
         }
 
+        public decimal ApplyCampaignsForProduct(ApplyCampaignForProductRequestDto requestDto, CampaignEntity campaign)
+        {
+            if (requestDto == null || !requestDto.Products.Any())
+                return 0;
+
+            decimal finalPrice = requestDto.SubTotal;
+
+            if (CheckConditionsForProduct(campaign, requestDto))
+            {
+                finalPrice = ApplyActions(campaign, finalPrice);
+            }
+
+            return Math.Max(finalPrice, 0);
+        }
+
+        private bool CheckConditionsForProduct(CampaignEntity campaign, ApplyCampaignForProductRequestDto dto)
+        {
+            var conditions = _campaignConditionRepository.GetList(x => x.CampaignId == campaign.Id);
+
+            foreach (var cond in conditions)
+            {
+                var condType = _campaignConditionTypeRepository.GetFirstOrDefault(x => x.Id == cond.ConditionTypeId);
+                if (condType == null) return false;
+
+                switch (condType.Code.ToUpperInvariant())
+                {
+                    case "COUPON_CODE":
+                        if (string.IsNullOrWhiteSpace(dto.CouponCode)) return false;
+
+                        if (cond.Operator == "=")
+                            return string.Equals(dto.CouponCode, cond.Value1, StringComparison.OrdinalIgnoreCase);
+
+                        if (cond.Operator == "IN")
+                            return cond.Value1.Split(',')
+                                .Any(v => v.Trim().Equals(dto.CouponCode, StringComparison.OrdinalIgnoreCase));
+
+                        return false;
+
+                    case "MIN_SUBTOTAL":
+                        if (!decimal.TryParse(cond.Value1, out var minSubtotal)) return false;
+                        return dto.SubTotal >= minSubtotal;
+
+                    // 🔥 ileride ProductId, CategoryId, Quantity bazlı şartları da buraya ekleyebiliriz
+
+                    default:
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+
         /// <summary>
         /// Tek bir koşulu değerlendirir.
         /// </summary>
@@ -113,6 +166,20 @@ namespace Tixxp.Business.Services.Concrete.Campaign
                 case "AGE":
                     // TODO: Kullanıcı bilgisi bağlanınca eklenecek
                     return true;
+
+                case "COUPON_CODE": 
+                    if (string.IsNullOrWhiteSpace(dto.CouponCode)) return false;
+
+                    if (cond.Operator == "=")
+                    {
+                        return string.Equals(dto.CouponCode, cond.Value1, StringComparison.OrdinalIgnoreCase);
+                    }
+                    else if (cond.Operator == "IN")
+                    {
+                        return cond.Value1.Split(',')
+                            .Any(v => v.Trim().Equals(dto.CouponCode, StringComparison.OrdinalIgnoreCase));
+                    }
+                    return false;
 
                 default:
                     return false;

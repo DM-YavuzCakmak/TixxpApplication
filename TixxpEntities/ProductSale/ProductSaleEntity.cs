@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Tixxp.Entities.Base;
+using Tixxp.Entities.Campaign;
 using Tixxp.Entities.Counter;
 using Tixxp.Entities.InvoiceType;
-using Tixxp.Entities.Personnel;
 using Tixxp.Entities.ProductSaleStatus;
 
 namespace Tixxp.Entities.ProductSale;
@@ -16,6 +16,9 @@ public class ProductSaleEntity : BaseEntity
     [Column("CounterId")]
     public long CounterId { get; set; }
 
+    [Column("CampaignId")]
+    public long? CampaignId { get; set; }
+
     [Column("StatusId")]
     public long StatusId { get; set; }
 
@@ -24,6 +27,9 @@ public class ProductSaleEntity : BaseEntity
 
     [ForeignKey(nameof(InvoiceTypeId))]
     public virtual InvoiceTypeEntity InvoiceType { get; set; }
+
+    [ForeignKey(nameof(CampaignId))]
+    public virtual CampaignEntity? Campaign { get; set; }
 
     [ForeignKey(nameof(StatusId))]
     public virtual ProductSaleStatusEntity ProductSaleStatus { get; set; }
