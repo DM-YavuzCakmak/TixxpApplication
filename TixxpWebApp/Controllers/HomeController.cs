@@ -405,7 +405,7 @@ public class HomeController : Controller
             .GetList(x => productIds.Contains(x.ProductId) && x.LanguageId == languageId).Data;
 
         var products = _productService.GetList(x => productIds.Contains(x.Id)).Data;
-        var prices = _productPriceService.GetList(x => productIds.Contains(x.ProductId)).Data;
+        var prices = _productPriceService.GetListWithInclude(x => productIds.Contains(x.ProductId), x => x.CurrencyType).Data;
         var salePersonnelIds = salesList.Select(x => x.CreatedBy).Distinct().ToList();
         var salePersonnel = _personnelService.GetList(x => salePersonnelIds.Contains(x.Id)).Data;
 
@@ -444,12 +444,12 @@ public class HomeController : Controller
                 Date = sale.Created_Date.ToString("dd.MM.yyyy HH:mm"),
                 DateFormatted = sale.Created_Date.ToString("dd.MM.yyyy"),
                 TotalPriceRaw = totalPrice,
-                TotalPrice = $"{totalPrice:0.00} ₺",
+                TotalPrice = $"{totalPrice:0.00} {prices[0].CurrencyType.Symbol}",
                 PaymentMethod = paymentMethod,
                 Status = statusDict.ContainsKey(sale.StatusId) ? statusDict[sale.StatusId] : $"#Unknown",
                 Details = detailList
             };
-        }).ToList();
+        }).OrderByDescending(x => x.Date).ToList();
 
 
 
@@ -628,7 +628,7 @@ public class HomeController : Controller
                         ProductId = item.ProductId,
                         Price = item.UnitPrice,
                         Quantity = item.Quantity,
-                        CurrencyTypeId = productPrices.FirstOrDefault(p => p.ProductId == item.ProductId)?.CurrencyTypeId ?? 0
+                        CurrencyTypeId = productPrices.FirstOrDefault(p => p.ProductId == item.ProductId).CurrencyTypeId 
                     });
                 }
 

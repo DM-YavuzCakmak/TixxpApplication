@@ -12,7 +12,7 @@ public class ProductPriceEntity : BaseEntity
     public long ProductId { get; set; }
 
     [Column("CurrencyTypeId")]
-    public int CurrencyTypeId { get; set; }
+    public long CurrencyTypeId { get; set; }
 
     [Column("Price")]
     public decimal Price { get; set; }
@@ -23,6 +23,6 @@ public class ProductPriceEntity : BaseEntity
     [ForeignKey(nameof(ProductId))]
     public virtual ProductEntity Product { get; set; }
 
-    [NotMapped]
+    [ForeignKey(nameof(CurrencyTypeId))]
     public virtual CurrencyTypeEntity CurrencyType { get; set; }
 }
