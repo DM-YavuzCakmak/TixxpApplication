@@ -94,7 +94,7 @@ public class HomeController : Controller
         var personnelIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         var companyIdentifierClaim = User.FindFirst("CompanyIdentifier");
 
-        if (personnelIdClaim != null || companyIdentifierClaim != null)
+        if (personnelIdClaim == null || companyIdentifierClaim == null)
             return RedirectToAction("Index", "Authorization");
 
         long personnelId = Convert.ToInt64(personnelIdClaim.Value);
