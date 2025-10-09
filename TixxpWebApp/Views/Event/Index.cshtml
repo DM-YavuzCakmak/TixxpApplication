@@ -94,17 +94,6 @@
                     @* @Html.AntiForgeryToken() *@
                     <input type="hidden" id="editId" name="Id" value="0" />
 
-                    <!-- Etkinlik Adı -->
-                    <div class="card custom-card mb-3">
-                        <div class="card-header">
-                            <div class="card-title mb-0">@Localizer["event.INDEX.EVENT_NAME"]</div>
-                        </div>
-                        <div class="card-body">
-                            <label class="form-label" for="editName">@Localizer["event.INDEX.EVENT_NAME"]</label>
-                            <input type="text" class="form-control" id="editName" name="Name" required />
-                        </div>
-                    </div>
-
                     <!-- Saatler (Başlangıç + Bitiş) -->
                     <div class="card custom-card mb-3">
                         <div class="card-header">
@@ -202,7 +191,6 @@
 
             $.get('/Event/GetById', { id: id }, function (data) {
                 $('#editId').val(data.id);
-                $('#editName').val(data.name);
                 $('#editStartTime').val(data.openingTime);
                 $('#editEndTime').val(data.closingTime);
                 $('#editDuration').val(data.durationInMinutes);
