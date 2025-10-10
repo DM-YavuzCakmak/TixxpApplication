@@ -1,4 +1,6 @@
-﻿using Tixxp.Business.Services.Abstract.PersonnelRoleGroup;
+﻿using Microsoft.AspNetCore.Http;
+using Tixxp.Business.Services.Abstract.Log;
+using Tixxp.Business.Services.Abstract.PersonnelRoleGroup;
 using Tixxp.Business.Services.Concrete.Base;
 using Tixxp.Entities.PersonnelRoleGroup;
 using Tixxp.Infrastructure.DataAccess.Abstract.PersonnelRole;
@@ -10,8 +12,9 @@ public class PersonnelRoleGroupService : BaseService<PersonnelRoleGroupEntity>, 
 {
     private readonly IPersonnelRoleGroupRepository _personnelRoleGroupRepository;
 
-    public PersonnelRoleGroupService(IPersonnelRoleGroupRepository personnelRoleGroupRepository)
-        : base(personnelRoleGroupRepository)
+    public PersonnelRoleGroupService(IPersonnelRoleGroupRepository personnelRoleGroupRepository, ILogService logService,
+        IHttpContextAccessor httpContextAccessor)
+        : base(personnelRoleGroupRepository, logService, httpContextAccessor)
     {
         _personnelRoleGroupRepository = personnelRoleGroupRepository;
     }

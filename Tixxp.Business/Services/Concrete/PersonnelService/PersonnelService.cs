@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Tixxp.Business.DataTransferObjects.Personnel.Login;
+using Tixxp.Business.Services.Abstract.Log;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Concrete.Base;
@@ -28,8 +29,9 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
     public PersonnelService(
         IPersonnelRepository personnelRepository,
         IHttpContextAccessor httpContextAccessor,
-        IPersonnelRoleService personnelRoleService)
-        : base(personnelRepository)
+        IPersonnelRoleService personnelRoleService,
+        ILogService logService)
+        : base(personnelRepository, logService, httpContextAccessor)
     {
         _personnelRepository = personnelRepository;
         _httpContextAccessor = httpContextAccessor;

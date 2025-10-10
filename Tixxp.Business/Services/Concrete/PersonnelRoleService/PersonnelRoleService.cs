@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tixxp.Business.Services.Abstract.Log;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.Product;
 using Tixxp.Business.Services.Concrete.Base;
@@ -17,8 +19,9 @@ public class PersonnelRoleService : BaseService<PersonnelRoleEntity>, IPersonnel
 {
     private readonly IPersonnelRoleRepository _personnelRoleRepository;
 
-    public PersonnelRoleService(IPersonnelRoleRepository personnelRoleRepository)
-        : base(personnelRoleRepository)
+    public PersonnelRoleService(IPersonnelRoleRepository personnelRoleRepository, ILogService logService,
+        IHttpContextAccessor httpContextAccessor)
+        : base(personnelRoleRepository, logService, httpContextAccessor)
     {
         _personnelRoleRepository = personnelRoleRepository;
     }

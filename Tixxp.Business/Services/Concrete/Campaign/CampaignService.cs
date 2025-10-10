@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Linq;
 using Tixxp.Business.DataTransferObjects.Campaign;
 using Tixxp.Business.Services.Abstract.Campaign;
+using Tixxp.Business.Services.Abstract.Log;
 using Tixxp.Business.Services.Concrete.Base;
 using Tixxp.Entities.Campaign;
 using Tixxp.Entities.CampaignAction;
@@ -28,8 +30,10 @@ namespace Tixxp.Business.Services.Concrete.Campaign
             ICampaignRepository campaignRepository,
             ICampaignActionRepository campaignActionRepository,
             ICampaignConditionRepository campaignConditionRepository,
-            ICampaignConditionTypeRepository campaignConditionTypeRepository
-        ) : base(campaignRepository)
+            ICampaignConditionTypeRepository campaignConditionTypeRepository,
+            ILogService logService,
+            IHttpContextAccessor httpContextAccessor
+        ) : base(campaignRepository, logService, httpContextAccessor)
         {
             _campaignRepository = campaignRepository;
             _campaignActionRepository = campaignActionRepository;

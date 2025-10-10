@@ -5,7 +5,9 @@ using Microsoft.Extensions.Options;
 using System.Globalization;
 using Tixxp.Business;
 using Tixxp.Business.Services.Abstract.CurrenctUser;
+using Tixxp.Business.Services.Abstract.Log;
 using Tixxp.Business.Services.Concrete.CurrentUser;
+using Tixxp.Business.Services.Concrete.Log;
 using Tixxp.Infrastructure;
 using Tixxp.WebApp.Middlewares;
 
@@ -43,7 +45,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     // 🔥 Buraya ekliyoruz
     options.RequestCultureProviders = new List<IRequestCultureProvider>
     {
-        new QueryStringRequestCultureProvider(), 
+        new QueryStringRequestCultureProvider(),
         new CookieRequestCultureProvider(),
         new AcceptLanguageHeaderRequestCultureProvider()
     };
@@ -59,6 +61,11 @@ builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddBusinessServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddTixxpDbContext(builder.Configuration);
+builder.Services.AddHttpClient<ILogService, LogService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:44332/api/Indexes/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 // ✅ Cookie Policy (IIS ve Chrome için önemli)
 builder.Services.Configure<CookiePolicyOptions>(options =>
