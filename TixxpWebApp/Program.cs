@@ -61,9 +61,11 @@ builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddBusinessServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddTixxpDbContext(builder.Configuration);
+
+var elasticBaseUrl = builder.Configuration["Elastic:BaseUrl"];
 builder.Services.AddHttpClient<ILogService, LogService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:44332/api/Indexes/");
+    client.BaseAddress = new Uri(elasticBaseUrl);
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 
