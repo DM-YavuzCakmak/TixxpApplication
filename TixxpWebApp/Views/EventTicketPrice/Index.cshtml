@@ -125,7 +125,15 @@
                     </div>
                     <div class="mb-3">
                         <label>@Localizer["eventTicketPrice.INDEX.PRICE"]</label>
-                        <input type="number" class="form-control" id="price" step="0.01" required />
+                        <input type="number"
+                               class="form-control"
+                               id="price"
+                               min="0"
+                               step="1"
+                               inputmode="decimal"
+                               pattern="^[0-9]+([.,][0-9]{0,2})?$"
+                               required
+                               oninput="validatePriceInput(this)" />
                     </div>
                     <button type="submit" class="btn btn-primary w-100">@Localizer["eventTicketPrice.INDEX.SAVE"]</button>
                 </form>
@@ -136,13 +144,18 @@
 
 @section Scripts {
     <script>
-        function openEditEventTicketPriceModal(id) {
+                function openEditEventTicketPriceModal(id) {
             const modal = $('#editEventTicketPriceModal');
             const form = $('#editEventTicketPriceForm');
 
             if (id === 0) {
                 form[0].reset();
                 $('#eventTicketPriceId').val(0);
+
+                // Tüm alanlar aktif hale gelsin (yeni kayıt)
+                $('#eventId, #ticketTypeId, #priceCategoryId, #currencyTypeId').prop('disabled', false);
+                $('#price').prop('readonly', false);
+
                 modal.find('.modal-title').text("@Localizer["eventTicketPrice.INDEX.NEW_EVENT_TICKET_PRICE"]");
                 modal.modal('show');
                 return;
@@ -155,9 +168,18 @@
                 $('#priceCategoryId').val(data.priceCategoryId);
                 $('#currencyTypeId').val(data.currencyTypeId);
                 $('#price').val(data.price);
+
+                // Edit modunda diğer alanlar kilitlensin
+                $('#eventId, #ticketTypeId, #priceCategoryId, #currencyTypeId').prop('disabled', true);
+                $('#price').prop('readonly', false);
+
                 modal.find('.modal-title').text("@Localizer["eventTicketPrice.INDEX.EDIT_PRICE"]");
                 modal.modal('show');
-            }).fail(() => Swal.fire("@Localizer["eventTicketPrice.INDEX.ERROR"]", "@Localizer["eventTicketPrice.INDEX.DATA_NOT_BE_RECEIVED"].", "error"));
+            }).fail(() => Swal.fire(
+                "@Localizer["eventTicketPrice.INDEX.ERROR"]",
+                "@Localizer["eventTicketPrice.INDEX.DATA_NOT_BE_RECEIVED"].",
+                "error"
+            ));
         }
 
         $('#editEventTicketPriceForm').submit(function (e) {
