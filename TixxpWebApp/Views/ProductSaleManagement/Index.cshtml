@@ -1,0 +1,262 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Product Sale Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var counters = ViewBag.Counters as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
+    var statuses = ViewBag.Statuses as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
+    var currencyTypes = ViewBag.CurrencyTypes as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
+}
+
+<style>
+    .min-w-200 {
+        min-width: 200px
+    }
+
+    .min-w-180 {
+        min-width: 180px
+    }
+
+    #filterRow {
+        white-space: nowrap;
+        overflow: auto;
+    }
+
+        #filterRow::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        #filterRow::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,.2);
+            border-radius: 4px;
+        }
+</style>
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center my-4 page-header-breadcrumb">
+            <h1 class="page-title fw-semibold fs-18 mb-0 text-white">
+                @Localizer["productSaleManagement.INDEX.TITLE"]
+            </h1>
+        </div>
+
+        <!-- Filters Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-semibold d-flex align-items-center justify-content-between">
+                <span>@Localizer["productSaleManagement.INDEX.FILTERS"]</span>
+
+                <div class="d-flex align-items-center gap-2">
+                    <label for="gPageSize" class="form-label mb-0 small text-muted">
+                        @Localizer["productSaleManagement.INDEX.PAGE_SIZE"]
+                    </label>
+                    <select id="gPageSize" class="form-select form-select-sm" style="width:auto;">
+                        <option>25</option>
+                        <option>50</option>
+                        <option>100</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form id="filterForm" class="d-flex align-items-end gap-3" style="white-space:nowrap;">
+                    <div id="filterRow" class="d-flex align-items-end gap-3 flex-grow-1">
+
+                        <div class="min-w-200">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.COUNTER"]</label>
+                            <select class="form-select" id="fCounter">
+                                <option value="">@Localizer["productSaleManagement.INDEX.ALL"]</option>
+                                @foreach (var c in counters)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="min-w-200">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.STATUS"]</label>
+                            <select class="form-select" id="fStatus">
+                                <option value="">@Localizer["productSaleManagement.INDEX.ALL"]</option>
+                                @foreach (var s in statuses)
+                                {
+                                    <option value="@s.Id">@s.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="min-w-200">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.CURRENCY_TYPE"]</label>
+                            <select class="form-select" id="fCurrencyType">
+                                <option value="">@Localizer["productSaleManagement.INDEX.ALL"]</option>
+                                @foreach (var ct in currencyTypes)
+                                {
+                                    <option value="@ct.Id">@ct.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="min-w-200">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.FIRST_NAME"]</label>
+                            <input type="text" class="form-control" id="fFirstName" placeholder="@Localizer["productSaleManagement.INDEX.FIRST_NAME.PLACEHOLDER"]" />
+                        </div>
+
+                        <div class="min-w-200">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.LAST_NAME"]</label>
+                            <input type="text" class="form-control" id="fLastName" placeholder="@Localizer["productSaleManagement.INDEX.LAST_NAME.PLACEHOLDER"]" />
+                        </div>
+
+                        <div class="min-w-200">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.IDENTITY_NUMBER"]</label>
+                            <input type="text" class="form-control" id="fIdentityNumber" maxlength="11" placeholder="@Localizer["productSaleManagement.INDEX.IDENTITY_NUMBER.PLACEHOLDER"]" />
+                        </div>
+
+                        <div class="min-w-180">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.START_DATE"]</label>
+                            <input type="date" class="form-control" id="fStartDate" />
+                        </div>
+
+                        <div class="min-w-180">
+                            <label class="form-label">@Localizer["productSaleManagement.INDEX.END_DATE"]</label>
+                            <input type="date" class="form-control" id="fEndDate" />
+                        </div>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex gap-2 flex-shrink-0">
+                        <button type="button" class="btn btn-primary" id="btnSearch">
+                            <i class="ti ti-search me-1"></i>@Localizer["productSaleManagement.INDEX.SEARCH"]
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="btnReset">
+                            <i class="ti ti-rotate me-1"></i>@Localizer["productSaleManagement.INDEX.RESET"]
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="card shadow-sm">
+            <div class="card-body text-muted">
+                @Localizer["productSaleManagement.INDEX.USE_FILTERS_DESC"]
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- hidden antiforgery -->
+<form id="af" method="post" class="d-none">@Html.AntiForgeryToken()</form>
+
+<!-- MODALS -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["productSaleManagement.INDEX.SALE_DETAIL"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["productSaleManagement.INDEX.CANCEL_SALE"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="cancelModalBody"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        (() => {
+            const results = document.getElementById('results');
+            const qs = (s, r=document) => r.querySelector(s);
+            const qsa = (s, r=document) => [...r.querySelectorAll(s)];
+            const afToken = () => (document.querySelector('#af input[name="__RequestVerificationToken"]') || {}).value || '';
+
+            function getFilters(page=1){
+                return {
+                    CounterId: qs('#fCounter')?.value || '',
+                    StatusId: qs('#fStatus')?.value || '',
+                    CurrencyTypeId: qs('#fCurrencyType')?.value || '',
+                    FirstName: qs('#fFirstName')?.value || '',
+                    LastName: qs('#fLastName')?.value || '',
+                    IdentityNumber: qs('#fIdentityNumber')?.value || '',
+                    StartDate: qs('#fStartDate')?.value || '',
+                    EndDate: qs('#fEndDate')?.value || '',
+                    Page: page,
+                    PageSize: parseInt(qs('#gPageSize')?.value, 10) || 25
+                };
+            }
+
+            function toQuery(o){
+                const p=new URLSearchParams();
+                Object.entries(o).forEach(([k,v])=>{ if(v) p.append(k,v); });
+                return p.toString();
+            }
+
+            async function search(page=1){
+                const f=getFilters(page);
+                const url='@Url.Action("Search", "ProductSaleManagement")'+'?'+toQuery(f);
+                results.innerHTML=`<div class="card-body"><div class="spinner-border me-2"></div>Loading...</div>`;
+                try{
+                    const resp=await fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest'}});
+                    results.innerHTML=await resp.text();
+                    bindPaging();
+                    bindRowActions();
+                }catch{ results.innerHTML='<div class="card-body text-danger">List could not be loaded.</div>'; }
+            }
+
+            function resetFilters(){
+                ['#fCounter','#fStatus','#fCurrencyType','#fFirstName','#fLastName','#fIdentityNumber','#fStartDate','#fEndDate'].forEach(id=>{
+                    const el=qs(id); if(el) el.value='';
+                });
+                qs('#gPageSize').value='25';
+            }
+
+            function bindPaging(){
+                qsa('.js-page', results).forEach(a=>{
+                    a.addEventListener('click',e=>{
+                        e.preventDefault();
+                        const p=parseInt(a.dataset.page,10);
+                        if(p>0) search(p);
+                    });
+                });
+            }
+
+            function bindRowActions(){
+                qsa('.js-detail',results).forEach(btn=>{
+                    btn.addEventListener('click',async()=>{
+                        const id=btn.dataset.id;
+                        const url='@Url.Action("Detail", "ProductSaleManagement")'+'?id='+id;
+                        const resp=await fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest'}});
+                        qs('#detailModalBody').innerHTML=await resp.text();
+                        new bootstrap.Modal(qs('#detailModal')).show();
+                    });
+                });
+                qsa('.js-cancel',results).forEach(btn=>{
+                    btn.addEventListener('click',async()=>{
+                        const id=btn.dataset.id;
+                        const url='@Url.Action("Cancel", "ProductSaleManagement")'+'?id='+id;
+                        const resp=await fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest'}});
+                        qs('#cancelModalBody').innerHTML=await resp.text();
+                        new bootstrap.Modal(qs('#cancelModal')).show();
+                    });
+                });
+            }
+
+            qs('#btnSearch')?.addEventListener('click',()=>search(1));
+            qs('#btnReset')?.addEventListener('click',()=>{resetFilters();search(1);});
+            qs('#gPageSize')?.addEventListener('change',()=>search(1));
+
+        })();
+    </script>
+}

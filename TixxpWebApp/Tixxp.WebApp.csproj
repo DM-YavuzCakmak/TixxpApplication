@@ -66,6 +66,36 @@
     <EmbeddedResource Update="Resources\Views\Home\_ProductSaleDetail.tr-TR.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ChangeStatus.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ChangeStatus.tr-TR.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ProductSaleCancel.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ProductSaleCancel.tr-TR.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ProductSaleDetail.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ProductSaleDetail.tr-TR.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ProductSaleList.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\_ProductSaleList.tr-TR.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\Index.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\ProductSaleManagement\Index.tr-TR.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\TicketSale\_Confirmation.tr-TR.resx">
       <LastGenOutput>_Confirmation.tr-TR.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1,0 +1,166 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.ProductSaleManagement.ProductSaleListResultVm 
+
+<style>
+    :root {
+        --psm-accent: #FF7A00;
+        --psm-border: rgba(0,0,0,.25);
+    }
+
+    .psm-grid-wrap {
+        overflow: auto;
+    }
+
+    .psm-grid {
+        border: 2px solid var(--psm-accent);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .psm-grid table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .psm-grid thead th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            font-weight: 600;
+            border: 1px solid var(--psm-border) !important;
+            border-bottom: 2px solid var(--psm-accent) !important;
+        }
+
+        .psm-grid tbody td {
+            border: 1px solid var(--psm-border) !important;
+        }
+
+        .psm-grid tbody tr:hover td {
+            background: rgba(255,122,0,.06);
+        }
+
+        .psm-grid .cell-nowrap {
+            white-space: nowrap;
+        }
+</style>
+
+<div class="card-body p-0">
+    <div class="psm-grid-wrap">
+        <div class="psm-grid">
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:100px;" class="cell-nowrap">@Localizer["_ProductSaleList.ID"]</th>
+                        <th style="width:160px;" class="cell-nowrap">@Localizer["_ProductSaleList.CREATED_DATE"]</th>
+                        <th class="cell-nowrap">@Localizer["_ProductSaleList.COUNTER"]</th>
+                        <th>@Localizer["_ProductSaleList.CUSTOMER"]</th>
+                        <th style="width:160px;" class="cell-nowrap">@Localizer["_ProductSaleList.STATUS"]</th>
+                        <th style="width:140px;" class="text-center cell-nowrap">@Localizer["_ProductSaleList.ACTIONS"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        foreach (var r in Model.Items)
+                        {
+                            var badgeClass = r.StatusId switch
+                            {
+                                1 => "bg-warning text-dark",
+                                2 => "bg-success",
+                                3 => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+
+                            <tr>
+                                <td class="fw-semibold cell-nowrap">#@r.Id</td>
+                                <td class="cell-nowrap">@r.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@r.CounterName</td>
+                                <td>
+                                    <div class="fw-semibold text-truncate" style="max-width:200px;" title="@r.FullName">@r.FullName</div>
+                                    <div class="small text-muted text-truncate" style="max-width:200px;" title="@r.IdentityNumber">@r.IdentityNumber</div>
+                                </td>
+                                <td class="cell-nowrap"><span class="badge @badgeClass">@r.StatusName</span></td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary js-detail"
+                                                data-id="@r.Id" data-bs-toggle="tooltip"
+                                                title="@Localizer["_ProductSaleList.DETAIL"]">
+                                            <i class="ti ti-list-details"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger js-cancel"
+                                                data-id="@r.Id" data-bs-toggle="tooltip"
+                                                title="@Localizer["_ProductSaleList.CANCEL_SALE"]">
+                                            <i class="ti ti-x"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                @Localizer["_ProductSaleList.NO_RECORDS_FOUND"]
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @{
+        var totalPages = (int)Math.Ceiling((Model.TotalCount * 1.0) / Math.Max(1, Model.PageSize));
+        if (totalPages < 1) totalPages = 1;
+        var win = 9;
+        var start = Math.Max(1, Model.Page - win / 2);
+        var end = Math.Min(totalPages, start + win - 1);
+        if (end - start + 1 < win) start = Math.Max(1, end - win + 1);
+    }
+
+    <div class="d-flex justify-content-between align-items-center p-3">
+        <div class="small text-muted">
+            @Localizer["_ProductSaleList.PAGE"] @Model.Page / @totalPages •
+            @Localizer["_ProductSaleList.TOTAL"] @Model.TotalCount
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link js-page" href="#" data-page="@(Model.Page - 1)">
+                        @Localizer["_ProductSaleList.PREV"]
+                    </a>
+                </li>
+                @if (start > 1)
+                {
+                    <li class="page-item"><a class="page-link js-page" href="#" data-page="1">1</a></li>
+                    @if (start > 2)
+                    {
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    }
+                }
+                @for (var i = start; i <= end; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link js-page" href="#" data-page="@i">@i</a>
+                    </li>
+                }
+                @if (end < totalPages)
+                {
+                    @if (end < totalPages - 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    }
+                    <li class="page-item"><a class="page-link js-page" href="#" data-page="@totalPages">@totalPages</a></li>
+                }
+                <li class="page-item @(Model.Page >= totalPages ? "disabled" : "")">
+                    <a class="page-link js-page" href="#" data-page="@(Model.Page + 1)">
+                        @Localizer["_ProductSaleList.NEXT"]
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

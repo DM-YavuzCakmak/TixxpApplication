@@ -1,0 +1,158 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.ProductSaleManagement.ProductSaleDetailMainVm
+
+<style>
+    .summary-card {
+        border: 1px solid #e5e5e5;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+        .summary-card:hover {
+            background-color: #FFF3E6;
+            border-color: #FF7A00 !important;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+        }
+
+    .table-sm th, .table-sm td {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row g-3">
+
+        <!-- Sale summary -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 summary-card">
+                <div class="card-header fw-semibold">
+                    @Localizer["_ProductSaleDetail.SALE_INFO"]
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.SALE_ID"]</dt>
+                        <dd class="col-7">#@Model.SaleId</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.CREATED_DATE"]</dt>
+                        <dd class="col-7">@Model.CreatedDate.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.COUNTER"]</dt>
+                        <dd class="col-7">@Model.CounterName</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.STATUS"]</dt>
+                        <dd class="col-7">@Model.StatusName</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice / Customer -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 summary-card">
+                <div class="card-header fw-semibold">
+                    @Localizer["_ProductSaleDetail.INVOICE_INFO"]
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.FIRST_NAME"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.InvoiceInfo?.FirstName) ? Model.InvoiceInfo.FirstName : "-")</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.LAST_NAME"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.InvoiceInfo?.LastName) ? Model.InvoiceInfo.LastName : "-")</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.IDENTITY_NUMBER"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.InvoiceInfo?.IdentityNumber) ? Model.InvoiceInfo.IdentityNumber : "-")</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.COMPANY_NAME"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.InvoiceInfo?.CompanyName) ? Model.InvoiceInfo.CompanyName : "-")</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.TAX_NUMBER"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.InvoiceInfo?.TaxNumber) ? Model.InvoiceInfo.TaxNumber : "-")</dd>
+
+                        <dt class="col-5">@Localizer["_ProductSaleDetail.TAX_OFFICE"]</dt>
+                        <dd class="col-7">@(!string.IsNullOrWhiteSpace(Model.InvoiceInfo?.TaxOffice) ? Model.InvoiceInfo.TaxOffice : "-")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-12">
+            <div class="card shadow-sm summary-card">
+                <div class="card-header fw-semibold">
+                    @Localizer["_ProductSaleDetail.PRODUCTS"]
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>@Localizer["_ProductSaleDetail.PRODUCT_NAME"]</th>
+                                    <th style="width:120px;">@Localizer["_ProductSaleDetail.QUANTITY"]</th>
+                                    <th style="width:100px;">@Localizer["_ProductSaleDetail.CURRENCY"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Details != null && Model.Details.Any())
+                                {
+                                    foreach (var p in Model.Details)
+                                    {
+                                        <tr>
+                                            <td>@(string.IsNullOrWhiteSpace(p.ProductName) ? $"#{p.ProductId}" : p.ProductName)</td>
+                                            <td>@p.Quantity</td>
+                                            <td>@p.CurrencySymbol</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">
+                                            @Localizer["_ProductSaleDetail.NO_PRODUCTS"]
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Totals -->
+        <div class="col-12 mt-3">
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <div class="card shadow-sm text-center h-100 summary-card">
+                        <div class="card-body">
+                            <div class="fw-bold text-muted">📦 @Localizer["_ProductSaleDetail.TOTAL_PRODUCTS"]</div>
+                            <div class="fs-4 fw-semibold text-dark">
+                                @(Model.Details?.Sum(p => p.Quantity) ?? 0)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card shadow-sm text-center h-100 summary-card">
+                        <div class="card-body">
+                            <div class="fw-bold text-muted">💰 @Localizer["_ProductSaleDetail.TOTAL_AMOUNT"]</div>
+                            <div class="fs-4 fw-bold text-dark">
+                                @{
+                                    // Bu kısım opsiyonel, eğer fiyat bilgisi ileride eklenecekse
+                                    var total = Model.Details?.Sum(p => p.Quantity) ?? 0;
+                                }
+                                @total @((Model.Details?.FirstOrDefault()?.CurrencySymbol) ?? "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

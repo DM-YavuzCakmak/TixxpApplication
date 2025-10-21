@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.ProductSaleManagement.ChangeStatusVm
+
+<form method="post" action="@Url.Action("ChangeStatus","ProductSaleManagement")" id="changeStatusForm">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="ProductSaleId" value="@Model.ProductSaleId" />
+
+    <div class="mb-3">
+        <label class="form-label" for="StatusId">@Localizer["_ChangeStatus.STATUS"]</label>
+        <select class="form-select" id="StatusId" name="StatusId" required>
+            <option value="">@Localizer["_ChangeStatus.SELECT"]…</option>
+            @foreach (var s in (Model?.StatusOptions ?? Enumerable.Empty<dynamic>()))
+            {
+                var isSelected = Convert.ToString(Model?.CurrentStatusId) == Convert.ToString(s.Id);
+                <option value="@s.Id" @@(isSelected ? "selected" : "")>@s.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            @Localizer["_ChangeStatus.CLOSE"]
+        </button>
+        <button type="submit" class="btn btn-primary">
+            @Localizer["_ChangeStatus.SAVE"]
+        </button>
+    </div>
+</form>

@@ -1,0 +1,23 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model Tixxp.WebApp.Models.ProductSaleManagement.ProductSaleCancelRequest
+
+<form method="post" action="@Url.Action("Cancel","ProductSaleManagement")" id="cancelForm">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="ProductSaleId" value="@Model.ProductSaleId" />
+
+    <div class="mb-3">
+        <label class="form-label">@Localizer["_ProductSaleCancel.REASON"] (@Localizer["_ProductSaleCancel.OPTIONAL"])</label>
+        <textarea class="form-control" name="Reason" rows="3" placeholder="@Localizer["_ProductSaleCancel.PLACEHOLDER"]">@Model.Reason</textarea>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            @Localizer["_ProductSaleCancel.CLOSE"]
+        </button>
+        <button type="submit" class="btn btn-danger">
+            @Localizer["_ProductSaleCancel.CONFIRM_CANCEL"]
+        </button>
+    </div>
+</form>

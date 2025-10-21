@@ -14,6 +14,7 @@
         public IEnumerable<IdNameVm> Channels { get; set; } = new List<IdNameVm>();
         public IEnumerable<IdNameVm> PaymentTypes { get; set; } = new List<IdNameVm>();
         public IEnumerable<IdNameVm> Statuses { get; set; } = new List<IdNameVm>();
+        public IEnumerable<IdNameVm> Counters { get; set; } = new List<IdNameVm>();
         public IEnumerable<IdNameVm> CurrencyTypes { get; set; } = new List<IdNameVm>();
     }
 
