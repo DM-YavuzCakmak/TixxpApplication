@@ -64,7 +64,6 @@
                         </ul>
                     </li>
                 }
-                @* Management *@
                 @if (User.IsInRole("TIXXP_PRODUCT_SALE") || User.IsInRole("TIXXP_RESERVATION_SALE"))
                 {
                     <li class="slide has-sub">
@@ -74,12 +73,19 @@
                             <i class="fe fe-chevron-right side-menu__angle"></i>
                         </a>
                         <ul class="slide-menu child1">
-                            <li class="slide">
-                                <a href="/ReservationManagement/Index" class="side-menu__item">Reservation Management</a>
-                            </li>
-                            <li class="slide">
-                                <a href="/ProductSaleManagement/Index" class="side-menu__item">Product Sale Management</a>
-                            </li>
+                            @if (User.IsInRole("TIXXP_PRODUCT_SALE"))
+                            {
+                                <li class="slide">
+                                    <a href="/ProductSaleManagement/Index" class="side-menu__item">Product Sale Management</a>
+                                </li>
+
+                            }
+                            @if (User.IsInRole("TIXXP_RESERVATION_SALE"))
+                            {
+                                <li class="slide">
+                                    <a href="/ReservationManagement/Index" class="side-menu__item">Reservation Management</a>
+                                </li>
+                            }
                         </ul>
                     </li>
                 }
@@ -96,15 +102,6 @@
                                 <span class="side-menu__label ms-2">Event Ticket Price</span>
                             </a>
                         </li>
-                        @*    @if (User.IsInRole("TIXXP_SEASONAL_PRICE"))
-                        {
-                            <li class="slide">
-                                <a href="/SeasonalPrice/Index" class="side-menu__item">
-                                    <i class="bi bi-tags-fill"></i>
-                                    <span class="side-menu__label ms-2">Seasonal Price</span>
-                                </a>
-                            </li>
-                        } *@
                         @if (User.IsInRole("TIXXP_ROLE_VIEW") || User.IsInRole("TIXXP_ROLE_GROUP_VIEW") || User.IsInRole("TIXXP_ROLE_GROUP_ROLE_VIEW"))
                         {
                             <li class="slide has-sub">
@@ -114,12 +111,7 @@
                                     <i class="fe fe-chevron-right side-menu__angle"></i>
                                 </a>
                                 <ul class="slide-menu child1">
-                                    @* @if (User.IsInRole("TIXXP_ROLE_VIEW"))
-                                    {
-                                        <li class="slide">
-                                            <a href="/Role/Index" class="side-menu__item">Role</a>
-                                        </li>
-                                    } *@
+                                   
                                     @if (User.IsInRole("TIXXP_ROLE_GROUP_VIEW"))
                                     {
                                         <li class="slide">
@@ -135,10 +127,6 @@
                                 </ul>
                             </li>
                         }
-                        @*  @if (User.IsInRole("TIXXP_MUSEUM"))
-                        {
-                            <li class="slide"><a href="/Museum/Index" class="side-menu__item"><i class="fa fa-university"></i><span class="side-menu__label ms-2">Museum</span></a></li>
-                        } *@
                         @if (User.IsInRole("TIXXP_PRICE_CATEGORY"))
                         {
                             <li class="slide"><a href="/PriceCategory/Index" class="side-menu__item"><i class="fa fa-money"></i><span class="side-menu__label ms-2">Price Category</span></a></li>
@@ -158,7 +146,7 @@
                                     }
                                     @if (User.IsInRole("TIXXP_AGENCY_CONTRACT"))
                                     {
-                                        <li class="slide"><a href="/AgencyContract/Index" class="side-menu__item text-wrap">Agecny Price<br />Category List</a></li>
+                                        <li class="slide"><a href="/AgencyContract/Index" class="side-menu__item text-wrap">Agency Price<br />Category List</a></li>
                                     }
                                 </ul>
                             </li>

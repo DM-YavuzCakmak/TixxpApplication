@@ -25,6 +25,7 @@ namespace Tixxp.Infrastructure
                 var optionsBuilder = new DbContextOptionsBuilder<TixappContext>();
                 optionsBuilder.UseSqlServer(fullConnectionString);
 
+                // Tablo şeması dbo kalmalı; veritabanı adı tenant (ör. TixxpChora)
                 return new TixappContext(optionsBuilder.Options, "dbo");
             });
 

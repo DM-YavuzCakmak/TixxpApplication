@@ -17,6 +17,15 @@ using Tixxp.Core.Utilities.Results.Concrete;
 using Tixxp.Entities.Personnel;
 using Tixxp.Infrastructure.DataAccess.Abstract.Personnel;
 using Tixxp.Infrastructure.DataAccess.Abstract.Role;
+using Tixxp.Business.Services.Abstract.PersonnelRoleGroup;
+using Tixxp.Business.Services.Abstract.RoleGroupRole;
+using Tixxp.Business.Services.Abstract.RoleService;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Tixxp.Infrastructure.DataAccess.Context;
+using Tixxp.Entities.PersonnelRoleGroup;
+using Tixxp.Entities.RoleGroupRole;
+using Tixxp.Entities.Role;
 
 namespace Tixxp.Business.Services.Concrete.PersonnelService;
 
@@ -24,18 +33,39 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
 {
     private readonly IPersonnelRepository _personnelRepository;
     private readonly IPersonnelRoleService _personnelRoleService;
+    private readonly IPersonnelRoleGroupService _personnelRoleGroupService;
+    private readonly IRoleGroupRoleService _roleGroupRoleService;
+    private readonly IRoleService _roleService;
+    private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public PersonnelService(
         IPersonnelRepository personnelRepository,
         IHttpContextAccessor httpContextAccessor,
         IPersonnelRoleService personnelRoleService,
+        IPersonnelRoleGroupService personnelRoleGroupService,
+        IRoleGroupRoleService roleGroupRoleService,
+        IRoleService roleService,
+        IConfiguration configuration,
         ILogService logService)
         : base(personnelRepository, logService, httpContextAccessor)
     {
         _personnelRepository = personnelRepository;
         _httpContextAccessor = httpContextAccessor;
         _personnelRoleService = personnelRoleService;
+        _personnelRoleGroupService = personnelRoleGroupService;
+        _roleGroupRoleService = roleGroupRoleService;
+        _roleService = roleService;
+        _configuration = configuration;
+    }
+
+    private TixappContext CreateTenantContext(string? initialCatalog)
+    {
+        var catalog = string.IsNullOrWhiteSpace(initialCatalog) ? SchemaConstant.Default : initialCatalog;
+        var template = _configuration.GetConnectionString("DefaultConnection");
+        var conn = template.Replace("{InitialCatalog}", catalog);
+        var opts = new DbContextOptionsBuilder<TixappContext>().UseSqlServer(conn).Options;
+        return new TixappContext(opts, "dbo");
     }
 
     public async Task<IDataResult<LoginResponseDto>> Login(LoginRequestDto loginRequestDto)
@@ -107,6 +137,40 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         {
             claims.Add(new Claim(ClaimTypes.Role, role.Name));
         }
+
+        // RoleGroup üzerinden gelen roller
+        try
+        {
+            using var ctx = CreateTenantContext(user.CompanyIdentifier);
+            var groupIds = ctx.Set<PersonnelRoleGroupEntity>()
+                .Where(x => x.PersonnelId == user.Id && !x.IsDeleted)
+                .Select(x => x.RoleGroupId)
+                .Distinct()
+                .ToList();
+            if (groupIds.Any())
+            {
+                var roleIds = ctx.Set<RoleGroupRoleEntity>()
+                    .Where(x => x.RoleGroupId != null && groupIds.Contains(x.RoleGroupId) && !x.IsDeleted)
+                    .Select(x => x.RoleId)
+                    .Where(id => id != null)
+                    .Select(id => id)
+                    .Distinct()
+                    .ToList();
+                if (roleIds.Any())
+                {
+                    // Role isimleri ortak veritabanında (Common) tutuluyor
+                    var rolesRes = _roleService.GetList(r => roleIds.Contains(r.Id));
+                    var roleNames = rolesRes?.Data?.Select(r => r.Name).Distinct().ToList() ?? new List<string>();
+                    var existing = new HashSet<string>(claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value));
+                    foreach (var name in roleNames)
+                    {
+                        if (!string.IsNullOrWhiteSpace(name) && !existing.Contains(name))
+                            claims.Add(new Claim(ClaimTypes.Role, name));
+                    }
+                }
+            }
+        }
+        catch { /* claims building shouldn't crash login */ }
 
         return claims;
     }
