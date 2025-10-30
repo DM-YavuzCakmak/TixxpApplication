@@ -42,7 +42,7 @@
                         <dd class="col-7">@Model.CounterName</dd>
 
                         <dt class="col-5">@Localizer["_ProductSaleDetail.STATUS"]</dt>
-                        <dd class="col-7">@Model.StatusName</dd>
+                        <dd class="col-7">@Html.Partial("~/Views/Shared/_StatusBadge.cshtml", Model.StatusName)</dd>
                     </dl>
                 </div>
             </div>

@@ -1,0 +1,4 @@
+/* Shared status badge styles */
+.badge.status-pending { background-color: #facc15 !important; color: #111 !important; }
+.badge.status-completed { background-color: #22c55e !important; color: #fff !important; }
+.badge.status-cancelled { background-color: #ef4444 !important; color: #fff !important; }

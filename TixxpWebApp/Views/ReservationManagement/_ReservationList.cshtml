@@ -84,9 +84,9 @@
                         {
                             var badgeClass = r.StatusId switch
                             {
-                                1 => "bg-warning text-dark",
-                                2 => "bg-success",
-                                3 => "bg-danger",
+                                1 => "status-pending",
+                                2 => "status-completed",
+                                3 => "status-cancelled",
                                 _ => "bg-secondary"
                             };
 

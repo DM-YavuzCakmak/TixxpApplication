@@ -249,7 +249,36 @@
                         const resp=await fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest'}});
                         qs('#cancelModalBody').innerHTML=await resp.text();
                         new bootstrap.Modal(qs('#cancelModal')).show();
+                        bindCancelForm();
                     });
+                });
+            }
+
+            function bindCancelForm(){
+                const form = qs('#cancelModalBody #cancelForm');
+                if(!form) return;
+                form.addEventListener('submit', async (e)=>{
+                    e.preventDefault();
+                    const fd = new FormData(form);
+                    try{
+                        const resp = await fetch(form.action, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            body: fd
+                        });
+                        let msg = 'Operation completed.';
+                        if (resp.headers.get('content-type')?.includes('application/json')) {
+                            const json = await resp.json().catch(()=>({}));
+                            msg = json?.message || msg;
+                        } else {
+                            msg = await resp.text();
+                        }
+                        qs('#cancelModalBody').innerHTML = `<div class="alert alert-success mb-0">${msg}</div>`;
+                        // refresh list after brief delay
+                        setTimeout(()=>{ search(1); }, 500);
+                    }catch(err){
+                        qs('#cancelModalBody').innerHTML = `<div class="alert alert-danger mb-0">Unexpected error.</div>`;
+                    }
                 });
             }
 

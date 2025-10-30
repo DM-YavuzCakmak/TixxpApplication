@@ -65,13 +65,7 @@
                     {
                         foreach (var r in Model.Items)
                         {
-                            var badgeClass = r.StatusId switch
-                            {
-                                1 => "bg-warning text-dark",
-                                2 => "bg-success",
-                                3 => "bg-danger",
-                                _ => "bg-secondary"
-                            };
+                            // using shared status badge partial by status name
 
                             <tr>
                                 <td class="fw-semibold cell-nowrap">#@r.Id</td>
@@ -81,7 +75,7 @@
                                     <div class="fw-semibold text-truncate" style="max-width:200px;" title="@r.FullName">@r.FullName</div>
                                     <div class="small text-muted text-truncate" style="max-width:200px;" title="@r.IdentityNumber">@r.IdentityNumber</div>
                                 </td>
-                                <td class="cell-nowrap"><span class="badge @badgeClass">@r.StatusName</span></td>
+                                <td class="cell-nowrap">@Html.Partial("~/Views/Shared/_StatusBadge.cshtml", r.StatusName)</td>
                                 <td class="text-center">
                                     <div class="d-inline-flex gap-1">
                                         <button type="button" class="btn btn-sm btn-outline-secondary js-detail"

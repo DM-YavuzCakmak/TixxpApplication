@@ -1,0 +1,17 @@
+@model string
+@{
+    var status = (Model ?? "").Trim();
+    var key = status.Replace(" ", "").ToLowerInvariant();
+    var css = key switch
+    {
+        "pending" => "status-pending",
+        "awaitingpayment" => "status-pending",
+        "completed" => "status-completed",
+        "cancelled" => "status-cancelled",
+        "canceled" => "status-cancelled",
+        "failed" => "status-cancelled",
+        _ => "bg-secondary"
+    };
+}
+<span class="badge @css">@status</span>
+

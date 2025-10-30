@@ -64,6 +64,25 @@
                         </ul>
                     </li>
                 }
+                @* Management *@
+                @if (User.IsInRole("TIXXP_PRODUCT_SALE") || User.IsInRole("TIXXP_RESERVATION_SALE"))
+                {
+                    <li class="slide has-sub">
+                        <a href="javascript:void(0);" class="side-menu__item">
+                            <i class="bx bx-task side-menu__icon"></i>
+                            <span class="side-menu__label">Management</span>
+                            <i class="fe fe-chevron-right side-menu__angle"></i>
+                        </a>
+                        <ul class="slide-menu child1">
+                            <li class="slide">
+                                <a href="/ReservationManagement/Index" class="side-menu__item">Reservation Management</a>
+                            </li>
+                            <li class="slide">
+                                <a href="/ProductSaleManagement/Index" class="side-menu__item">Product Sale Management</a>
+                            </li>
+                        </ul>
+                    </li>
+                }
                 <li class="slide has-sub">
                     <a href="javascript:void(0);" class="side-menu__item">
                         <i class="bx bx-cog side-menu__icon"></i>

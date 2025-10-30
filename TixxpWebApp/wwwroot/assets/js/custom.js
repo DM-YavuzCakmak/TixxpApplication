@@ -42,188 +42,193 @@
   );
 
   /* for theme primary */
-  const nanoThemes = [
-    [
-      "nano",
-      {
-        defaultRepresentation: "RGB",
-        components: {
-          preview: true,
-          opacity: false,
-          hue: true,
+  if (window.Pickr && pickrContainerPrimary && themeContainerPrimary) {
+    const nanoThemes = [
+      [
+        "nano",
+        {
+          defaultRepresentation: "RGB",
+          components: {
+            preview: true,
+            opacity: false,
+            hue: true,
 
-          interaction: {
-            hex: false,
-            rgba: true,
-            hsva: false,
-            input: true,
-            clear: false,
-            save: false,
+            interaction: {
+              hex: false,
+              rgba: true,
+              hsva: false,
+              input: true,
+              clear: false,
+              save: false,
+            },
           },
         },
-      },
-    ],
-  ];
-  const nanoButtons = [];
-  let nanoPickr = null;
-  for (const [theme, config] of nanoThemes) {
-    const button = document.createElement("button");
-    button.innerHTML = theme;
-    nanoButtons.push(button);
+      ],
+    ];
+    const nanoButtons = [];
+    let nanoPickr = null;
+    for (const [theme, config] of nanoThemes) {
+      const button = document.createElement("button");
+      button.innerHTML = theme;
+      nanoButtons.push(button);
 
-    button.addEventListener("click", () => {
-      const el = document.createElement("p");
-      pickrContainerPrimary.appendChild(el);
+      button.addEventListener("click", () => {
+        const el = document.createElement("p");
+        pickrContainerPrimary.appendChild(el);
 
-      /* Delete previous instance */
-      if (nanoPickr) {
-        nanoPickr.destroyAndRemove();
-      }
+        /* Delete previous instance */
+        if (nanoPickr) {
+          nanoPickr.destroyAndRemove();
+        }
 
-      /* Apply active class */
-      for (const btn of nanoButtons) {
-        btn.classList[btn === button ? "add" : "remove"]("active");
-      }
+        /* Apply active class */
+        for (const btn of nanoButtons) {
+          btn.classList[btn === button ? "add" : "remove"]("active");
+        }
 
-      /* Create fresh instance */
-      nanoPickr = new Pickr(
-        Object.assign(
-          {
-            el,
-            theme,
-            default: "#845adf",
-          },
-          config
-        )
-      );
-
-      /* Set events */
-      nanoPickr.on("changestop", (source, instance) => {
-        let color = instance.getColor().toRGBA();
-        let html = document.querySelector("html");
-        html.style.setProperty(
-          "--primary-rgb",
-          `${Math.floor(color[0])}, ${Math.floor(color[1])}, ${Math.floor(
-            color[2]
-          )}`
+        /* Create fresh instance */
+        nanoPickr = new Pickr(
+          Object.assign(
+            {
+              el,
+              theme,
+              default: "#845adf",
+            },
+            config
+          )
         );
-        /* theme color picker */
-        localStorage.setItem(
-          "primaryRGB",
-          `${Math.floor(color[0])}, ${Math.floor(color[1])}, ${Math.floor(
-            color[2]
-          )}`
-        );
-        updateColors();
+
+        /* Set events */
+        nanoPickr.on("changestop", (source, instance) => {
+          let color = instance.getColor().toRGBA();
+          let html = document.querySelector("html");
+          html.style.setProperty(
+            "--primary-rgb",
+            `${Math.floor(color[0])}, ${Math.floor(color[1])}, ${Math.floor(
+              color[2]
+            )}`
+          );
+          /* theme color picker */
+          localStorage.setItem(
+            "primaryRGB",
+            `${Math.floor(color[0])}, ${Math.floor(color[1])}, ${Math.floor(
+              color[2]
+            )}`
+          );
+          updateColors();
+        });
       });
-    });
 
-    themeContainerPrimary.appendChild(button);
+      themeContainerPrimary.appendChild(button);
+    }
+    nanoButtons[0].click();
   }
-  nanoButtons[0].click();
   /* for theme primary */
 
   /* for theme background */
-  const nanoThemes1 = [
-    [
-      "nano",
-      {
-        defaultRepresentation: "RGB",
-        components: {
-          preview: true,
-          opacity: false,
-          hue: true,
+  if (window.Pickr && pickrContainerBackground && themeContainerBackground) {
+    const nanoThemes1 = [
+      [
+        "nano",
+        {
+          defaultRepresentation: "RGB",
+          components: {
+            preview: true,
+            opacity: false,
+            hue: true,
 
-          interaction: {
-            hex: false,
-            rgba: true,
-            hsva: false,
-            input: true,
-            clear: false,
-            save: false,
+            interaction: {
+              hex: false,
+              rgba: true,
+              hsva: false,
+              input: true,
+              clear: false,
+              save: false,
+            },
           },
         },
-      },
-    ],
-  ];
-  const nanoButtons1 = [];
-  let nanoPickr1 = null;
-  for (const [theme, config] of nanoThemes) {
-    const button = document.createElement("button");
-    button.innerHTML = theme;
-    nanoButtons1.push(button);
+      ],
+    ];
+    const nanoButtons1 = [];
+    let nanoPickr1 = null;
+    for (const [theme, config] of nanoThemes1) {
+      const button = document.createElement("button");
+      button.innerHTML = theme;
+      nanoButtons1.push(button);
 
-    button.addEventListener("click", () => {
-      const el = document.createElement("p");
-      pickrContainerBackground.appendChild(el);
+      button.addEventListener("click", () => {
+        const el = document.createElement("p");
+        pickrContainerBackground.appendChild(el);
 
-      /* Delete previous instance */
-      if (nanoPickr1) {
-        nanoPickr1.destroyAndRemove();
-      }
+        /* Delete previous instance */
+        if (nanoPickr1) {
+          nanoPickr1.destroyAndRemove();
+        }
 
-      /* Apply active class */
-      for (const btn of nanoButtons) {
-        btn.classList[btn === button ? "add" : "remove"]("active");
-      }
+        /* Apply active class */
+        for (const btn of nanoButtons1) {
+          btn.classList[btn === button ? "add" : "remove"]("active");
+        }
 
-      /* Create fresh instance */
-      nanoPickr1 = new Pickr(
-        Object.assign(
-          {
-            el,
-            theme,
-            default: "#845adf",
-          },
-          config
-        )
-      );
-
-      /* Set events */
-      nanoPickr1.on("changestop", (source, instance) => {
-        let color = instance.getColor().toRGBA();
-        let html = document.querySelector("html");
-        html.style.setProperty(
-          "--body-bg-rgb",
-          `${color[0]}, ${color[1]}, ${color[2]}`
+        /* Create fresh instance */
+        nanoPickr1 = new Pickr(
+          Object.assign(
+            {
+              el,
+              theme,
+              default: "#845adf",
+            },
+            config
+          )
         );
-        document
-          .querySelector("html")
-          .style.setProperty(
-            "--body-bg-rgb2",
+
+        /* Set events */
+        nanoPickr1.on("changestop", (source, instance) => {
+          let color = instance.getColor().toRGBA();
+          let html = document.querySelector("html");
+          html.style.setProperty(
+            "--body-bg-rgb",
+            `${color[0]}, ${color[1]}, ${color[2]}`
+          );
+          document
+            .querySelector("html")
+            .style.setProperty(
+              "--body-bg-rgb2",
+              `${color[0] + 14}, ${color[1] + 14}, ${color[2] + 14}`
+            );
+          document
+            .querySelector("html")
+            .style.setProperty(
+              "--light-rgb",
+              `${color[0] + 14}, ${color[1] + 14}, ${color[2] + 14}`
+            );
+          document
+            .querySelector("html")
+            .style.setProperty(
+              "--form-control-bg",
+              `rgb(${color[0] + 14}, ${color[1] + 14}, ${color[2] + 14})`
+            );
+          localStorage.removeItem("bgtheme");
+          updateColors();
+          html.setAttribute("data-theme-mode", "dark");
+          html.setAttribute("data-menu-styles", "dark");
+          html.setAttribute("data-header-styles", "dark");
+          const d = document.querySelector("#switcher-dark-theme");
+          if (d) d.checked = true;
+          localStorage.setItem(
+            "bodyBgRGB",
+            `${color[0]}, ${color[1]}, ${color[2]}`
+          );
+          localStorage.setItem(
+            "bodylightRGB",
             `${color[0] + 14}, ${color[1] + 14}, ${color[2] + 14}`
           );
-        document
-          .querySelector("html")
-          .style.setProperty(
-            "--light-rgb",
-            `${color[0] + 14}, ${color[1] + 14}, ${color[2] + 14}`
-          );
-        document
-          .querySelector("html")
-          .style.setProperty(
-            "--form-control-bg",
-            `rgb(${color[0] + 14}, ${color[1] + 14}, ${color[2] + 14})`
-          );
-        localStorage.removeItem("bgtheme");
-        updateColors();
-        html.setAttribute("data-theme-mode", "dark");
-        html.setAttribute("data-menu-styles", "dark");
-        html.setAttribute("data-header-styles", "dark");
-        document.querySelector("#switcher-dark-theme").checked = true;
-        localStorage.setItem(
-          "bodyBgRGB",
-          `${color[0]}, ${color[1]}, ${color[2]}`
-        );
-        localStorage.setItem(
-          "bodylightRGB",
-          `${color[0] + 14}, ${color[1] + 14}, ${color[2] + 14}`
-        );
+        });
       });
-    });
-    themeContainerBackground.appendChild(button);
+      themeContainerBackground.appendChild(button);
+    }
+    nanoButtons1[0].click();
   }
-  nanoButtons1[0].click();
   /* for theme background */
 
   /* header theme toggle */
@@ -237,8 +242,10 @@
         html.setAttribute("style", "");
       }
       html.removeAttribute("data-bg-theme");
-      document.querySelector("#switcher-light-theme").checked = true;
-      document.querySelector("#switcher-menu-light").checked = true;
+      const slt = document.querySelector("#switcher-light-theme");
+      const sml = document.querySelector("#switcher-menu-light");
+      if (slt) slt.checked = true;
+      if (sml) sml.checked = true;
       document
         .querySelector("html")
         .style.removeProperty("--body-bg-rgb", localStorage.bodyBgRGB);
@@ -247,14 +254,22 @@
       html.style.removeProperty("--light-rgb");
       html.style.removeProperty("--form-control-bg");
       html.style.removeProperty("--input-border");
-      document.querySelector("#switcher-header-light").checked = true;
-      document.querySelector("#switcher-menu-light").checked = true;
-      document.querySelector("#switcher-light-theme").checked = true;
-      document.querySelector("#switcher-background4").checked = false;
-      document.querySelector("#switcher-background3").checked = false;
-      document.querySelector("#switcher-background2").checked = false;
-      document.querySelector("#switcher-background1").checked = false;
-      document.querySelector("#switcher-background").checked = false;
+      const shl = document.querySelector("#switcher-header-light");
+      const sml2 = document.querySelector("#switcher-menu-light");
+      const slt2 = document.querySelector("#switcher-light-theme");
+      const bg4 = document.querySelector("#switcher-background4");
+      const bg3 = document.querySelector("#switcher-background3");
+      const bg2 = document.querySelector("#switcher-background2");
+      const bg1 = document.querySelector("#switcher-background1");
+      const bg0 = document.querySelector("#switcher-background");
+      if (shl) shl.checked = true;
+      if (sml2) sml2.checked = true;
+      if (slt2) slt2.checked = true;
+      if (bg4) bg4.checked = false;
+      if (bg3) bg3.checked = false;
+      if (bg2) bg2.checked = false;
+      if (bg1) bg1.checked = false;
+      if (bg0) bg0.checked = false;
       localStorage.removeItem("Adminordarktheme");
       localStorage.removeItem("AdminorMenu");
       localStorage.removeItem("AdminorHeader");
@@ -271,18 +286,26 @@
         html.setAttribute("style", "");
       }
       html.setAttribute("data-menu-styles", "dark");
-      document.querySelector("#switcher-dark-theme").checked = true;
-      document.querySelector("#switcher-menu-dark").checked = true;
-      document.querySelector("#switcher-header-dark").checked = true;
+      const sdt = document.querySelector("#switcher-dark-theme");
+      const smd = document.querySelector("#switcher-menu-dark");
+      const shd = document.querySelector("#switcher-header-dark");
+      if (sdt) sdt.checked = true;
+      if (smd) smd.checked = true;
+      if (shd) shd.checked = true;
       checkOptions();
-      document.querySelector("#switcher-menu-dark").checked = true;
-      document.querySelector("#switcher-header-dark").checked = true;
-      document.querySelector("#switcher-dark-theme").checked = true;
-      document.querySelector("#switcher-background4").checked = false;
-      document.querySelector("#switcher-background3").checked = false;
-      document.querySelector("#switcher-background2").checked = false;
-      document.querySelector("#switcher-background1").checked = false;
-      document.querySelector("#switcher-background").checked = false;
+      if (smd) smd.checked = true;
+      if (shd) shd.checked = true;
+      if (sdt) sdt.checked = true;
+      const bg4 = document.querySelector("#switcher-background4");
+      const bg3 = document.querySelector("#switcher-background3");
+      const bg2 = document.querySelector("#switcher-background2");
+      const bg1 = document.querySelector("#switcher-background1");
+      const bg0 = document.querySelector("#switcher-background");
+      if (bg4) bg4.checked = false;
+      if (bg3) bg3.checked = false;
+      if (bg2) bg2.checked = false;
+      if (bg1) bg1.checked = false;
+      if (bg0) bg0.checked = false;
       localStorage.setItem("Adminordarktheme", "true");
       localStorage.setItem("AdminorMenu", "dark");
       localStorage.setItem("AdminorHeader", "dark");
@@ -291,7 +314,7 @@
     }
   }
   let layoutSetting = document.querySelector(".layout-setting");
-  layoutSetting.addEventListener("click", toggleTheme);
+  if (layoutSetting) layoutSetting.addEventListener("click", toggleTheme);
   /* header theme toggle */
 
   /* Choices JS */
@@ -413,9 +436,9 @@ function openFullscreen() {
       /* IE11 */
       elem.msRequestFullscreen();
     }
-    close.classList.add("d-block");
-    close.classList.remove("d-none");
-    open.classList.add("d-none");
+    if (close) close.classList.add("d-block");
+    if (close) close.classList.remove("d-none");
+    if (open) open.classList.add("d-none");
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -427,10 +450,10 @@ function openFullscreen() {
       /* IE11 */
       document.msExitFullscreen();
     }
-    close.classList.remove("d-block");
-    open.classList.remove("d-none");
-    close.classList.add("d-none");
-    open.classList.add("d-block");
+    if (close) close.classList.remove("d-block");
+    if (open) open.classList.remove("d-none");
+    if (close) close.classList.add("d-none");
+    if (open) open.classList.add("d-block");
   }
 }
 /* full screen */
@@ -533,5 +556,28 @@ document.addEventListener('DOMContentLoaded', function () {
       // Remove active class from the navbar-form
       document.getElementById('myNavbarForm').classList.remove('active');
   });
+  // Ensure sidebar toggle works regardless of theme script state
+  const sidemenuToggle = document.querySelector('.sidemenu-toggle');
+  if (sidemenuToggle) {
+    sidemenuToggle.addEventListener('click', function () {
+      const html = document.documentElement;
+      const verticalStyle = html.getAttribute('data-vertical-style') || 'overlay';
+      if (verticalStyle === 'overlay') {
+        const isClosed = html.getAttribute('data-toggled') === 'icon-overlay-close';
+        if (isClosed) {
+          html.removeAttribute('data-toggled');
+        } else {
+          html.setAttribute('data-toggled', 'icon-overlay-close');
+        }
+      } else {
+        const isClosed = html.getAttribute('data-toggled') === 'close';
+        if (isClosed) {
+          html.removeAttribute('data-toggled');
+        } else {
+          html.setAttribute('data-toggled', 'close');
+        }
+      }
+    });
+  }
 });
 /* for Search */
