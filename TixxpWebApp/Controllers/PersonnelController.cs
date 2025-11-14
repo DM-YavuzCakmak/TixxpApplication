@@ -1,11 +1,10 @@
-﻿// CONTROLLER
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
-using Tixxp.Business.DataTransferObjects.Personnel.Login;
 using Tixxp.Business.Services.Abstract.PersonnelRoleService;
 using Tixxp.Business.Services.Abstract.PersonnelService;
 using Tixxp.Business.Services.Abstract.RoleService;
-using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Core.Utilities.Results.Concrete;
 using Tixxp.Entities.Personnel;
 using Tixxp.Entities.PersonnelRole;
@@ -16,57 +15,73 @@ namespace Tixxp.WebApp.Controllers
     {
         private readonly IPersonnelService _personnelService;
         private readonly IPersonnelRoleService _personnelRoleService;
-
         private readonly IRoleService _roleService;
+        private readonly IStringLocalizer<PersonnelController> _localizer;
 
-        public PersonnelController(IPersonnelService personnelService, IPersonnelRoleService personnelRoleService, IRoleService roleService)
+
+        public PersonnelController(
+            IPersonnelService personnelService,
+            IPersonnelRoleService personnelRoleService,
+            IRoleService roleService,
+            IStringLocalizer<PersonnelController> localizer)
         {
             _personnelService = personnelService;
             _personnelRoleService = personnelRoleService;
             _roleService = roleService;
+            _localizer = localizer;
         }
 
+        // ----------------------------------------------------
+        // INDEX
+        // ----------------------------------------------------
         public IActionResult Index()
         {
-            var personnelIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (personnelIdClaim == null)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Auth");
 
-            long personnelId = Convert.ToInt64(personnelIdClaim.Value);
+            long currentUserId = Convert.ToInt64(userId);
+            var currentUser = _personnelService.GetById(currentUserId);
 
-            var personnelResult = _personnelService.GetById(personnelId);
-            if (!personnelResult.Success || personnelResult.Data == null)
+            if (!currentUser.Success || currentUser.Data == null)
                 return RedirectToAction("Login", "Auth");
 
-            var companyIdentifier = personnelResult.Data.CompanyIdentifier;
+            string companyIdentifier = currentUser.Data.CompanyIdentifier;
 
-            var personnelListResult = _personnelService.GetList(x => x.CompanyIdentifier == companyIdentifier && x.Id != personnelId && !x.IsDeleted);
-            var personnelList = personnelListResult?.Data?.ToList() ?? new List<PersonnelEntity>();
+            var listResult = _personnelService.GetList(x =>
+                x.CompanyIdentifier == companyIdentifier &&
+                x.Id != currentUserId &&
+                !x.IsDeleted);
 
-            return View(personnelList);
+            return View(listResult?.Data?.ToList() ?? new List<PersonnelEntity>());
         }
 
+        // ----------------------------------------------------
+        // HIERARCHY TREE
+        // ----------------------------------------------------
         [HttpGet]
         public JsonResult GetHierarchyTree()
         {
-            var personnelIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (personnelIdClaim == null)
-                return Json(new { success = false, message = "Oturum bulunamadı" });
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
 
-            long personnelId = Convert.ToInt64(personnelIdClaim.Value);
-            var currentUser = _personnelService.GetById(personnelId);
+            long currentUserId = Convert.ToInt64(userId);
+            var currentUser = _personnelService.GetById(currentUserId);
+
             if (!currentUser.Success || currentUser.Data == null)
-                return Json(new { success = false, message = "Kullanıcı bilgisi alınamadı" });
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
 
-            var listResult = _personnelService.GetList(x => x.CompanyIdentifier == currentUser.Data.CompanyIdentifier && !x.IsDeleted);
-            if (!listResult.Success || listResult.Data == null)
-                return Json(new { success = false, message = "Veri alınamadı" });
+            var list = _personnelService.GetList(x =>
+                x.CompanyIdentifier == currentUser.Data.CompanyIdentifier &&
+                !x.IsDeleted);
 
-            var allPersonnel = listResult.Data;
+            if (!list.Success || list.Data == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
 
-            var tree = BuildTree(null, allPersonnel);
+            var tree = BuildTree(null, list.Data);
 
-            return Json(new { success = true, data = tree });
+            return Json(new SuccessDataResult<object>(tree));
         }
 
         private List<object> BuildTree(long? parentId, IEnumerable<PersonnelEntity> all)
@@ -81,191 +96,227 @@ namespace Tixxp.WebApp.Controllers
                 }).ToList<object>();
         }
 
+        // ----------------------------------------------------
+        // GET BY ID
+        // ----------------------------------------------------
         [HttpGet]
         public JsonResult GetById(long id)
         {
             var result = _personnelService.GetById(id);
-            if (result.Success && result.Data != null)
-            {
-                var personnel = result.Data;
-                return Json(new
-                {
-                    success = true,
-                    data = new
-                    {
-                        id = personnel.Id,
-                        firstName = personnel.FirstName,
-                        lastName = personnel.LastName,
-                        email = personnel.Email,
-                        phone = personnel.Phone
-                    }
-                });
-            }
 
-            return Json(new { success = false, message = "Kullanıcı bulunamadı." });
+            if (!result.Success || result.Data == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
+
+            var p = result.Data;
+
+            return Json(new SuccessDataResult<object>(new
+            {
+                id = p.Id,
+                firstName = p.FirstName,
+                lastName = p.LastName,
+                email = p.Email,
+                phone = p.Phone
+            }));
         }
 
-
+        // ----------------------------------------------------
+        // SAVE (ADD / UPDATE)
+        // ----------------------------------------------------
         [HttpPost]
         public JsonResult Save(PersonnelEntity model)
         {
+            // VALIDATION - BASIC CHECKS
+            if (model == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.MODEL_INVALID"]));
+
             if (string.IsNullOrWhiteSpace(model.FirstName) ||
                 string.IsNullOrWhiteSpace(model.LastName) ||
                 string.IsNullOrWhiteSpace(model.Email))
             {
-                return Json(new ErrorResult("Zorunlu alanlar doldurulmalıdır."));
+                return Json(new ErrorResult(_localizer["personnel.ERROR.MODEL_INVALID"]));
             }
 
-            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserIdStr))
-                return Json(new ErrorResult("Oturum bilgisi bulunamadı."));
+            // EMAIL VALIDATION
+            if (!System.Text.RegularExpressions.Regex.IsMatch(model.Email, @"^[^\s@]+@[^\s@]+\.[^\s@]+$"))
+                return Json(new ErrorResult(_localizer["personnel.ERROR.EMAIL_INVALID"]));
 
-            long currentUserId = Convert.ToInt64(currentUserIdStr);
+            // PHONE VALIDATION (OPTIONAL)
+            if (!string.IsNullOrEmpty(model.Phone))
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(model.Phone, @"^[0-9]{10}$"))
+                    return Json(new ErrorResult(_localizer["personnel.ERROR.PHONE_INVALID"]));
+            }
 
-            // Kullanıcının sistemde varlığını kontrol et
-            var currentUserResult = _personnelService.GetById(currentUserId);
-            if (!currentUserResult.Success || currentUserResult.Data == null)
-                return Json(new ErrorResult("Kullanıcı bilgisi alınamadı."));
+            // AUTH
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
 
+            long currentUserId = Convert.ToInt64(userId);
+            var currentUser = _personnelService.GetById(currentUserId);
+
+            if (!currentUser.Success || currentUser.Data == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
+
+            // ----------------------------------------------------
+            // CREATE NEW USER
+            // ----------------------------------------------------
             if (model.Id == 0)
             {
-                // Yeni kullanıcı ekleme
                 if (string.IsNullOrWhiteSpace(model.Password))
-                    return Json(new ErrorResult("Şifre alanı zorunludur."));
+                    return Json(new ErrorResult(_localizer["personnel.ERROR.PASSWORD_REQUIRED"]));
 
-                var saltBytes = _personnelService.GenerateSalt();
-                var saltBase64 = Convert.ToBase64String(saltBytes);
-                var hash = _personnelService.GenerateSha256Hash(saltBytes, model.Password);
+                byte[] salt = _personnelService.GenerateSalt();
+                string saltStr = Convert.ToBase64String(salt);
+                string passwordHash = _personnelService.GenerateSha256Hash(salt, model.Password);
 
                 model.UserName = model.Email;
-                model.Password = hash;
-                model.Salt = saltBase64;
+                model.Password = passwordHash;
+                model.Salt = saltStr;
                 model.IsActive = true;
                 model.IsDeleted = false;
                 model.LoginTypeId = 2;
                 model.Created_Date = DateTime.Now;
                 model.CreatedBy = currentUserId;
-                model.CompanyIdentifier = currentUserResult.Data.CompanyIdentifier;
-
+                model.CompanyIdentifier = currentUser.Data.CompanyIdentifier;
                 model.NationalIdNumber ??= "123";
+
                 var addResult = _personnelService.Add(model);
-                return Json(addResult);
+
+                if (!addResult.Success)
+                    return Json(new ErrorResult(_localizer["personnel.ERROR.SAVE_FAILED"]));
+
+                return Json(new SuccessResult(_localizer["personnel.SUCCESS.SAVED"]));
             }
-            else
-            {
-                var existing = _personnelService.GetById(model.Id);
-                if (!existing.Success || existing.Data == null)
-                    return Json(new ErrorResult("Güncellenecek kullanıcı bulunamadı."));
 
-                var personnel = existing.Data;
+            // ----------------------------------------------------
+            // UPDATE EXISTING USER
+            // ----------------------------------------------------
+            var existing = _personnelService.GetById(model.Id);
+            if (!existing.Success || existing.Data == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
 
-                personnel.FirstName = model.FirstName;
-                personnel.LastName = model.LastName;
-                personnel.Email = model.Email;
-                personnel.UserName = model.Email;
-                personnel.Phone = model.Phone;
-                personnel.Updated_Date = DateTime.Now;
-                personnel.UpdatedBy = currentUserId;
+            var p = existing.Data;
 
-                var updateResult = _personnelService.Update(personnel);
-                return Json(updateResult);
-            }
+            p.FirstName = model.FirstName;
+            p.LastName = model.LastName;
+            p.Email = model.Email;
+            p.UserName = model.Email;
+            p.Phone = model.Phone;
+            p.Updated_Date = DateTime.Now;
+            p.UpdatedBy = currentUserId;
+
+            var updateResult = _personnelService.Update(p);
+
+            if (!updateResult.Success)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.SAVE_FAILED"]));
+
+            return Json(new SuccessResult(_localizer["personnel.SUCCESS.SAVED"]));
         }
 
+        // ----------------------------------------------------
+        // DELETE
+        // ----------------------------------------------------
         [HttpPost]
         public JsonResult Delete(long id)
         {
-            var personnelResult = _personnelService.GetById(id);
-            if (!personnelResult.Success || personnelResult.Data == null)
-                return Json(new { success = false, message = "Kullanıcı bulunamadı." });
+            var user = _personnelService.GetById(id);
 
-            var personnel = personnelResult.Data;
-            personnel.IsDeleted = true;
-            personnel.Updated_Date = DateTime.Now;
+            if (!user.Success || user.Data == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
 
-            var updateResult = _personnelService.Update(personnel);
+            var p = user.Data;
+            p.IsDeleted = true;
+            p.Updated_Date = DateTime.Now;
 
-            if (updateResult.Success)
-                return Json(new { success = true, message = "Kullanıcı başarıyla silindi." });
+            var update = _personnelService.Update(p);
 
-            return Json(new { success = false, message = "Silme işlemi sırasında hata oluştu." });
+            if (!update.Success)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.DELETE_FAILED"]));
+
+            return Json(new SuccessResult(_localizer["personnel.SUCCESS.DELETED"]));
         }
 
-
+        // ----------------------------------------------------
+        // GET ALL ROLES
+        // ----------------------------------------------------
         [HttpGet]
         public JsonResult GetAllRole()
         {
             var result = _roleService.GetAll();
-            if (result.Success && result.Data != null)
-            {
-                var roles = result.Data.Select(r => new
-                {
-                    id = r.Id,
-                    name = r.Name
-                }).ToList();
 
-                return Json(new { success = true, data = roles });
-            }
+            if (!result.Success || result.Data == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.ROLE_NOT_FOUND"]));
 
-            return Json(new { success = false, message = "Rol listesi alınamadı." });
+            var roles = result.Data.Select(r => new { id = r.Id, name = r.Name }).ToList();
+
+            return Json(new SuccessDataResult<object>(roles));
         }
 
-
+        // ----------------------------------------------------
+        // ASSIGN ROLE
+        // ----------------------------------------------------
         [HttpPost]
         public JsonResult AssignRole(long personnelId, long roleId)
         {
             if (personnelId <= 0 || roleId <= 0)
-                return Json(new ErrorResult("Geçersiz kullanıcı veya rol bilgisi."));
+                return Json(new ErrorResult(_localizer["personnel.ERROR.INVALID_ID"]));
 
-            var existing = _personnelRoleService.GetFirstOrDefault(x => x.PersonnelId == personnelId && x.RoleId == roleId);
-            if (existing.Success && existing.Data != null)
-            {
-                return Json(new ErrorResult("Kullanıcı bu role sahip."));
-            }
+            var exists = _personnelRoleService
+                .GetFirstOrDefault(x => x.PersonnelId == personnelId && x.RoleId == roleId);
 
-            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserIdStr))
-                return Json(new ErrorResult("Oturum bilgisi bulunamadı."));
+            if (exists.Success && exists.Data != null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.ROLE_ALREADY_ASSIGNED"]));
 
-            long currentUserId = Convert.ToInt64(currentUserIdStr);
-
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Json(new ErrorResult(_localizer["personnel.ERROR.NOT_FOUND"]));
 
             var newRole = new PersonnelRoleEntity
             {
                 PersonnelId = personnelId,
                 RoleId = roleId,
                 Created_Date = DateTime.Now,
-                CreatedBy = currentUserId
+                CreatedBy = Convert.ToInt64(userId)
             };
 
             var addResult = _personnelRoleService.Add(newRole);
-            return Json(addResult);
+
+            if (!addResult.Success)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.ROLE_ASSIGN_FAILED"]));
+
+            return Json(new SuccessResult(_localizer["personnel.SUCCESS.ROLE_ASSIGNED"]));
         }
 
+        // ----------------------------------------------------
+        // GET ROLES OF PERSONNEL
+        // ----------------------------------------------------
         [HttpGet]
         public JsonResult GetRolesByPersonnelId(long personnelId)
         {
-            var personnelRolesResult = _personnelRoleService.GetList(x => x.PersonnelId == personnelId && !x.IsDeleted);
-            if (!personnelRolesResult.Success || personnelRolesResult.Data == null)
-            {
-                return Json(new { success = false, message = "Rol atamaları alınamadı." });
-            }
+            var result = _personnelRoleService.GetList(x =>
+                x.PersonnelId == personnelId &&
+                !x.IsDeleted);
+
+            if (!result.Success || result.Data == null)
+                return Json(new ErrorResult(_localizer["personnel.ERROR.ROLE_NOT_FOUND"]));
 
             var roleList = new List<object>();
-            foreach (var item in personnelRolesResult.Data)
+
+            foreach (var pr in result.Data)
             {
-                var roleResult = _roleService.GetById(item.RoleId);
-                if (roleResult.Success && roleResult.Data != null)
+                var role = _roleService.GetById(pr.RoleId);
+                if (role.Success && role.Data != null)
                 {
                     roleList.Add(new
                     {
-                        id = roleResult.Data.Id,
-                        name = roleResult.Data.Name
+                        id = role.Data.Id,
+                        name = role.Data.Name
                     });
                 }
             }
 
-            return Json(new { success = true, data = roleList });
+            return Json(new SuccessDataResult<object>(roleList));
         }
     }
 }

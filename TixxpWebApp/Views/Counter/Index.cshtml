@@ -1,14 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
-@using System.Linq
 @model List<Tixxp.WebApp.Models.Counter.CounterListVm>
 @inject IViewLocalizer Localizer
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <div class="main-content app-content">
     <div class="container-fluid">
+
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
             <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["counter.INDEX.TITLE"]</h1>
         </div>
@@ -19,10 +18,11 @@
                     <div class="card-header">
                         <div class="card-title">@Localizer["counter.INDEX.COUNTER_LIST"]</div>
                     </div>
+
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table text-nowrap table-sm">
-                                <thead>
+                            <table class="table text-nowrap table-hover table-bordered align-middle">
+                                <thead class="table-light">
                                     <tr>
                                         <th>@Localizer["counter.INDEX.COUNTER_NAME"]</th>
                                         <th>@Localizer["counter.INDEX.OKC_SERIAL"]</th>
@@ -30,9 +30,11 @@
                                         <th>@Localizer["counter.INDEX.OKC"]</th>
                                         <th>@Localizer["counter.INDEX.TSM"]</th>
                                         <th>@Localizer["counter.INDEX.GMP"]</th>
+                                        <th>@Localizer["counter.INDEX.OTP"]</th>
                                         <th>@Localizer["counter.INDEX.ACTION"]</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     @if (Model != null && Model.Any())
                                     {
@@ -42,31 +44,39 @@
                                                 <td>@counter.Name</td>
                                                 <td>@counter.OkcFiscalSerialNumber</td>
                                                 <td>@counter.IpAddress</td>
+
                                                 <td>
                                                     <span class="badge @(counter.IsOkcIntegrated ? "bg-success-transparent" : "bg-danger-transparent")">
                                                         @(counter.IsOkcIntegrated? Localizer["counter.INDEX.ACTIVE"] : Localizer["counter.INDEX.PASSIVE"])
                                                     </span>
                                                 </td>
+
                                                 <td>
                                                     <span class="badge @(counter.TsmOpen ? "bg-success-transparent" : "bg-danger-transparent")">
                                                         @(counter.TsmOpen? Localizer["counter.INDEX.ACTIVE"] : Localizer["counter.INDEX.PASSIVE"])
                                                     </span>
                                                 </td>
+
                                                 <td>
                                                     <span class="badge @(counter.GmpOpen ? "bg-success-transparent" : "bg-danger-transparent")">
                                                         @(counter.GmpOpen? Localizer["counter.INDEX.ACTIVE"] : Localizer["counter.INDEX.PASSIVE"])
                                                     </span>
                                                 </td>
+
                                                 <td>
-                                                    <div class="hstack gap-2 fs-15">
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="openEditModal(@counter.Id)">
+                                                    <span class="badge @(counter.OtpVerification ? "bg-success-transparent" : "bg-danger-transparent")">
+                                                        @(counter.OtpVerification? Localizer["counter.INDEX.ACTIVE"] : Localizer["counter.INDEX.PASSIVE"])
+                                                    </span>
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <div class="hstack gap-2">
+                                                        <button class="btn btn-icon btn-sm btn-light" onclick="openEditModal(@counter.Id)" title="@Localizer["counter.INDEX.EDIT"]">
                                                             <i class="ri-edit-line"></i>
-                                                        </a>
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="confirmDelete(@counter.Id)">
+                                                        </button>
+                                                        <button class="btn btn-icon btn-sm btn-light" onclick="confirmDelete(@counter.Id)" title="@Localizer["counter.INDEX.DELETE"]">
                                                             <i class="ri-delete-bin-line"></i>
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -74,145 +84,236 @@
                                     }
                                     else
                                     {
-                                        <tr><td colspan="7" class="text-center">@Localizer["counter.INDEX.NO_RECORD"]</td></tr>
+                                        <tr>
+                                            <td colspan="8" class="text-center">@Localizer["counter.INDEX.NO_RECORD"]</td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- Düzenleme Modalı -->
+<!-- EDIT MODAL -->
 <div class="modal fade" id="editCounterModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
+
             <div class="modal-header bg-light p-3">
                 <h5 class="modal-title">@Localizer["counter.INDEX.EDIT_COUNTER"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
                 <form id="editCounterForm">
-                    <input type="hidden" id="editId" name="Id" />
+
+                    <input type="hidden" id="editId" />
 
                     <div class="row">
+
                         <div class="col-md-6 mb-3">
                             <label class="form-label">@Localizer["counter.INDEX.COUNTER_NAME_TR"]</label>
-                            <input type="text" class="form-control" id="editNameTr" name="NameTr" required />
+                            <input type="text" class="form-control" id="editNameTr" required />
                         </div>
+
                         <div class="col-md-6 mb-3">
                             <label class="form-label">@Localizer["counter.INDEX.COUNTER_NAME_EN"]</label>
-                            <input type="text" class="form-control" id="editNameEn" name="NameEn" />
+                            <input type="text" class="form-control" id="editNameEn" />
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">@Localizer["counter.INDEX.OKC_SERIAL"]</label>
-                            <input type="text" class="form-control" id="editSerial" name="OkcFiscalSerialNumber" />
+                            <input type="text" class="form-control" id="editSerial" />
                         </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">@Localizer["counter.INDEX.OKC_BRAND"]</label>
+                            <input type="number" class="form-control" id="editOkcBrand" />
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">@Localizer["counter.INDEX.OKC_PASSWORD"]</label>
+                            <input type="text" class="form-control" id="editOkcPassword" />
+                        </div>
+
                         <div class="col-md-6 mb-3">
                             <label class="form-label">@Localizer["counter.INDEX.IP_ADDRESS"]</label>
-                            <input type="text" class="form-control" id="editIp" name="IpAddress" />
+                            <input type="text" class="form-control" id="editIp" />
                         </div>
-                        <div class="col-md-6 mb-3">
+
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">@Localizer["counter.INDEX.PORT"]</label>
-                            <input type="number" class="form-control" id="editPort" name="Port" />
+                            <input type="number" class="form-control" id="editPort" />
                         </div>
-                        <div class="col-md-6 mb-3">
+
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">@Localizer["counter.INDEX.VERSION"]</label>
-                            <input type="text" class="form-control" id="editVersion" name="Version" />
+                            <input type="text" class="form-control" id="editVersion" />
                         </div>
+
+                        <!-- BOOL ALANLAR -->
+                        <div class="col-md-4 mb-2">
+                            <label class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editOkcIntegrated">
+                                <span class="form-check-label">@Localizer["counter.INDEX.OKC_INTEGRATED"]</span>
+                            </label>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editTsmOpen">
+                                <span class="form-check-label">@Localizer["counter.INDEX.TSM_OPEN"]</span>
+                            </label>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editGmpOpen">
+                                <span class="form-check-label">@Localizer["counter.INDEX.GMP_OPEN"]</span>
+                            </label>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editOtpVerification">
+                                <span class="form-check-label">@Localizer["counter.INDEX.OTP_VERIFICATION"]</span>
+                            </label>
+                        </div>
+
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">@Localizer["counter.INDEX.SAVE"]</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        @Localizer["counter.INDEX.SAVE"]
+                    </button>
+
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
+
     function openEditModal(id) {
-        $.get('/Counter/GetById', { id: id }, function (data) {
-            $('#editId').val(data.counter.id);
+        $.get('/Counter/GetById', { id: id }, function (resp) {
 
-            var trName = "";
-            var enName = "";
-            if (data.translations) {
-                var tr = data.translations.find(t => t.languageId == 1);
-                var en = data.translations.find(t => t.languageId == 2);
-                if (tr) trName = tr.name;
-                if (en) enName = en.name;
-            }
-            $('#editNameTr').val(trName);
-            $('#editNameEn').val(enName);
+            const c = resp.counter;
 
-            $('#editSerial').val(data.counter.okcFiscalSerialNumber);
-            $('#editIp').val(data.counter.ipAddress);
-            $('#editPort').val(data.counter.port);
-            $('#editVersion').val(data.counter.version);
+            $('#editId').val(c.id);
+
+            let tr = resp.translations.find(x => x.languageId == 1);
+            let en = resp.translations.find(x => x.languageId == 2);
+
+            $('#editNameTr').val(tr ? tr.name : "");
+            $('#editNameEn').val(en ? en.name : "");
+
+            $('#editSerial').val(c.okcFiscalSerialNumber);
+            $('#editOkcBrand').val(c.okcBrand);
+            $('#editOkcPassword').val(c.okcPassword);
+            $('#editIp').val(c.ipAddress);
+            $('#editPort').val(c.port);
+            $('#editVersion').val(c.version);
+
+            $('#editOkcIntegrated').prop('checked', c.isOkcIntegrated);
+            $('#editTsmOpen').prop('checked', c.tsmOpen);
+            $('#editGmpOpen').prop('checked', c.gmpOpen);
+            $('#editOtpVerification').prop('checked', c.otpVerification);
 
             $('#editCounterModal').modal('show');
-        }).fail(function () {
-            Swal.fire({
-                icon: 'error',
-                title: '@Localizer["counter.INDEX.ERROR"]',
-                text: '@Localizer["counter.INDEX.ERROR_FETCH"]'
-            });
+
         });
     }
+
 
     $("#editCounterForm").submit(function (e) {
         e.preventDefault();
 
         var payload = {
-            Id: $('#editId').val(),
-            OkcFiscalSerialNumber: $('#editSerial').val(),
-            IpAddress: $('#editIp').val(),
-            Port: $('#editPort').val(),
-            Version: $('#editVersion').val()
+            id: Number($('#editId').val()),
+            okcFiscalSerialNumber: $('#editSerial').val(),
+            okcBrand: Number($('#editOkcBrand').val()),
+            okcPassword: $('#editOkcPassword').val(),
+            ipAddress: $('#editIp').val(),
+            port: Number($('#editPort').val()),
+            version: $('#editVersion').val(),
+
+            isOkcIntegrated: $('#editOkcIntegrated').is(":checked"),
+            tsmOpen: $('#editTsmOpen').is(":checked"),
+            gmpOpen: $('#editGmpOpen').is(":checked"),
+            otpVerification: $('#editOtpVerification').is(":checked")
         };
 
-        $.post('/Counter/Update', payload, function (res) {
-            if (res.success) {
-                var translations = [
-                    { CounterId: payload.Id, LanguageId: 1, Name: $('#editNameTr').val() },
-                    { CounterId: payload.Id, LanguageId: 2, Name: $('#editNameEn').val() }
-                ];
+        $.ajax({
+            url: '/Counter/Update',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function (res) {
 
-                translations.forEach(tr => {
-                    $.post('/Counter/UpdateTranslation', tr);
-                });
-
-                Swal.fire('@Localizer["counter.INDEX.SUCCESS"]', res.message, 'success')
-                    .then(() => location.reload());
-            } else {
-                Swal.fire('@Localizer["counter.INDEX.ERROR"]', res.message, 'error');
+                if (res.success) {
+                    Swal.fire(
+                        "@Localizer["counter.ALERT.SUCCESS_TITLE"]",
+                        "@Localizer["counter.ALERT.UPDATE_SUCCESS"]",
+                        "success"
+                    ).then(() => location.reload());
+                }
+                else {
+                    Swal.fire(
+                        "@Localizer["counter.ALERT.ERROR_TITLE"]",
+                        res.message,
+                        "error"
+                    );
+                }
             }
         });
+
     });
 
+
     function confirmDelete(id) {
+
         Swal.fire({
-            title: '@Localizer["counter.INDEX.CONFIRM_TITLE"]',
-            text: '@Localizer["counter.INDEX.CONFIRM_TEXT"]',
-            icon: 'warning',
+            title: "@Localizer["counter.ALERT.DELETE_TITLE"]",
+            text: "@Localizer["counter.ALERT.DELETE_TEXT"]",
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonText: '@Localizer["counter.INDEX.CONFIRM_OK"]',
-            cancelButtonText: '@Localizer["counter.INDEX.CONFIRM_CANCEL"]'
+            confirmButtonText: "@Localizer["counter.ALERT.DELETE_CONFIRM"]",
+            cancelButtonText: "@Localizer["counter.ALERT.DELETE_CANCEL"]"
         }).then((result) => {
+
             if (result.isConfirmed) {
+
                 $.post('/Counter/Delete', { id: id }, function (res) {
+
                     if (res.success) {
-                        Swal.fire('@Localizer["counter.INDEX.DELETED"]', res.message, 'success')
-                            .then(() => location.reload());
-                    } else {
-                        Swal.fire('@Localizer["counter.INDEX.ERROR"]', res.message, 'error');
+                        Swal.fire(
+                            "@Localizer["counter.ALERT.SUCCESS_TITLE"]",
+                            "@Localizer["counter.ALERT.DELETE_SUCCESS"]",
+                            "success"
+                        ).then(() => location.reload());
                     }
+                    else {
+                        Swal.fire(
+                            "@Localizer["counter.ALERT.ERROR_TITLE"]",
+                            res.message,
+                            "error"
+                        );
+                    }
+
                 });
+
             }
+
         });
+
     }
+
 </script>

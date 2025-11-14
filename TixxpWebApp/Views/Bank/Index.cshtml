@@ -1,4 +1,6 @@
-﻿@model List<Tixxp.Entities.Bank.BankEntity>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model List<Tixxp.Entities.Bank.BankEntity>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,9 +11,15 @@
 <div class="main-content app-content">
     <div class="container-fluid">
 
+        <!-- HEADER -->
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Banka Listesi</h1>
-            <button class="btn btn-primary" onclick="openAddModal()">+ Ekle</button>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">
+                @Localizer["bank.INDEX.PAGE_TITLE"]
+            </h1>
+
+            <button class="btn btn-primary" onclick="openAddModal()">
+                @Localizer["bank.INDEX.BUTTON_ADD"]
+            </button>
         </div>
 
         <div class="row">
@@ -22,9 +30,9 @@
                             <table class="table table-bordered text-nowrap w-100">
                                 <thead>
                                     <tr>
-                                        <th>Adı</th>
-                                        <th>Muhasebe Kodu</th>
-                                        <th>İşlem</th>
+                                        <th>@Localizer["bank.INDEX.COLUMN_NAME"]</th>
+                                        <th>@Localizer["bank.INDEX.COLUMN_ACCOUNTING_CODE"]</th>
+                                        @* <th>@Localizer["bank.INDEX.COLUMN_ACTION"]</th> *@
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -35,17 +43,26 @@
                                             <tr>
                                                 <td>@bank.Name</td>
                                                 <td>@bank.AccountingCode</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-warning" onclick="openEditModal(@bank.Id, '@bank.Name', '@bank.AccountingCode')">Düzenle</button>
-                                                    <button class="btn btn-sm btn-danger" onclick="deleteBank(@bank.Id)">Sil</button>
-                                                </td>
+                                               @*  <td>
+                                                    <button class="btn btn-sm btn-warning"
+                                                            onclick="openEditModal(@bank.Id, '@bank.Name', '@bank.AccountingCode')">
+                                                        @Localizer["bank.INDEX.BUTTON_EDIT"]
+                                                    </button>
+
+                                                    <button class="btn btn-sm btn-danger"
+                                                            onclick="deleteBank(@bank.Id)">
+                                                        @Localizer["bank.INDEX.BUTTON_DELETE"]
+                                                    </button>
+                                                </td> *@
                                             </tr>
                                         }
                                     }
                                     else
                                     {
                                         <tr>
-                                            <td colspan="3" class="text-center">Kıyat bulunamadı.</td>
+                                            <td colspan="3" class="text-center">
+                                                @Localizer["bank.INDEX.EMPTY"]
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -55,43 +72,52 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- Modal -->
+<!-- MODAL -->
 <div class="modal fade" id="bankModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Banka</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="modalTitle">@Localizer["bank.MODAL.TITLE"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
                 <form id="bankForm">
                     <input type="hidden" id="bankId" name="Id" />
 
                     <div class="mb-3">
-                        <label>Adı</label>
+                        <label class="form-label">@Localizer["bank.MODAL.NAME"]</label>
                         <input type="text" class="form-control" id="bankName" name="Name" required />
                     </div>
+
                     <div class="mb-3">
-                        <label>Muhasebe Kodu</label>
+                        <label class="form-label">@Localizer["bank.MODAL.ACCOUNTING_CODE"]</label>
                         <input type="text" class="form-control" id="bankAccountingCode" name="AccountingCode" />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        @Localizer["bank.MODAL.SAVE"]
+                    </button>
                 </form>
             </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         function openAddModal() {
             $('#bankForm')[0].reset();
             $('#bankId').val('');
-            $('#modalTitle').text('Banka Ekle');
+            $('#modalTitle').text("@Localizer["bank.MODAL.ADD_TITLE"]");
             $('#bankModal').modal('show');
         }
 
@@ -99,38 +125,53 @@
             $('#bankId').val(id);
             $('#bankName').val(name);
             $('#bankAccountingCode').val(accountingCode);
-            $('#modalTitle').text('Banka Güncelle');
+            $('#modalTitle').text("@Localizer["bank.MODAL.EDIT_TITLE"]");
             $('#bankModal').modal('show');
         }
 
         $('#bankForm').submit(function (e) {
             e.preventDefault();
-            var formData = $(this).serialize();
-            $.post('/Bank/Save', formData, function (response) {
+
+            $.post('/Bank/Save', $(this).serialize(), function (response) {
                 if (response.success) {
-                    Swal.fire('Başarılı!', response.message, 'success').then(() => location.reload());
+                    Swal.fire(
+                        "@Localizer["bank.ALERT.SUCCESS_TITLE"]",
+                        response.message,
+                        "success"
+                    ).then(() => location.reload());
                 } else {
-                    Swal.fire('Hata', response.message, 'error');
+                    Swal.fire(
+                        "@Localizer["bank.ALERT.ERROR_TITLE"]",
+                        response.message,
+                        "error"
+                    );
                 }
             });
         });
 
         function deleteBank(id) {
             Swal.fire({
-                title: 'Emin misiniz?',
-                text: 'Bu banka silinecek!',
-                icon: 'warning',
+                title: "@Localizer["bank.ALERT.DELETE_CONFIRM_TITLE"]",
+                text: "@Localizer["bank.ALERT.DELETE_CONFIRM_TEXT"]",
+                icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Evet, sil!'
+                confirmButtonText: "@Localizer["bank.ALERT.DELETE_CONFIRM_OK"]",
+                cancelButtonText: "@Localizer["bank.ALERT.DELETE_CONFIRM_CANCEL"]"
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('/Bank/Delete', { id: id }, function (response) {
                         if (response.success) {
-                            Swal.fire('Silindi!', response.message, 'success').then(() => location.reload());
+                            Swal.fire(
+                                "@Localizer["bank.ALERT.DELETE_SUCCESS"]",
+                                response.message,
+                                "success"
+                            ).then(() => location.reload());
                         } else {
-                            Swal.fire('Hata', response.message, 'error');
+                            Swal.fire(
+                                "@Localizer["bank.ALERT.ERROR_TITLE"]",
+                                response.message,
+                                "error"
+                            );
                         }
                     });
                 }

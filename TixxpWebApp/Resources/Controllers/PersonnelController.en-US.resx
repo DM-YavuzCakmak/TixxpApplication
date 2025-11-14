@@ -117,109 +117,136 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="counter.INDEX.COUNTER_LIST" xml:space="preserve">
-    <value>Gișe Listesi</value>
+  <data name="personnel.INDEX.PAGE_TITLE" xml:space="preserve">
+    <value>Personnel Management</value>
   </data>
-  <data name="counter.INDEX.COUNTER_NAME" xml:space="preserve">
-    <value>Gișe Adı</value>
+  <data name="personnel.INDEX.NEW_USER" xml:space="preserve">
+    <value>New Personnel</value>
   </data>
-  <data name="counter.INDEX.OKC_SERIAL" xml:space="preserve">
-    <value>OKC Seri No</value>
+  <data name="personnel.INDEX.TABLE_TITLE" xml:space="preserve">
+    <value>Personnel List</value>
   </data>
-  <data name="counter.INDEX.IP" xml:space="preserve">
-    <value>IP</value>
+  <data name="personnel.INDEX.FIRST_NAME" xml:space="preserve">
+    <value>First Name</value>
   </data>
-  <data name="counter.INDEX.OKC" xml:space="preserve">
-    <value>OKC</value>
+  <data name="personnel.INDEX.LAST_NAME" xml:space="preserve">
+    <value>Last Name</value>
   </data>
-  <data name="counter.INDEX.TSM" xml:space="preserve">
-    <value>TSM</value>
+  <data name="personnel.INDEX.EMAIL" xml:space="preserve">
+    <value>Email</value>
   </data>
-  <data name="counter.INDEX.GMP" xml:space="preserve">
-    <value>GMP</value>
+  <data name="personnel.INDEX.ACTION" xml:space="preserve">
+    <value>Actions</value>
   </data>
-  <data name="counter.INDEX.ACTION" xml:space="preserve">
-    <value>İşlem</value>
+  <data name="personnel.INDEX.NO_RECORD" xml:space="preserve">
+    <value>No records found.</value>
   </data>
-  <data name="counter.INDEX.ACTIVE" xml:space="preserve">
-    <value>Aktif</value>
+  <data name="personnel.INDEX.HIERARCHY_TITLE" xml:space="preserve">
+    <value>Company Hierarchy</value>
   </data>
-  <data name="counter.INDEX.PASSIVE" xml:space="preserve">
-    <value>Pasif</value>
+  <data name="personnel.INDEX.HIERARCHY_ERROR" xml:space="preserve">
+    <value>Failed to load hierarchy data.</value>
   </data>
-  <data name="counter.INDEX.NO_RECORD" xml:space="preserve">
-    <value>Kayıt bulunamadı.</value>
+  <data name="personnel.INDEX.HIERARCHY_LOADING" xml:space="preserve">
+    <value>Loading information...</value>
   </data>
-  <data name="counter.INDEX.EDIT_COUNTER" xml:space="preserve">
-    <value>Gișe Düzenle</value>
+  <data name="personnel.INDEX.BUBBLE_ERROR" xml:space="preserve">
+    <value>User information could not be loaded.</value>
   </data>
-  <data name="counter.INDEX.COUNTER_NAME_TR" xml:space="preserve">
-    <value>Gișe Adı (TR)</value>
+  <data name="personnel.INDEX.ROLES_OF_USER" xml:space="preserve">
+    <value>User Roles</value>
   </data>
-  <data name="counter.INDEX.COUNTER_NAME_EN" xml:space="preserve">
-    <value>Gișe Adı (EN)</value>
+  <data name="personnel.INDEX.USER_INFO" xml:space="preserve">
+    <value>Personnel Information</value>
   </data>
-  <data name="counter.INDEX.IP_ADDRESS" xml:space="preserve">
-    <value>IP Adresi</value>
+  <data name="personnel.INDEX.FIRST_NAME_LABEL" xml:space="preserve">
+    <value>First Name</value>
   </data>
-  <data name="counter.INDEX.PORT" xml:space="preserve">
-    <value>Port</value>
+  <data name="personnel.INDEX.LAST_NAME_LABEL" xml:space="preserve">
+    <value>Last Name</value>
   </data>
-  <data name="counter.INDEX.VERSION" xml:space="preserve">
-    <value>Versiyon</value>
+  <data name="personnel.INDEX.EMAIL_LABEL" xml:space="preserve">
+    <value>Email</value>
   </data>
-  <data name="counter.INDEX.SAVE" xml:space="preserve">
-    <value>Kaydet</value>
+  <data name="personnel.INDEX.PHONE_LABEL" xml:space="preserve">
+    <value>Phone</value>
   </data>
-  <data name="counter.INDEX.TITLE" xml:space="preserve">
-    <value>Gișe Yönetimi</value>
+  <data name="personnel.INDEX.PASSWORD_LABEL" xml:space="preserve">
+    <value>Password</value>
   </data>
-  <data name="counter.INDEX.OTP" xml:space="preserve">
-    <value>OTP</value>
+  <data name="personnel.INDEX.SAVE" xml:space="preserve">
+    <value>Save</value>
   </data>
-  <data name="counter.INDEX.OKC_BRAND" xml:space="preserve">
-    <value>OKC Marka</value>
+  <data name="personnel.INDEX.ASSIGN_ROLE" xml:space="preserve">
+    <value>Assign Role</value>
   </data>
-  <data name="counter.INDEX.OKC_PASSWORD" xml:space="preserve">
-    <value>OKC Şifre</value>
+  <data name="personnel.INDEX.SHOW_ROLES" xml:space="preserve">
+    <value>Show Roles</value>
   </data>
-  <data name="counter.INDEX.OTP_VERIFICATION" xml:space="preserve">
-    <value>OTP Doğrulama</value>
+  <data name="personnel.INDEX.SELECT_ROLE" xml:space="preserve">
+    <value>Select Role</value>
   </data>
-  <data name="counter.INDEX.OKC_INTEGRATED" xml:space="preserve">
-    <value>OKC Entegrasyonu</value>
+  <data name="personnel.INDEX.SELECT_ROLE_PLACEHOLDER" xml:space="preserve">
+    <value>Please select a role</value>
   </data>
-  <data name="counter.INDEX.TSM_OPEN" xml:space="preserve">
-    <value>TSM Açık</value>
+  <data name="personnel.INDEX.NO_ROLE_FOUND" xml:space="preserve">
+    <value>No roles found.</value>
   </data>
-  <data name="counter.INDEX.GMP_OPEN" xml:space="preserve">
-    <value>GMP Açık</value>
+  <data name="personnel.INDEX.DELETE_CONFIRM_TITLE" xml:space="preserve">
+    <value>Are you sure?</value>
   </data>
-  <data name="counter.INDEX.EDIT" xml:space="preserve">
-    <value>Düzenle</value>
+  <data name="personnel.INDEX.DELETE_CONFIRM_TEXT" xml:space="preserve">
+    <value>This user will be deleted.</value>
   </data>
-  <data name="counter.ALERT.SUCCESS_TITLE" xml:space="preserve">
-    <value>Başarılı</value>
+  <data name="personnel.INDEX.DELETE_CONFIRM_YES" xml:space="preserve">
+    <value>Yes</value>
   </data>
-  <data name="counter.ALERT.ERROR_TITLE" xml:space="preserve">
-    <value>Hata</value>
+  <data name="personnel.INDEX.DELETE_CONFIRM_CANCEL" xml:space="preserve">
+    <value>Cancel</value>
   </data>
-  <data name="counter.ALERT.UPDATE_SUCCESS" xml:space="preserve">
-    <value>Gișe başarıyla güncellendi.</value>
+  <data name="personnel.INDEX.DELETED" xml:space="preserve">
+    <value>Deleted</value>
   </data>
-  <data name="counter.ALERT.DELETE_TITLE" xml:space="preserve">
-    <value>Silmek istediğinize emin misiniz?</value>
+  <data name="personnel.ERROR.NOT_FOUND" xml:space="preserve">
+    <value>User not found.</value>
   </data>
-  <data name="counter.ALERT.DELETE_TEXT" xml:space="preserve">
-    <value>Bu işlem geri alınamaz.</value>
+  <data name="personnel.ERROR.MODEL_INVALID" xml:space="preserve">
+    <value>Invalid form information. Please check the fields.</value>
   </data>
-  <data name="counter.ALERT.DELETE_CONFIRM" xml:space="preserve">
-    <value>Evet, sil</value>
+  <data name="personnel.ERROR.EMAIL_INVALID" xml:space="preserve">
+    <value>Please enter a valid email address.</value>
   </data>
-  <data name="counter.ALERT.DELETE_CANCEL" xml:space="preserve">
-    <value>Vazgeç</value>
+  <data name="personnel.ERROR.PHONE_INVALID" xml:space="preserve">
+    <value>Phone number must be exactly 10 digits.</value>
   </data>
-  <data name="counter.ALERT.DELETE_SUCCESS" xml:space="preserve">
-    <value>Gișe başarıyla silindi.</value>
+  <data name="personnel.ERROR.PASSWORD_REQUIRED" xml:space="preserve">
+    <value>Password is required.</value>
+  </data>
+  <data name="personnel.ERROR.SAVE_FAILED" xml:space="preserve">
+    <value>An error occurred while saving the user.</value>
+  </data>
+  <data name="personnel.ERROR.DELETE_FAILED" xml:space="preserve">
+    <value>An error occurred while deleting the user.</value>
+  </data>
+  <data name="personnel.ERROR.INVALID_ID" xml:space="preserve">
+    <value>Invalid user or role information.</value>
+  </data>
+  <data name="personnel.ERROR.ROLE_NOT_FOUND" xml:space="preserve">
+    <value>Role not found.</value>
+  </data>
+  <data name="personnel.ERROR.ROLE_ALREADY_ASSIGNED" xml:space="preserve">
+    <value>User already has this role.</value>
+  </data>
+  <data name="personnel.ERROR.ROLE_ASSIGN_FAILED" xml:space="preserve">
+    <value>An error occurred while assigning the role.</value>
+  </data>
+  <data name="personnel.SUCCESS.SAVED" xml:space="preserve">
+    <value>User has been successfully saved.</value>
+  </data>
+  <data name="personnel.SUCCESS.DELETED" xml:space="preserve">
+    <value>User has been successfully deleted.</value>
+  </data>
+  <data name="personnel.SUCCESS.ROLE_ASSIGNED" xml:space="preserve">
+    <value>Role has been successfully assigned.</value>
   </data>
 </root>

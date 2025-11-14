@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="counter.INDEX.COUNTER_LIST" xml:space="preserve">
-    <value>Counters</value>
+    <value>Counter List</value>
   </data>
   <data name="counter.INDEX.COUNTER_NAME" xml:space="preserve">
     <value>Counter Name</value>
   </data>
   <data name="counter.INDEX.OKC_SERIAL" xml:space="preserve">
-    <value>OKC Serial No</value>
+    <value>OKC Serial</value>
   </data>
   <data name="counter.INDEX.IP" xml:space="preserve">
     <value>IP</value>
@@ -148,7 +148,7 @@
     <value>Inactive</value>
   </data>
   <data name="counter.INDEX.NO_RECORD" xml:space="preserve">
-    <value>No record found.</value>
+    <value>No records found.</value>
   </data>
   <data name="counter.INDEX.EDIT_COUNTER" xml:space="preserve">
     <value>Edit Counter</value>
@@ -171,31 +171,55 @@
   <data name="counter.INDEX.SAVE" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="counter.INDEX.SUCCESS" xml:space="preserve">
+  <data name="counter.INDEX.TITLE" xml:space="preserve">
+    <value>Counter Management</value>
+  </data>
+  <data name="counter.INDEX.OTP" xml:space="preserve">
+    <value>OTP</value>
+  </data>
+  <data name="counter.INDEX.OKC_BRAND" xml:space="preserve">
+    <value>OKC Brand</value>
+  </data>
+  <data name="counter.INDEX.OKC_PASSWORD" xml:space="preserve">
+    <value>OKC Password</value>
+  </data>
+  <data name="counter.INDEX.OTP_VERIFICATION" xml:space="preserve">
+    <value>OTP Verification</value>
+  </data>
+  <data name="counter.INDEX.OKC_INTEGRATED" xml:space="preserve">
+    <value>OKC Integrated</value>
+  </data>
+  <data name="counter.INDEX.TSM_OPEN" xml:space="preserve">
+    <value>TSM Open</value>
+  </data>
+  <data name="counter.INDEX.GMP_OPEN" xml:space="preserve">
+    <value>GMP Open</value>
+  </data>
+  <data name="counter.INDEX.EDIT" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="counter.ALERT.SUCCESS_TITLE" xml:space="preserve">
     <value>Success</value>
   </data>
-  <data name="counter.INDEX.ERROR" xml:space="preserve">
+  <data name="counter.ALERT.ERROR_TITLE" xml:space="preserve">
     <value>Error</value>
   </data>
-  <data name="counter.INDEX.ERROR_FETCH" xml:space="preserve">
-    <value>Failed to fetch counter data.</value>
+  <data name="counter.ALERT.UPDATE_SUCCESS" xml:space="preserve">
+    <value>Counter updated successfully.</value>
   </data>
-  <data name="counter.INDEX.CONFIRM_TITLE" xml:space="preserve">
-    <value>Are you sure?</value>
+  <data name="counter.ALERT.DELETE_TITLE" xml:space="preserve">
+    <value>Are you sure you want to delete?</value>
   </data>
-  <data name="counter.INDEX.CONFIRM_TEXT" xml:space="preserve">
-    <value>You are about to delete this counter.</value>
+  <data name="counter.ALERT.DELETE_TEXT" xml:space="preserve">
+    <value>This action cannot be undone.</value>
   </data>
-  <data name="counter.INDEX.CONFIRM_OK" xml:space="preserve">
-    <value>Yes, delete!</value>
+  <data name="counter.ALERT.DELETE_CONFIRM" xml:space="preserve">
+    <value>Yes, delete</value>
   </data>
-  <data name="counter.INDEX.CONFIRM_CANCEL" xml:space="preserve">
+  <data name="counter.ALERT.DELETE_CANCEL" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="counter.INDEX.DELETED" xml:space="preserve">
-    <value>Deleted</value>
-  </data>
-  <data name="counter.INDEX.TITLE" xml:space="preserve">
-    <value>Counter List</value>
+  <data name="counter.ALERT.DELETE_SUCCESS" xml:space="preserve">
+    <value>Counter deleted successfully.</value>
   </data>
 </root>

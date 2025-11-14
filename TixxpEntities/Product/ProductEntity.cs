@@ -11,4 +11,7 @@ public class ProductEntity : BaseEntity
 
     [Column("ImageFilePath")]
     public string ImageFilePath { get; set; }
+
+    [NotMapped]
+    public string? Name { get; set; }
 }

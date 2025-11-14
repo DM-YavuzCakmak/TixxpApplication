@@ -1,4 +1,6 @@
-﻿@model List<Tixxp.Entities.Personnel.PersonnelEntity>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model List<Tixxp.Entities.Personnel.PersonnelEntity>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -13,7 +15,7 @@
         border: 1px solid #ccc;
         padding: 12px 16px;
         border-radius: 10px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
         top: 100%;
         left: 50%;
         transform: translateX(-50%);
@@ -25,21 +27,21 @@
         display: none;
     }
 
-        .info-bubble.show {
-            display: block !important;
-            opacity: 1;
-        }
+    .info-bubble.show {
+        display: block !important;
+        opacity: 1;
+    }
 
-        .info-bubble::after {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent transparent white transparent;
-        }
+    .info-bubble::after {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent white transparent;
+    }
 
     .text-bg-purple {
         background-color: #8e44ad;
@@ -47,10 +49,6 @@
         padding: 6px 12px;
         border-radius: 20px;
         font-size: 0.85rem;
-    }
-
-    .bg-light-subtle {
-        background-color: #f8f8fc;
     }
 
     .hierarchy-section {
@@ -63,7 +61,6 @@
         margin-bottom: 20px;
         text-align: center;
         color: #6f42c1;
-        position: relative;
     }
 
     .hierarchy-tree {
@@ -76,71 +73,53 @@
     .tree ul {
         position: relative;
         padding-top: 20px;
-        padding-left: 0;
         display: flex;
         justify-content: center;
         gap: 20px;
     }
 
     .tree li {
-        list-style-type: none;
-        overflow: visible !important;
+        list-style: none;
         text-align: center;
         position: relative;
         padding: 20px 10px 0 10px;
     }
 
-        .tree li::before,
-        .tree li::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            border-top: 2px solid #ccc;
-            width: 50%;
-            height: 20px;
-            z-index: 0;
-        }
+    .tree li::before,
+    .tree li::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        border-top: 2px solid #ccc;
+        width: 50%;
+        height: 20px;
+    }
 
-        .tree li::before {
-            right: 50%;
-            border-right: 2px solid #ccc;
-            border-top-right-radius: 4px;
-        }
+    .tree li::before {
+        right: 50%;
+        border-right: 2px solid #ccc;
+    }
 
-        .tree li::after {
-            left: 50%;
-            border-left: 2px solid #ccc;
-            border-top-left-radius: 4px;
-        }
+    .tree li::after {
+        left: 50%;
+        border-left: 2px solid #ccc;
+    }
 
-        .tree li:only-child::before,
-        .tree li:only-child::after {
-            display: none;
-        }
-
-        .tree li:only-child {
-            padding-top: 0;
-        }
+    .tree li:only-child::before,
+    .tree li:only-child::after {
+        display: none;
+    }
 
     .tree .node {
         display: inline-block;
         background: #8e44ad;
         color: white;
         padding: 10px 18px;
-        position: relative;
         border-radius: 8px;
-        font-weight: 500;
         font-size: 14px;
-        z-index: 2;
-        overflow: visible !important;
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-        transition: 0.2s ease-in-out;
+        cursor: pointer;
+        position: relative;
     }
-
-        .tree .node:hover {
-            background: #6f42c1;
-            cursor: pointer;
-        }
 
     .tree ul ul::before {
         content: '';
@@ -150,92 +129,109 @@
         border-left: 2px solid #ccc;
         height: 20px;
     }
+
+    .validation-error {
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
 </style>
 
 <div class="main-content app-content">
     <div class="container-fluid">
+
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Kullanıcı Listesi</h1>
-            <button class="btn btn-primary" onclick="openEditModal(0)">+ Yeni Kullanıcı</button>
+            <h1 class="page-title fs-18 text-fixed-white">@Localizer["personnel.INDEX.PAGE_TITLE"]</h1>
+            <button class="btn btn-primary" onclick="openEditModal(0)">
+                @Localizer["personnel.INDEX.NEW_USER"]
+            </button>
         </div>
 
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="card custom-card">
-                    <div class="card-header">
-                        <div class="card-title">Kullanıcılar</div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered text-nowrap w-100">
-                                <thead>
+        <div class="card custom-card">
+            <div class="card-header">
+                <div class="card-title">@Localizer["personnel.INDEX.TABLE_TITLE"]</div>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered w-100">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["personnel.INDEX.FIRST_NAME"]</th>
+                                <th>@Localizer["personnel.INDEX.LAST_NAME"]</th>
+                                <th>@Localizer["personnel.INDEX.EMAIL"]</th>
+                                <th>@Localizer["personnel.INDEX.ACTION"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var p in Model)
+                                {
                                     <tr>
-                                        <th>Ad</th>
-                                        <th>Soyad</th>
-                                        <th>Email</th>
-                                        <th>İşlem</th>
+                                        <td>@p.FirstName</td>
+                                        <td>@p.LastName</td>
+                                        <td>@p.Email</td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                                                <button type="button" class="btn btn-icon btn-sm btn-light" onclick="openEditModal(@p.Id)">
+                                                    <i class="ri-edit-line"></i>
+                                                </button>
+
+                                                <button type="button" class="btn btn-icon btn-sm btn-light" onclick="confirmDelete(@p.Id)">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+
+                                                <button type="button" class="btn btn-sm text-white" style="background:#6f42c1" onclick="openAssignRoleModal(@p.Id)">
+                                                    <i class="ri-shield-user-line me-1"></i>
+                                                    @Localizer["personnel.INDEX.ASSIGN_ROLE"]
+                                                </button>
+
+                                                <button type="button" class="btn btn-sm text-white" style="background:#9b59b6" onclick="showRoles(@p.Id)">
+                                                    <i class="ri-eye-line me-1"></i>
+                                                    @Localizer["personnel.INDEX.SHOW_ROLES"]
+                                                </button>
+
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @if (Model != null && Model.Any())
-                                    {
-                                        foreach (var personnel in Model)
-                                        {
-                                            <tr>
-                                                <td>@personnel.FirstName</td>
-                                                <td>@personnel.LastName</td>
-                                                <td>@personnel.Email</td>
-                                                <td>
-                                                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                                                        <!-- Eski işlem butonları -->
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="openEditModal(@personnel.Id)">
-                                                            <i class="ri-edit-line"></i>
-                                                        </a>
-                                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="confirmDelete(@personnel.Id)">
-                                                            <i class="ri-delete-bin-line"></i>
-                                                        </a>
-                                                        <!-- Yeni mor temalı rol butonları -->
-                                                        <button class="btn btn-sm text-white" style="background-color:#6f42c1;" onclick="openAssignRoleModal(@personnel.Id)">
-                                                            <i class="ri-shield-user-line me-1"></i> Rol Ata
-                                                        </button>
-                                                        <button class="btn btn-sm text-white" style="background-color:#9b59b6;" onclick="showRoles(@personnel.Id)">
-                                                            <i class="ri-eye-line me-1"></i> Rolleri Göster
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <tr><td colspan="4" class="text-center">Kayıt bulunamadı.</td></tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card custom-card mt-5 hierarchy-section">
-                        <div class="card-header">
-                            <div class="card-title hierarchy-title">
-                                👥 Kullanıcı Hiyerarşi Sıralaması
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div id="hierarchyContainer" class="hierarchy-tree"></div>
-                        </div>
-                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        @Localizer["personnel.INDEX.NO_RECORD"]
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
+            <div class="card custom-card mt-5 hierarchy-section">
+                <div class="card-header">
+                    <div class="card-title hierarchy-title">
+                        @Localizer["personnel.INDEX.HIERARCHY_TITLE"]
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="hierarchyContainer" class="hierarchy-tree"></div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-
-<div class="modal fade" id="showRolesModal" tabindex="-1" aria-hidden="true">
+<!-- Show Roles Modal -->
+<div class="modal fade" id="showRolesModal">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content">
             <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Kullanıcının Rolleri</h5>
+                <h5 class="modal-title">@Localizer["personnel.INDEX.ROLES_OF_USER"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -245,283 +241,358 @@
     </div>
 </div>
 
-
-<!-- Kullanıcı Modal -->
-<div class="modal fade" id="editPersonnelModal" tabindex="-1" aria-hidden="true">
+<!-- Edit Modal -->
+<div class="modal fade" id="editPersonnelModal">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content">
+
             <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Kullanıcı Bilgisi</h5>
+                <h5 class="modal-title">@Localizer["personnel.INDEX.USER_INFO"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
                 <form id="editPersonnelForm">
                     <input type="hidden" id="editId" name="Id" />
 
                     <div class="mb-3">
-                        <label class="form-label">Ad</label>
-                        <input type="text" class="form-control" name="FirstName" required />
+                        <label class="form-label">@Localizer["personnel.INDEX.FIRST_NAME_LABEL"]</label>
+                        <input class="form-control" name="FirstName" required />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Soyad</label>
-                        <input type="text" class="form-control" name="LastName" required />
+                        <label class="form-label">@Localizer["personnel.INDEX.LAST_NAME_LABEL"]</label>
+                        <input class="form-control" name="LastName" required />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">@Localizer["personnel.INDEX.EMAIL_LABEL"]</label>
                         <input type="email" class="form-control" name="Email" required />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Telefon</label>
-                        <input type="text" class="form-control" name="Phone" />
+                        <label class="form-label">@Localizer["personnel.INDEX.PHONE_LABEL"]</label>
+                        <input class="form-control"
+                               name="Phone"
+                               id="phoneInput"
+                               maxlength="10"
+                               inputmode="numeric"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Şifre</label>
+                        <label class="form-label">@Localizer["personnel.INDEX.PASSWORD_LABEL"]</label>
                         <input type="password" class="form-control" name="Password" required />
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                    <button type="submit" class="btn btn-primary w-100">
+                        @Localizer["personnel.INDEX.SAVE"]
+                    </button>
                 </form>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- Kullanıcı Rol Atama Modal -->
-<div class="modal fade" id="assignRoleModal" tabindex="-1" aria-hidden="true">
+<!-- Assign Role Modal -->
+<div class="modal fade" id="assignRoleModal">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content">
+
             <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Rol Ata</h5>
+                <h5 class="modal-title">@Localizer["personnel.INDEX.ASSIGN_ROLE"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
                 <form id="assignRoleForm">
                     <input type="hidden" id="assignRolePersonnelId" name="PersonnelId" />
+
                     <div class="mb-3">
-                        <label class="form-label">Rol Seçin</label>
-                        <select class="form-control" name="RoleId" id="roleSelect" required>
-                            <option value="">-- Rol seçiniz --</option>
+                        <label>@Localizer["personnel.INDEX.SELECT_ROLE"]</label>
+                        <select class="form-control" id="roleSelect" name="RoleId" required>
+                            <option value="">@Localizer["personnel.INDEX.SELECT_ROLE_PLACEHOLDER"]</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Ata</button>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        @Localizer["personnel.INDEX.SAVE"]
+                    </button>
                 </form>
             </div>
+
         </div>
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script>
+    /* ------------------------
+       HIERARCHY TREE
+    -------------------------*/
 
-
-@section Scripts {
-    <script>
-        // Sayfa dışında bir yere tıklanınca tüm info balonlarını kapat
-        $(document).on('click', function (e) {
-            if (!$(e.target).closest('.node').length) {
-                $('.info-bubble').removeClass('show').hide();
+    function loadHierarchyTree() {
+        $.get('/Personnel/GetHierarchyTree', function (res) {
+            if (!res.success) {
+                $('#hierarchyContainer').html(
+                    '<p class="text-danger">@Localizer["personnel.INDEX.HIERARCHY_ERROR"]</p>'
+                );
+                return;
             }
+            $('#hierarchyContainer').html(renderTree(res.data));
+        });
+    }
+
+    function renderTree(nodes) {
+        if (!nodes || !nodes.length)
+            return '';
+
+        var html = '<ul>';
+
+        nodes.forEach(function (n) {
+            html += '<li>';
+            html += '<div class="node" onclick="toggleInfoBubble(' + n.id + ')">';
+            html += n.name;
+            html += '<div class="info-bubble" id="bubble-' + n.id + '">';
+            html += '<span class="text-muted">@Localizer["personnel.INDEX.HIERARCHY_LOADING"]</span>';
+            html += '</div>'; // info-bubble
+            html += '</div>'; // node
+
+            html += renderTree(n.children);
+
+            html += '</li>';
         });
 
-        function toggleInfoBubble(element, id, name) {
-            $('.info-bubble').removeClass('show').hide(); // diğer balonları kapat
-            const bubble = $(`#bubble-${id}`);
+        html += '</ul>';
 
-            if (bubble.is(':visible')) {
-                bubble.removeClass('show').hide();
-            } else {
-                bubble.addClass('show').show();
+        return '<div class="tree">' + html + '</div>';
+    }
 
-                // Daha önce veri yüklenmemişse AJAX çek
-                if (!bubble.data('loaded')) {
-                    $.get('/Personnel/GetById', { id }, function (res) {
-                        if (res.success) {
-                            const d = res.data;
-                            bubble.html(`
-                                <strong>${d.firstName} ${d.lastName}</strong><br/>
-                                <small>Email:</small> ${d.email}<br/>
-                                <small>Telefon:</small> ${d.phone || '-'}<br/>
-                                <small>ID:</small> ${d.id}
-                            `);
-                            bubble.data('loaded', true);
-                        } else {
-                            bubble.html('<span class="text-danger">Bilgi alınamadı.</span>');
-                        }
-                    }).fail(() => {
-                        bubble.html('<span class="text-danger">Hata oluştu.</span>');
-                    });
-                }
-            }
-        }
+    function toggleInfoBubble(id) {
+        $('.info-bubble').hide();
+        var bubble = $('#bubble-' + id);
+        bubble.show();
 
-        $(document).ready(function () {
-            loadHierarchyTree();
-        });
+        if (bubble.data('loaded'))
+            return;
 
-        function loadHierarchyTree() {
-            $.get("/Personnel/GetHierarchyTree", function (response) {
-                if (response.success) {
-                    const container = $('#hierarchyContainer');
-                    container.empty();
-                    const html = renderTree(response.data);
-                    container.append(html);
-                } else {
-                    $('#hierarchyContainer').html('<p>Hiyerarşi verisi alınamadı.</p>');
-                }
-            });
-        }
-
-        function renderTree(nodes) {
-            if (!nodes || nodes.length === 0) return '';
-
-            let html = '<ul>';
-            nodes.forEach(function (node) {
-                html += `
-                    <li>
-                        <div class="node" onclick="toggleInfoBubble(this, ${node.id}, '${node.name.replace("'", "\\'")}')">
-                            ${node.name}
-                            <div class="info-bubble" id="bubble-${node.id}">
-                                <strong>${node.name}</strong><br/>
-                                <span class="text-muted">Yükleniyor...</span>
-                            </div>
-                        </div>
-                        ${renderTree(node.children)}
-                    </li>`;
-            });
-            html += '</ul>';
-            return `<div class="tree">${html}</div>`;
-        }
-
-        function showRoles(personnelId) {
-            $.get('/Personnel/GetRolesByPersonnelId', { personnelId }, function (response) {
-                const container = $('#roleTagsContainer');
-                container.empty();
-
-                if (response.success && response.data.length > 0) {
-                    response.data.forEach(function (role) {
-                        container.append(`<span class="text-bg-purple">${role.name}</span>`);
-                    });
-                } else {
-                    container.append('<p>Rol bulunamadı.</p>');
-                }
-
-                $('#showRolesModal').modal('show');
-            }).fail(function () {
-                Swal.fire({ icon: 'error', title: 'Hata', text: 'Roller alınırken hata oluştu.' });
-            });
-        }
-
-        function openAssignRoleModal(personnelId) {
-            $('#assignRolePersonnelId').val(personnelId);
-
-            $.get('/Personnel/GetAllRole', function (response) {
-                const roleSelect = $('#roleSelect');
-                roleSelect.empty();
-                if (response.success && response.data.length > 0) {
-                    roleSelect.append('<option value="">-- Rol seçiniz --</option>');
-                    response.data.forEach(function (role) {
-                        roleSelect.append('<option value="' + role.id + '">' + role.name + '</option>');
-                    });
-                } else {
-                    roleSelect.append('<option value="">Rol bulunamadı</option>');
-                }
-                $('#assignRoleModal').modal('show');
-            }).fail(function () {
-                Swal.fire({ icon: 'error', title: 'Hata', text: 'Roller alınırken hata oluştu.' });
-            });
-        }
-
-        $('#assignRoleForm').submit(function (e) {
-            e.preventDefault();
-            const formData = $(this).serialize();
-
-            $.post('/Personnel/AssignRole', formData, function (response) {
-                if (response.success) {
-                    Swal.fire({ icon: 'success', title: 'Başarılı', text: response.message }).then(() => {
-                        $('#assignRoleModal').modal('hide');
-                    });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
-                }
-            }).fail(function () {
-                Swal.fire({ icon: 'error', title: 'Hata', text: 'Rol atama sırasında hata oluştu.' });
-            });
-        });
-
-        function openEditModal(id) {
-            if (id === 0) {
-                $('#editPersonnelForm')[0].reset();
-                $('#editId').val('');
-                $('#editPersonnelForm input[name="Password"]').prop('required', true);
-                $('#editPersonnelModal').modal('show');
+        $.get('/Personnel/GetById', { id: id }, function (res) {
+            if (!res.success) {
+                bubble.html('<span class="text-danger">@Localizer["personnel.INDEX.BUBBLE_ERROR"]</span>');
                 return;
             }
 
-            $.get('/Personnel/GetById', { id: id }, function (data) {
-                if (data.success) {
-                    const d = data.data;
-                    $('#editId').val(d.id);
-                    $('#editPersonnelForm input[name="FirstName"]').val(d.firstName);
-                    $('#editPersonnelForm input[name="LastName"]').val(d.lastName);
-                    $('#editPersonnelForm input[name="Email"]').val(d.email);
-                    $('#editPersonnelForm input[name="Phone"]').val(d.phone);
-                    $('#editPersonnelForm input[name="Password"]').val('******').prop('required', false);
-                    $('#editPersonnelModal').modal('show');
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Hata', text: data.message });
-                }
-            }).fail(function () {
-                Swal.fire({ icon: 'error', title: 'Hata', text: 'Kullanıcı bilgisi alınamadı.' });
-            });
+            var d = res.data;
+
+            var html = '<strong>' + d.firstName + ' ' + d.lastName + '</strong><br/>' +
+                'Email: ' + d.email + '<br/>' +
+                'Phone: ' + (d.phone || '-');
+
+            bubble.html(html);
+            bubble.data('loaded', true);
+        });
+    }
+
+    $(document).ready(function () {
+        loadHierarchyTree();
+    });
+
+    /* ------------------------
+       EDIT MODAL
+    -------------------------*/
+
+    function openEditModal(id) {
+        if (id === 0) {
+            $('#editPersonnelForm')[0].reset();
+            $('#editId').val('');
+            $("input[name='Password']").prop('required', true);
+            $('#editPersonnelModal').modal('show');
+            return;
         }
 
-        $('#editPersonnelForm').submit(function (e) {
-            e.preventDefault();
-
-            const passwordInput = $('#editPersonnelForm input[name="Password"]');
-            if (passwordInput.val() === '******') {
-                passwordInput.prop('disabled', true);
+        $.get('/Personnel/GetById', { id: id }, function (res) {
+            if (!res.success) {
+                Swal.fire('Error', res.message, 'error');
+                return;
             }
 
-            const formData = $(this).serialize();
-            passwordInput.prop('disabled', false);
+            var d = res.data;
 
-            $.post('/Personnel/Save', formData, function (response) {
-                if (response.success) {
-                    Swal.fire({ icon: 'success', title: 'Başarılı', text: response.message }).then(() => location.reload());
+            $('#editId').val(d.id);
+            $("input[name='FirstName']").val(d.firstName);
+            $("input[name='LastName']").val(d.lastName);
+            $("input[name='Email']").val(d.email);
+            $("input[name='Phone']").val(d.phone);
+            $("input[name='Password']").val('******').prop('required', false);
+
+            $('#editPersonnelModal').modal('show');
+        });
+    }
+
+    /* ------------------------
+       VALIDATION
+    -------------------------*/
+
+    function validatePersonnelForm() {
+        var isValid = true;
+        $('.validation-error').remove();
+
+        var firstName = $("input[name='FirstName']").val().trim();
+        var lastName = $("input[name='LastName']").val().trim();
+        var email = $("input[name='Email']").val().trim();
+        var phone = $("input[name='Phone']").val().trim();
+        var password = $("input[name='Password']").val().trim();
+        var id = $('#editId').val();
+
+        var nameRegex = /^[a-zA-ZşŞıİçÇöÖüÜĞğ\s]+$/;
+
+        if (!nameRegex.test(firstName)) {
+            addError('FirstName', 'Lütfen geçerli bir ad giriniz.');
+            isValid = false;
+        }
+
+        if (!nameRegex.test(lastName)) {
+            addError('LastName', 'Lütfen geçerli bir soyad giriniz.');
+            isValid = false;
+        }
+
+        var emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+        if (!emailRegex.test(email)) {
+            addError('Email', 'Lütfen geçerli bir email adresi giriniz.');
+            isValid = false;
+        }
+
+        if (phone && !/^[0-9]{10}$/.test(phone)) {
+            addError('Phone', 'Telefon 10 haneli olmalıdır.');
+            isValid = false;
+        }
+
+        if (!id && password.length < 6) {
+            addError('Password', 'Parola en az 6 karakter olmalıdır.');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function addError(inputName, message) {
+        var input = $("input[name='" + inputName + "']");
+        input.after('<small class="validation-error text-danger">' + message + '</small>');
+    }
+
+    /* ------------------------
+       SAVE
+    -------------------------*/
+
+    $('#editPersonnelForm').submit(function (e) {
+        e.preventDefault();
+
+        if (!validatePersonnelForm()) {
+            return;
+        }
+
+        var passInput = $("input[name='Password']");
+        if (passInput.val() === '******') {
+            passInput.prop('disabled', true);
+        }
+
+        var formData = $(this).serialize();
+        passInput.prop('disabled', false);
+
+        $.post('/Personnel/Save', formData, function (res) {
+            if (res.success) {
+                Swal.fire('Success', res.message, 'success')
+                    .then(function () { location.reload(); });
+            } else {
+                Swal.fire('Error', res.message, 'error');
+            }
+        });
+    });
+
+    /* ------------------------
+       DELETE
+    -------------------------*/
+
+    function confirmDelete(id) {
+        Swal.fire({
+            title: '@Localizer["personnel.INDEX.DELETE_CONFIRM_TITLE"]',
+            text: '@Localizer["personnel.INDEX.DELETE_CONFIRM_TEXT"]',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '@Localizer["personnel.INDEX.DELETE_CONFIRM_YES"]',
+            cancelButtonText: '@Localizer["personnel.INDEX.DELETE_CONFIRM_CANCEL"]'
+        }).then(function (result) {
+
+            if (!result.isConfirmed) return;
+
+            $.post('/Personnel/Delete', { id: id }, function (res) {
+                if (res.success) {
+                    Swal.fire('@Localizer["personnel.INDEX.DELETED"]', res.message, 'success')
+                        .then(function () { location.reload(); });
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
+                    Swal.fire('Error', res.message, 'error');
                 }
-            }).fail(function () {
-                Swal.fire({ icon: 'error', title: 'Hata', text: 'Kayıt sırasında bir hata oluştu.' });
             });
         });
+    }
 
-        function confirmDelete(id) {
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu kullanıcıyı silmek üzeresiniz.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Vazgeç'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('/Personnel/Delete', { id: id }, function (response) {
-                        if (response.success) {
-                            Swal.fire({ icon: 'success', title: 'Silindi', text: response.message }).then(() => location.reload());
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'Hata', text: response.message });
-                        }
-                    }).fail(function () {
-                        Swal.fire({ icon: 'error', title: 'Hata', text: 'Silme işlemi sırasında bir hata oluştu.' });
-                    });
-                }
-            });
-        }
-    </script>
-}
+    /* ------------------------
+       SHOW ROLES
+    -------------------------*/
 
+    function showRoles(personnelId) {
+        $.get('/Personnel/GetRolesByPersonnelId', { personnelId: personnelId }, function (res) {
+            var container = $('#roleTagsContainer');
+            container.html('');
+
+            if (res.success && res.data && res.data.length > 0) {
+                res.data.forEach(function (role) {
+                    container.append('<span class="text-bg-purple">' + role.name + '</span>');
+                });
+            } else {
+                container.append('<p>@Localizer["personnel.INDEX.NO_ROLE_FOUND"]</p>');
+            }
+
+            $('#showRolesModal').modal('show');
+        });
+    }
+
+    /* ------------------------
+       ASSIGN ROLE
+    -------------------------*/
+
+    function openAssignRoleModal(personnelId) {
+        $('#assignRolePersonnelId').val(personnelId);
+
+        $.get('/Personnel/GetAllRole', function (res) {
+            var roleSelect = $('#roleSelect');
+            roleSelect.html('');
+
+            if (res.success && res.data && res.data.length > 0) {
+                roleSelect.append('<option value="">@Localizer["personnel.INDEX.SELECT_ROLE_PLACEHOLDER"]</option>');
+                res.data.forEach(function (role) {
+                    roleSelect.append('<option value="' + role.id + '">' + role.name + '</option>');
+                });
+            } else {
+                roleSelect.append('<option value="">@Localizer["personnel.INDEX.NO_ROLE_FOUND"]</option>');
+            }
+
+            $('#assignRoleModal').modal('show');
+        });
+    }
+
+    $('#assignRoleForm').submit(function (e) {
+        e.preventDefault();
+
+        $.post('/Personnel/AssignRole', $(this).serialize(), function (res) {
+            if (res.success) {
+                Swal.fire('Success', res.message, 'success')
+                    .then(function () { $('#assignRoleModal').modal('hide'); });
+            } else {
+                Swal.fire('Error', res.message, 'error');
+            }
+        });
+    });
+</script>

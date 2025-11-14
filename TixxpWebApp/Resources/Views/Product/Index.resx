@@ -117,109 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="counter.INDEX.COUNTER_LIST" xml:space="preserve">
-    <value>Gișe Listesi</value>
+  <data name="product.INDEX.PAGE_TITLE" xml:space="preserve">
+    <value>Product List</value>
   </data>
-  <data name="counter.INDEX.COUNTER_NAME" xml:space="preserve">
-    <value>Gișe Adı</value>
+  <data name="product.INDEX.NEW_PRODUCT" xml:space="preserve">
+    <value>+ New Product</value>
   </data>
-  <data name="counter.INDEX.OKC_SERIAL" xml:space="preserve">
-    <value>OKC Seri No</value>
+  <data name="product.INDEX.TABLE_TITLE" xml:space="preserve">
+    <value>Products</value>
   </data>
-  <data name="counter.INDEX.IP" xml:space="preserve">
-    <value>IP</value>
+  <data name="product.INDEX.PRODUCT_NAMES_ALL_LANG" xml:space="preserve">
+    <value>Product Names (All Languages)</value>
   </data>
-  <data name="counter.INDEX.OKC" xml:space="preserve">
-    <value>OKC</value>
+  <data name="product.INDEX.PRODUCT_CODE" xml:space="preserve">
+    <value>Code</value>
   </data>
-  <data name="counter.INDEX.TSM" xml:space="preserve">
-    <value>TSM</value>
+  <data name="product.INDEX.ACTION" xml:space="preserve">
+    <value>Action</value>
   </data>
-  <data name="counter.INDEX.GMP" xml:space="preserve">
-    <value>GMP</value>
+  <data name="product.INDEX.NO_RECORD" xml:space="preserve">
+    <value>No records found.</value>
   </data>
-  <data name="counter.INDEX.ACTION" xml:space="preserve">
-    <value>İşlem</value>
+  <data name="product.MODAL.TITLE" xml:space="preserve">
+    <value>Product Information</value>
   </data>
-  <data name="counter.INDEX.ACTIVE" xml:space="preserve">
-    <value>Aktif</value>
+  <data name="product.MODAL.ADD_NEW" xml:space="preserve">
+    <value>Add New Product</value>
   </data>
-  <data name="counter.INDEX.PASSIVE" xml:space="preserve">
-    <value>Pasif</value>
+  <data name="product.MODAL.EDIT" xml:space="preserve">
+    <value>Edit Product</value>
   </data>
-  <data name="counter.INDEX.NO_RECORD" xml:space="preserve">
-    <value>Kayıt bulunamadı.</value>
+  <data name="product.MODAL.PRODUCT_NAME" xml:space="preserve">
+    <value>Product Name</value>
   </data>
-  <data name="counter.INDEX.EDIT_COUNTER" xml:space="preserve">
-    <value>Gișe Düzenle</value>
+  <data name="product.MODAL.PRODUCT_CODE" xml:space="preserve">
+    <value>Product Code</value>
   </data>
-  <data name="counter.INDEX.COUNTER_NAME_TR" xml:space="preserve">
-    <value>Gișe Adı (TR)</value>
+  <data name="product.MODAL.SAVE" xml:space="preserve">
+    <value>Save</value>
   </data>
-  <data name="counter.INDEX.COUNTER_NAME_EN" xml:space="preserve">
-    <value>Gișe Adı (EN)</value>
+  <data name="product.MODAL.CANCEL" xml:space="preserve">
+    <value>Cancel</value>
   </data>
-  <data name="counter.INDEX.IP_ADDRESS" xml:space="preserve">
-    <value>IP Adresi</value>
+  <data name="product.MODAL.CLOSE" xml:space="preserve">
+    <value>Close</value>
   </data>
-  <data name="counter.INDEX.PORT" xml:space="preserve">
-    <value>Port</value>
+  <data name="product.DELETE.CONFIRM" xml:space="preserve">
+    <value>Are you sure you want to delete this product?</value>
   </data>
-  <data name="counter.INDEX.VERSION" xml:space="preserve">
-    <value>Versiyon</value>
+  <data name="product.ERROR.SAVE_FAILED" xml:space="preserve">
+    <value>An error occurred while saving the product.</value>
   </data>
-  <data name="counter.INDEX.SAVE" xml:space="preserve">
-    <value>Kaydet</value>
-  </data>
-  <data name="counter.INDEX.TITLE" xml:space="preserve">
-    <value>Gișe Yönetimi</value>
-  </data>
-  <data name="counter.INDEX.OTP" xml:space="preserve">
-    <value>OTP</value>
-  </data>
-  <data name="counter.INDEX.OKC_BRAND" xml:space="preserve">
-    <value>OKC Marka</value>
-  </data>
-  <data name="counter.INDEX.OKC_PASSWORD" xml:space="preserve">
-    <value>OKC Şifre</value>
-  </data>
-  <data name="counter.INDEX.OTP_VERIFICATION" xml:space="preserve">
-    <value>OTP Doğrulama</value>
-  </data>
-  <data name="counter.INDEX.OKC_INTEGRATED" xml:space="preserve">
-    <value>OKC Entegrasyonu</value>
-  </data>
-  <data name="counter.INDEX.TSM_OPEN" xml:space="preserve">
-    <value>TSM Açık</value>
-  </data>
-  <data name="counter.INDEX.GMP_OPEN" xml:space="preserve">
-    <value>GMP Açık</value>
-  </data>
-  <data name="counter.INDEX.EDIT" xml:space="preserve">
-    <value>Düzenle</value>
-  </data>
-  <data name="counter.ALERT.SUCCESS_TITLE" xml:space="preserve">
-    <value>Başarılı</value>
-  </data>
-  <data name="counter.ALERT.ERROR_TITLE" xml:space="preserve">
-    <value>Hata</value>
-  </data>
-  <data name="counter.ALERT.UPDATE_SUCCESS" xml:space="preserve">
-    <value>Gișe başarıyla güncellendi.</value>
-  </data>
-  <data name="counter.ALERT.DELETE_TITLE" xml:space="preserve">
-    <value>Silmek istediğinize emin misiniz?</value>
-  </data>
-  <data name="counter.ALERT.DELETE_TEXT" xml:space="preserve">
-    <value>Bu işlem geri alınamaz.</value>
-  </data>
-  <data name="counter.ALERT.DELETE_CONFIRM" xml:space="preserve">
-    <value>Evet, sil</value>
-  </data>
-  <data name="counter.ALERT.DELETE_CANCEL" xml:space="preserve">
-    <value>Vazgeç</value>
-  </data>
-  <data name="counter.ALERT.DELETE_SUCCESS" xml:space="preserve">
-    <value>Gișe başarıyla silindi.</value>
+  <data name="product.ERROR.DELETE_FAILED" xml:space="preserve">
+    <value>An error occurred while deleting the product.</value>
   </data>
 </root>

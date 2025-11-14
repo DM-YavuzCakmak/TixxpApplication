@@ -102,9 +102,13 @@ public class PersonnelService : BaseService<PersonnelEntity>, IPersonnelService
         var principal = new ClaimsPrincipal(identity);
 
         await _httpContextAccessor.HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal,
-            new AuthenticationProperties { IsPersistent = false });
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        principal,
+        new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTime.UtcNow.AddHours(24)
+        });
 
         return new SuccessDataResult<LoginResponseDto>(new LoginResponseDto
         {

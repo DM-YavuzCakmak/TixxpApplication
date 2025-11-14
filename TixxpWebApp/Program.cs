@@ -82,7 +82,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.LoginPath = "/Authorization/Index";
         options.AccessDeniedPath = "/Authorization/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromHours(1);
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);
         options.SlidingExpiration = true;
         options.Cookie.IsEssential = true;
         options.Cookie.HttpOnly = true;
@@ -137,7 +137,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Authorization}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllers();
 app.Run();

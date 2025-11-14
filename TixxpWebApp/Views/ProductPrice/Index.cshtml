@@ -1,60 +1,82 @@
-﻿@model List<Tixxp.Entities.ProductPrice.ProductPriceEntity>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model List<Tixxp.WebApp.Models.ProductPrice.ProductWithPriceViewModel>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+
     var currencyTypes = ViewBag.CurrencyTypes as List<Tixxp.Entities.CurrencyType.CurrencyTypeEntity> ?? new();
-    var productsWithoutPrice = ViewBag.ProductsWithoutPrice as List<Tixxp.Entities.Product.ProductEntity> ?? new();
+    var products = ViewBag.Products as List<Tixxp.Entities.Product.ProductEntity> ?? new();
 }
 
 <div class="main-content app-content">
     <div class="container-fluid">
+
+        <!-- HEADER -->
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Ürün Fiyat Listesi</h1>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">
+                @Localizer["productPrice.INDEX.PAGE_TITLE"]
+            </h1>
+
             @if (User.IsInRole("TIXXP_PRODUCT_PRICE_ADD"))
             {
-                <button class="btn btn-primary btn-sm" onclick="openAddPriceModal()">+ Yeni Fiyat</button>
+                <button class="btn btn-primary btn-sm" onclick="openAddPriceModal()">
+                    @Localizer["productPrice.INDEX.NEW_PRICE"]
+                </button>
             }
         </div>
 
+        <!-- TABLE -->
         <div class="card custom-card">
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered text-nowrap w-100">
                         <thead>
                             <tr>
-                                <th>Ürün</th>
-                                <th>Para Birimi</th>
-                                <th>Fiyat</th>
-                                <th>KDV (%)</th>
+                                <th>@Localizer["productPrice.INDEX.COLUMN_PRODUCT"]</th>
+                                <th>@Localizer["productPrice.INDEX.COLUMN_CODE"]</th>
+                                <th>@Localizer["productPrice.INDEX.COLUMN_CURRENCY"]</th>
+                                <th>@Localizer["productPrice.INDEX.COLUMN_PRICE"]</th>
+                                <th>@Localizer["productPrice.INDEX.COLUMN_VAT"]</th>
+
                                 @if (User.IsInRole("TIXXP_PRODUCT_PRICE_EDIT") || User.IsInRole("TIXXP_PRODUCT_PRICE_DELETE"))
                                 {
-                                    <th>İşlem</th>
+                                    <th>@Localizer["productPrice.INDEX.COLUMN_ACTION"]</th>
                                 }
                             </tr>
                         </thead>
+
                         <tbody>
-                            @foreach (var price in Model)
+                            @foreach (var item in Model)
                             {
                                 <tr>
-                                    <td>@price.CurrencyType?.Name</td>
-                                    <td>@price.Price ₺</td>
-                                    <td>@price.VatRate</td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.Code</td>
+                                    <td>@item.CurrencyName (@item.CurrencyTypeSymbol)</td>
+                                    <td>@item.Price ₺</td>
+                                    <td>@item.VatRate</td>
+
                                     @if (User.IsInRole("TIXXP_PRODUCT_PRICE_EDIT") || User.IsInRole("TIXXP_PRODUCT_PRICE_DELETE"))
                                     {
                                         <td>
                                             <div class="hstack gap-2 fs-15">
+
                                                 @if (User.IsInRole("TIXXP_PRODUCT_PRICE_EDIT"))
                                                 {
-                                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="openEditPriceModal(@price.Id)">
+                                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                       onclick="openEditPriceModal(@item.Id)">
                                                         <i class="ri-edit-line"></i>
                                                     </a>
                                                 }
+
                                                 @if (User.IsInRole("TIXXP_PRODUCT_PRICE_DELETE"))
                                                 {
-                                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light" onclick="confirmDeletePrice(@price.Id)">
+                                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                       onclick="confirmDeletePrice(@item.Id)">
                                                         <i class="ri-delete-bin-line"></i>
                                                     </a>
                                                 }
+
                                             </div>
                                         </td>
                                     }
@@ -65,92 +87,111 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- Yeni Fiyat Ekle Modalı -->
-<div class="modal fade" id="addPriceModal" tabindex="-1" aria-hidden="true">
+<!-- ADD PRICE MODAL -->
+<div class="modal fade" id="addPriceModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content">
+
             <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Yeni Ürün Fiyatı</h5>
+                <h5 class="modal-title">@Localizer["productPrice.MODAL.ADD_TITLE"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="addPriceForm">
+
+            <form id="addPriceForm">
+                <div class="modal-body">
+
                     <div class="mb-3">
-                        <label class="form-label">Ürün</label>
+                        <label class="form-label">@Localizer["productPrice.MODAL.PRODUCT"]</label>
                         <select class="form-select" name="ProductId" required>
-                            @foreach (var product in productsWithoutPrice)
+                            @foreach (var p in products)
                             {
-                                // <option value="@product.Id">@product.Name</option>
+                                <option value="@p.Id">@p.Name (@p.Code)</option>
                             }
                         </select>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Para Birimi</label>
+                        <label class="form-label">@Localizer["productPrice.MODAL.CURRENCY"]</label>
                         <select class="form-select" name="CurrencyTypeId" required>
-                            @foreach (var currency in currencyTypes)
+                            @foreach (var c in currencyTypes)
                             {
-                                <option value="@currency.Id">@currency.Name</option>
+                                <option value="@c.Id">@c.Name (@c.Symbol)</option>
                             }
                         </select>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Fiyat</label>
-                        <input type="number" class="form-control" name="Price" step="0.01" required />
+                        <label class="form-label">@Localizer["productPrice.MODAL.PRICE"]</label>
+                        <input type="number" name="Price" step="1" class="form-control" required />
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">KDV (%)</label>
-                        <input type="number" class="form-control" name="VatRate" required />
+                        <label class="form-label">@Localizer["productPrice.MODAL.VAT"]</label>
+                        <input type="number" name="VatRate" class="form-control" required />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
-                </form>
-            </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary w-100" type="submit">@Localizer["productPrice.MODAL.SAVE"]</button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Fiyat Güncelle Modalı -->
-<div class="modal fade" id="editPriceModal" tabindex="-1" aria-hidden="true">
+<!-- EDIT PRICE MODAL -->
+<div class="modal fade" id="editPriceModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content">
+
             <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Fiyat Güncelle</h5>
+                <h5 class="modal-title">@Localizer["productPrice.MODAL.EDIT_TITLE"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="editPriceForm">
-                    <input type="hidden" name="Id" id="editPriceId" />
+
+            <form id="editPriceForm">
+                <div class="modal-body">
+
+                    <input type="hidden" id="editId" name="Id" />
 
                     <div class="mb-3">
-                        <label class="form-label">Ürün</label>
-                        <input type="text" class="form-control" id="editProductName" disabled />
+                        <label class="form-label">@Localizer["productPrice.MODAL.PRODUCT"]</label>
+                        <input type="text" id="editProductName" class="form-control" disabled />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Para Birimi</label>
-                        <select class="form-select" name="CurrencyTypeId" id="editCurrencyTypeId" required>
-                            @foreach (var currency in currencyTypes)
+                        <label class="form-label">@Localizer["productPrice.MODAL.CURRENCY"]</label>
+                        <select class="form-select" id="editCurrencyTypeId" name="CurrencyTypeId">
+                            @foreach (var c in currencyTypes)
                             {
-                                <option value="@currency.Id">@currency.Name</option>
+                                <option value="@c.Id">@c.Name (@c.Symbol)</option>
                             }
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Fiyat</label>
-                        <input type="number" class="form-control" id="editPrice" name="Price" step="0.01" required />
+                        <label class="form-label">@Localizer["productPrice.MODAL.PRICE"]</label>
+                        <input type="number" class="form-control" id="editPrice" name="Price" step="1" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">KDV (%)</label>
-                        <input type="number" class="form-control" id="editVatRate" name="VatRate" required />
+                        <label class="form-label">@Localizer["productPrice.MODAL.VAT"]</label>
+                        <input type="number" class="form-control" id="editVatRate" name="VatRate" />
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Güncelle</button>
-                </form>
-            </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary w-100" type="submit">@Localizer["productPrice.MODAL.UPDATE"]</button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>
@@ -162,62 +203,64 @@
             $('#addPriceModal').modal('show');
         }
 
-            function openEditPriceModal(id) {
+        function openEditPriceModal(id) {
             $.get('/ProductPrice/GetById', { id: id }, function (data) {
-                $('#editPriceId').val(data.id);
-                $('#editProductName').val(data.product.name);
-                $('#editCurrencyTypeId').val(data.currencyTypeId); // <-- updated dropdown selection
+
+                $('#editId').val(data.id);
+                $('#editProductName').val(data.productName);
+                $('#editCurrencyTypeId').val(data.currencyTypeId);
                 $('#editPrice').val(data.price);
                 $('#editVatRate').val(data.vatRate);
+
                 $('#editPriceModal').modal('show');
-            }).fail(function () {
-                Swal.fire("Hata", "Fiyat verisi alınamadı.", "error");
+
             });
         }
 
         $('#addPriceForm').submit(function (e) {
             e.preventDefault();
-            const formData = $(this).serialize();
-            $.post('/ProductPrice/Save', formData, function (response) {
-                if (response.success) {
-                    Swal.fire("Başarılı", response.message, "success").then(() => location.reload());
-                } else {
-                    Swal.fire("Hata", response.message, "error");
-                }
+
+            $.post('/ProductPrice/Save', $(this).serialize(), function (res) {
+                if (res.success)
+                    Swal.fire("@Localizer["productPrice.ALERT.SUCCESS"]", res.message, "success")
+                        .then(() => location.reload());
+                else
+                    Swal.fire("@Localizer["productPrice.ALERT.ERROR"]", res.message, "error");
             });
         });
 
         $('#editPriceForm').submit(function (e) {
             e.preventDefault();
-            const formData = $(this).serialize();
-            $.post('/ProductPrice/Update', formData, function (response) {
-                if (response.success) {
-                    Swal.fire("Başarılı", response.message, "success").then(() => location.reload());
-                } else {
-                    Swal.fire("Hata", response.message, "error");
-                }
+
+            $.post('/ProductPrice/Update', $(this).serialize(), function (res) {
+                if (res.success)
+                    Swal.fire("@Localizer["productPrice.ALERT.SUCCESS"]", res.message, "success")
+                        .then(() => location.reload());
+                else
+                    Swal.fire("@Localizer["productPrice.ALERT.ERROR"]", res.message, "error");
             });
         });
 
         function confirmDeletePrice(id) {
             Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu fiyat kaydını silmek üzeresiniz.",
-                icon: 'warning',
+                title: "@Localizer["productPrice.DELETE.CONFIRM_TITLE"]",
+                text: "@Localizer["productPrice.DELETE.CONFIRM_TEXT"]",
+                icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Vazgeç'
-            }).then((result) => {
+                confirmButtonText: "@Localizer["productPrice.DELETE.CONFIRM_OK"]",
+                cancelButtonText: "@Localizer["productPrice.DELETE.CONFIRM_CANCEL"]"
+            }).then(result => {
                 if (result.isConfirmed) {
-                    $.post('/ProductPrice/Delete', { id: id }, function (response) {
-                        if (response.success) {
-                            Swal.fire("Silindi", response.message, "success").then(() => location.reload());
-                        } else {
-                            Swal.fire("Hata", response.message, "error");
-                        }
+                    $.post('/ProductPrice/Delete', { id: id }, function (res) {
+                        if (res.success)
+                            Swal.fire("@Localizer["productPrice.ALERT.SUCCESS"]", res.message, "success")
+                                .then(() => location.reload());
+                        else
+                            Swal.fire("@Localizer["productPrice.ALERT.ERROR"]", res.message, "error");
                     });
                 }
             });
         }
+
     </script>
 }

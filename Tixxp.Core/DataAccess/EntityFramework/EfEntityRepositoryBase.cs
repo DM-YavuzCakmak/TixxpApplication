@@ -46,7 +46,7 @@ public class EfEntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEnti
 
     public TEntity Get(Expression<Func<TEntity, bool>> filter)
     {
-        return _context.Set<TEntity>().Where(x => !x.IsDeleted).SingleOrDefault(filter);
+        return _context.Set<TEntity>().Where(x => x.IsDeleted == false).SingleOrDefault(filter);
     }
 
     public IList<TEntity> GetAll()

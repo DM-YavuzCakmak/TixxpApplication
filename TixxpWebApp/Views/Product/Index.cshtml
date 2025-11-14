@@ -1,5 +1,6 @@
-﻿@model List<Tixxp.WebApp.Models.Product.ProductWithTranslationViewModel>
-
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@model List<Tixxp.WebApp.Models.Product.ProductWithTranslationViewModel>
+@inject IViewLocalizer Localizer
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -7,10 +8,15 @@
 <div class="main-content app-content">
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Ürün Listesi</h1>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">
+                @Localizer["product.INDEX.PAGE_TITLE"]
+            </h1>
+
             @if (User.IsInRole("TIXXP_PRODUCT_ADD"))
             {
-                <button class="btn btn-primary" onclick="openEditModal(0)">+ Yeni Ürün</button>
+                <button class="btn btn-primary" onclick="openEditModal(0)">
+                    @Localizer["product.INDEX.NEW_PRODUCT"]
+                </button>
             }
         </div>
 
@@ -18,21 +24,24 @@
             <div class="col-xl-12">
                 <div class="card custom-card">
                     <div class="card-header">
-                        <div class="card-title">Ürünler</div>
+                        <div class="card-title">@Localizer["product.INDEX.TABLE_TITLE"]</div>
                     </div>
+
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered text-nowrap w-100">
                                 <thead>
                                     <tr>
-                                        <th>Ürün Adları (Tüm Diller)</th>
-                                        <th>Kodu</th>
+                                        <th>@Localizer["product.INDEX.PRODUCT_NAMES_ALL_LANG"]</th>
+                                        <th>@Localizer["product.INDEX.PRODUCT_CODE"]</th>
+
                                         @if (User.IsInRole("TIXXP_PRODUCT_EDIT") || User.IsInRole("TIXXP_PRODUCT_DELETE"))
                                         {
-                                            <th>İşlem</th>
+                                            <th>@Localizer["product.INDEX.ACTION"]</th>
                                         }
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     @if (Model != null && Model.Any())
                                     {
@@ -47,7 +56,9 @@
                                                         </div>
                                                     }
                                                 </td>
+
                                                 <td>@item.Product.Code</td>
+
                                                 @if (User.IsInRole("TIXXP_PRODUCT_EDIT") || User.IsInRole("TIXXP_PRODUCT_DELETE"))
                                                 {
                                                     <td>
@@ -59,6 +70,7 @@
                                                                     <i class="ri-edit-line"></i>
                                                                 </a>
                                                             }
+
                                                             @if (User.IsInRole("TIXXP_PRODUCT_DELETE"))
                                                             {
                                                                 <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
@@ -74,15 +86,22 @@
                                     }
                                     else
                                     {
-                                        <tr><td colspan="3" class="text-center">Kayıt bulunamadı.</td></tr>
+                                        <tr>
+                                            <td colspan="3" class="text-center">
+                                                @Localizer["product.INDEX.NO_RECORD"]
+                                            </td>
+                                        </tr>
                                     }
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -90,77 +109,95 @@
 <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+
             <form id="productForm">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="productModalLabel">Ürün Bilgileri</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    <h5 class="modal-title" id="productModalLabel">@Localizer["product.MODAL.TITLE"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="@Localizer["product.MODAL.CLOSE"]"></button>
                 </div>
+
                 <div class="modal-body">
+
                     <input type="hidden" name="Id" id="ProductId" />
 
                     <div class="mb-3">
-                        <label class="form-label">Ürün Adı</label>
+                        <label class="form-label">@Localizer["product.MODAL.PRODUCT_NAME"]</label>
                         <input type="text" class="form-control" name="Name" id="ProductName" required />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Ürün Kodu</label>
+                        <label class="form-label">@Localizer["product.MODAL.PRODUCT_CODE"]</label>
                         <input type="text" class="form-control" name="Code" id="ProductCode" required />
                     </div>
 
-                    <div id="translationInputs">
-                        <!-- Diller dinamik olarak JS ile eklenebilir -->
-                    </div>
+                    <div id="translationInputs"></div>
+
                 </div>
+
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Kaydet</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-success">@Localizer["product.MODAL.SAVE"]</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        @Localizer["product.MODAL.CANCEL"]
+                    </button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
-
-
-
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @section Scripts {
     <script>
         function openEditModal(id) {
-            // Temizle
+
             $('#productForm')[0].reset();
             $('#ProductId').val(0);
             $('#translationInputs').html('');
 
             if (id === 0) {
-                $('#productModalLabel').text('Yeni Ürün Ekle');
+                $('#productModalLabel').text('@Localizer["product.MODAL.ADD_NEW"]');
                 $('#productModal').modal('show');
-                // Dil inputlarını oluştur
                 addTranslationInputs();
             } else {
-                $('#productModalLabel').text('Ürünü Düzenle');
+                $('#productModalLabel').text('@Localizer["product.MODAL.EDIT"]');
 
-                $.get(`/Product/GetById/${id}`, function (data) {
-                    $('#ProductId').val(data.Product.Id);
-                    $('#ProductCode').val(data.Product.Code);
+                     $.get(`/Product/GetById/${id}`, function (data) {
 
-                    $('#translationInputs').html('');
-                    data.Translations.forEach(function (t) {
-                        $('#translationInputs').append(`
-                            <div class="mb-2">
-                              <label>${t.Language.Code.toUpperCase()}</label>
-                              <input type="text" class="form-control" name="Translations[${t.Language.Code}]" value="${t.Name}" />
-                            </div>
-                        `);
-                    });
+            $('#ProductId').val(data.product.id);
+            $('#ProductCode').val(data.product.code);
 
-                    $('#productModal').modal('show');
-                });
+            $('#translationInputs').html('');
+
+            let defaultName = "";
+
+            data.translations.forEach(function (t) {
+
+                const lang = t.language.code.toLowerCase();
+
+                if (lang === "tr-tr" || lang === "tr") {
+                    defaultName = t.name;
+                }
+
+                $('#translationInputs').append(`
+                    <div class="mb-2">
+                        <label>${t.language.code.toUpperCase()}</label>
+                        <input type="text" class="form-control"
+                               name="Translations[${lang}]" value="${t.name}" />
+                    </div>
+                `);
+            });
+
+            $('#ProductName').val(defaultName);
+
+            $('#productModal').modal('show');
+        });
             }
         }
 
         function addTranslationInputs() {
-            const languages = ['tr', 'en', 'de']; // ihtiyaca göre çoğalt
+            const languages = ['tr', 'en'];
+
             languages.forEach(lang => {
                 $('#translationInputs').append(`
                     <div class="mb-2">
@@ -173,23 +210,65 @@
 
         $('#productForm').on('submit', function (e) {
             e.preventDefault();
-            const formData = $(this).serialize();
 
-            $.post('/Product/Save', formData, function () {
-                location.reload(); // Başarılıysa sayfayı yenile
+            $.post('/Product/Save', $(this).serialize(), function () {
+                location.reload();
             }).fail(function (xhr) {
-                alert('Hata oluştu: ' + xhr.responseText);
+                alert('@Localizer["product.ERROR.SAVE_FAILED"]: ' + xhr.responseText);
             });
         });
 
-        function confirmDelete(id) {
-            if (confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
-                $.post(`/Product/Delete/${id}`, function () {
-                    location.reload();
-                }).fail(function (xhr) {
-                    alert('Silme işlemi başarısız: ' + xhr.responseText);
+                function confirmDelete(id) {
+
+            // Ürün bilgisi almak için GetById çağırıyoruz
+            $.get(`/Product/GetById/${id}`, function (res) {
+
+                const productName =
+                    res.translations?.find(t => t.language.code.toLowerCase().startsWith("tr"))?.name
+                    ?? res.translations?.[0]?.name
+                    ?? "-";
+
+                const productCode = res.product.code ?? "-";
+
+                Swal.fire({
+                    title: '@Localizer["product.DELETE.TITLE"]',
+                    html: `
+                        <div style="font-size:15px; margin-top:10px;">
+                            <strong>@Localizer["product.DELETE.PRODUCT"]:</strong> ${productName}<br/>
+                            <strong>@Localizer["product.DELETE.CODE"]:</strong> ${productCode}
+                        </div>
+                    `,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "@Localizer["product.DELETE.CONFIRM_BUTTON"]",
+                    cancelButtonText: "@Localizer["product.DELETE.CANCEL_BUTTON"]",
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    reverseButtons: true
+                }).then(result => {
+
+                    if (!result.isConfirmed) return;
+
+                    $.post(`/Product/Delete/${id}`, function (res) {
+
+                        if (res.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "@Localizer["product.DELETE.SUCCESS"]",
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire("Hata", "@Localizer["product.ERROR.DELETE_FAILED"]", "error");
+                        }
+
+                    }).fail(() => {
+                        Swal.fire("Hata", "@Localizer["product.ERROR.DELETE_FAILED"]", "error");
+                    });
+
                 });
-            }
+
+            });
         }
     </script>
 }
