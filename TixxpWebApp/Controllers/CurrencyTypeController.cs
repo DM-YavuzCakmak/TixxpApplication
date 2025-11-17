@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Entities.CurrencyType;
 
@@ -7,10 +8,14 @@ namespace Tixxp.WebApp.Controllers
     public class CurrencyTypeController : Controller
     {
         private readonly ICurrencyTypeService _currencyTypeService;
+        private readonly IStringLocalizer<CurrencyTypeController> _stringLocalizer;
 
-        public CurrencyTypeController(ICurrencyTypeService currencyTypeService)
+        public CurrencyTypeController(
+            ICurrencyTypeService currencyTypeService,
+            IStringLocalizer<CurrencyTypeController> stringLocalizer)
         {
             _currencyTypeService = currencyTypeService;
+            _stringLocalizer = stringLocalizer;
         }
 
         public IActionResult Index()
@@ -46,7 +51,7 @@ namespace Tixxp.WebApp.Controllers
         {
             var entity = _currencyTypeService.GetById(id).Data;
             if (entity == null)
-                return Json(new { success = false, message = "Kayıt bulunamadı." });
+                return Json(new { success = false, message = _stringLocalizer["currencyType.INDEX.RECORD_NOT_FOUND"].Value });
 
             entity.IsDeleted = true;
             var result = _currencyTypeService.Update(entity);

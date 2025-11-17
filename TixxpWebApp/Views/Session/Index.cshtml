@@ -659,6 +659,12 @@
           if(bulkDates.length===0){ Swal.fire('Uyarı','En az bir tarih ekleyin.','warning'); return; }
           if(bulkTimes.length===0){ Swal.fire('Uyarı','En az bir başlangıç saati ekleyin.','warning'); return; }
 
+          // Submit butonunu devre dışı bırak ve loading göster
+          const submitBtn = $(this).find('button[type="submit"]');
+          const originalText = submitBtn.html();
+          const creatingText = '@Localizer["session.INDEX.CREATING"]';
+          submitBtn.prop('disabled', true).html(`<span class="spinner-border spinner-border-sm me-2"></span>${creatingText}`);
+
           const payload={
             EventId: eventId,
             TypeId:   $('#bulkTypeId').val()? Number($('#bulkTypeId').val()): null,
@@ -672,12 +678,14 @@
             EventTicketPriceIds: ($('#bulkEtpIds').val()? [Number($('#bulkEtpIds').val())] : [])
           };
 
+          // Global loading otomatik gösterilecek (AJAX interceptor sayesinde)
           $.ajax({
             url:'/Session/CreateBulk',
             method:'POST',
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(payload),
             success:function(res){
+              submitBtn.prop('disabled', false).html(originalText);
               if(res.success){
                 Swal.fire('Başarılı', res.message, 'success').then(()=>location.reload());
               }else{
@@ -685,6 +693,7 @@
               }
             },
             error:(xhr)=>{
+              submitBtn.prop('disabled', false).html(originalText);
               console.error(xhr.responseText);
               Swal.fire('Hata','Sunucuya ulaşılamadı.','error');
             }

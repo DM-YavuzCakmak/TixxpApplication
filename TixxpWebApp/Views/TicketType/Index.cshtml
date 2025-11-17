@@ -1,17 +1,18 @@
 ﻿@model List<Tixxp.Entities.TicketType.TicketTypeEntity>
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Bilet Tipi Listesi";
+    ViewBag.Title = Localizer["ticketType.INDEX.TITLE"].Value;
 }
 
 <div class="main-content app-content">
     <div class="container-fluid">
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Bilet Tipi Listesi</h1>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["ticketType.INDEX.TITLE"]</h1>
             @if (User.IsInRole("TIXXP_TICKET_TYPE_ADD"))
             {
-                <button class="btn btn-primary btn-sm" onclick="openEditTicketTypeModal(0)">+ Yeni Bilet Tipi</button>
+                <button class="btn btn-primary btn-sm" onclick="openEditTicketTypeModal(0)">+ @Localizer["ticketType.INDEX.ADD_NEW"]</button>
             }
         </div>
 
@@ -19,17 +20,17 @@
             <div class="col-xl-12">
                 <div class="card custom-card">
                     <div class="card-header">
-                        <div class="card-title">Bilet Tipleri</div>
+                        <div class="card-title">@Localizer["ticketType.INDEX.TICKET_TYPES"]</div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered text-nowrap table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Adı</th>
+                                        <th>@Localizer["ticketType.INDEX.NAME"]</th>
                                         @if (User.IsInRole("TIXXP_TICKET_TYPE_EDIT") || User.IsInRole("TIXXP_TICKET_TYPE_DELETE"))
                                         {
-                                            <th>İşlem</th>
+                                            <th>@Localizer["ticketType.INDEX.ACTIONS"]</th>
                                         }
                                     </tr>
                                 </thead>
@@ -47,14 +48,16 @@
                                                             @if (User.IsInRole("TIXXP_TICKET_TYPE_EDIT"))
                                                             {
                                                                 <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                                   onclick="openEditTicketTypeModal(@item.Id)">
+                                                                   onclick="openEditTicketTypeModal(@item.Id)"
+                                                                   title="@Localizer["ticketType.INDEX.EDIT"]">
                                                                     <i class="ri-edit-line"></i>
                                                                 </a>
                                                             }
                                                             @if (User.IsInRole("TIXXP_TICKET_TYPE_DELETE"))
                                                             {
                                                                 <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                                   onclick="confirmDeleteTicketType(@item.Id)">
+                                                                   onclick="confirmDeleteTicketType(@item.Id)"
+                                                                   title="@Localizer["ticketType.INDEX.DELETE"]">
                                                                     <i class="ri-delete-bin-line"></i>
                                                                 </a>
                                                             }
@@ -66,7 +69,7 @@
                                     }
                                     else
                                     {
-                                        <tr><td colspan="2" class="text-center">Kayıt bulunamadı.</td></tr>
+                                        <tr><td colspan="2" class="text-center">@Localizer["ticketType.INDEX.NO_RECORDS_FOUND"]</td></tr>
                                     }
                                 </tbody>
                             </table>
@@ -84,17 +87,17 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Bilet Tipi Düzenle</h5>
+                <h5 class="modal-title" id="editTicketTypeModalTitle"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="editTicketTypeForm">
                     <input type="hidden" id="editTicketTypeId" name="Id" />
                     <div class="mb-3">
-                        <label class="form-label">Bilet Tipi Adı</label>
+                        <label class="form-label">@Localizer["ticketType.INDEX.TICKET_TYPE_NAME"]</label>
                         <input type="text" class="form-control" id="editTicketTypeName" name="Name" required />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                    <button type="submit" class="btn btn-primary w-100">@Localizer["ticketType.INDEX.SAVE"]</button>
                 </form>
             </div>
         </div>
@@ -103,35 +106,49 @@
 
 @section Scripts {
     <script>
+        const localizer = {
+            areYouSure: '@Localizer["ticketType.INDEX.ARE_YOU_SURE"].Value.Replace("'", "\\'")',
+            deleteConfirmation: '@Localizer["ticketType.INDEX.DELETE_CONFIRMATION"].Value.Replace("'", "\\'")',
+            yesDelete: '@Localizer["ticketType.INDEX.YES_DELETE"].Value.Replace("'", "\\'")',
+            cancel: '@Localizer["ticketType.INDEX.CANCEL"].Value.Replace("'", "\\'")',
+            deleted: '@Localizer["ticketType.INDEX.DELETED"].Value.Replace("'", "\\'")',
+            success: '@Localizer["ticketType.INDEX.SUCCESS"].Value.Replace("'", "\\'")',
+            error: '@Localizer["ticketType.INDEX.ERROR"].Value.Replace("'", "\\'")',
+            serverError: '@Localizer["ticketType.INDEX.SERVER_ERROR"].Value.Replace("'", "\\'")',
+            dataError: '@Localizer["ticketType.INDEX.DATA_ERROR"].Value.Replace("'", "\\'")',
+            addTicketType: '@Localizer["ticketType.INDEX.ADD_TICKET_TYPE"].Value.Replace("'", "\\'")',
+            editTicketType: '@Localizer["ticketType.INDEX.EDIT_TICKET_TYPE"].Value.Replace("'", "\\'")'
+        };
+
         function confirmDeleteTicketType(id) {
             Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu bilet tipini silmek üzeresiniz.",
+                title: localizer.areYouSure,
+                text: localizer.deleteConfirmation,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Vazgeç'
+                confirmButtonText: localizer.yesDelete,
+                cancelButtonText: localizer.cancel
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('/TicketType/Delete', { id: id }, function (response) {
                         if (response.success) {
-                            Swal.fire("Silindi", response.message, "success").then(() => location.reload());
+                            Swal.fire(localizer.deleted, response.message, "success").then(() => location.reload());
                         } else {
-                            Swal.fire("Hata", response.message, "error");
+                            Swal.fire(localizer.error, response.message, "error");
                         }
-                    }).fail(() => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error"));
+                    }).fail(() => Swal.fire(localizer.error, localizer.serverError, "error"));
                 }
             });
         }
 
         function openEditTicketTypeModal(id) {
-            const modalTitle = $('#editTicketTypeModal .modal-title');
+            const modalTitle = $('#editTicketTypeModalTitle');
             if (id === 0) {
                 $('#editTicketTypeForm')[0].reset();
                 $('#editTicketTypeId').val(0);
-                modalTitle.text("Bilet Tipi Ekle");
+                modalTitle.text(localizer.addTicketType);
                 $('#editTicketTypeModal').modal('show');
                 return;
             }
@@ -139,9 +156,9 @@
             $.get('/TicketType/GetById', { id: id }, function (data) {
                 $('#editTicketTypeId').val(data.id);
                 $('#editTicketTypeName').val(data.name);
-                modalTitle.text("Bilet Tipi Düzenle");
+                modalTitle.text(localizer.editTicketType);
                 $('#editTicketTypeModal').modal('show');
-            }).fail(() => Swal.fire("Hata", "Veri alınamadı.", "error"));
+            }).fail(() => Swal.fire(localizer.error, localizer.dataError, "error"));
         }
 
         $('#editTicketTypeForm').submit(function (e) {
@@ -161,12 +178,12 @@
                 data: JSON.stringify(data),
                 success: function (response) {
                     if (response.success) {
-                        Swal.fire("Başarılı", response.message, "success").then(() => location.reload());
+                        Swal.fire(localizer.success, response.message, "success").then(() => location.reload());
                     } else {
-                        Swal.fire("Hata", response.message, "error");
+                        Swal.fire(localizer.error, response.message, "error");
                     }
                 },
-                error: () => Swal.fire("Hata", "Sunucuya ulaşılamadı.", "error")
+                error: () => Swal.fire(localizer.error, localizer.serverError, "error")
             });
         });
     </script>

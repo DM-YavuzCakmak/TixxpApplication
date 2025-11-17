@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Tixxp.Business.Services.Abstract.TicketType;
 using Tixxp.Entities.TicketType;
 
@@ -7,10 +8,14 @@ namespace Tixxp.WebApp.Controllers
     public class TicketTypeController : Controller
     {
         private readonly ITicketTypeService _ticketTypeService;
+        private readonly IStringLocalizer<TicketTypeController> _stringLocalizer;
 
-        public TicketTypeController(ITicketTypeService ticketTypeService)
+        public TicketTypeController(
+            ITicketTypeService ticketTypeService,
+            IStringLocalizer<TicketTypeController> stringLocalizer)
         {
             _ticketTypeService = ticketTypeService;
+            _stringLocalizer = stringLocalizer;
         }
 
         public IActionResult Index()
@@ -48,7 +53,7 @@ namespace Tixxp.WebApp.Controllers
         {
             var existing = _ticketTypeService.GetFirstOrDefault(x => x.Id == model.Id);
             if (!existing.Success)
-                return Json(new { success = false, message = "Kayıt bulunamadı." });
+                return Json(new { success = false, message = _stringLocalizer["ticketType.INDEX.RECORD_NOT_FOUND"].Value });
 
             existing.Data.Name = model.Name;
             existing.Data.Updated_Date = DateTime.Now;
@@ -62,7 +67,7 @@ namespace Tixxp.WebApp.Controllers
         {
             var existing = _ticketTypeService.GetFirstOrDefault(x => x.Id == id);
             if (!existing.Success)
-                return Json(new { success = false, message = "Kayıt bulunamadı." });
+                return Json(new { success = false, message = _stringLocalizer["ticketType.INDEX.RECORD_NOT_FOUND"].Value });
 
             existing.Data.IsDeleted = true;
             var result = _ticketTypeService.Update(existing.Data);

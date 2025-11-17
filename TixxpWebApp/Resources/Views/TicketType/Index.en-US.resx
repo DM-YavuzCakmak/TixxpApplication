@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ticketType.INDEX.TITLE" xml:space="preserve">
+    <value>Ticket Type List</value>
+  </data>
+  <data name="ticketType.INDEX.ADD_NEW" xml:space="preserve">
+    <value>Add New Ticket Type</value>
+  </data>
+  <data name="ticketType.INDEX.TICKET_TYPES" xml:space="preserve">
+    <value>Ticket Types</value>
+  </data>
+  <data name="ticketType.INDEX.NAME" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ticketType.INDEX.ACTIONS" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ticketType.INDEX.EDIT" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ticketType.INDEX.DELETE" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="ticketType.INDEX.NO_RECORDS_FOUND" xml:space="preserve">
+    <value>No records found.</value>
+  </data>
+  <data name="ticketType.INDEX.EDIT_TICKET_TYPE" xml:space="preserve">
+    <value>Edit Ticket Type</value>
+  </data>
+  <data name="ticketType.INDEX.TICKET_TYPE_NAME" xml:space="preserve">
+    <value>Ticket Type Name</value>
+  </data>
+  <data name="ticketType.INDEX.SAVE" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ticketType.INDEX.ADD_TICKET_TYPE" xml:space="preserve">
+    <value>Add Ticket Type</value>
+  </data>
+  <data name="ticketType.INDEX.ARE_YOU_SURE" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="ticketType.INDEX.DELETE_CONFIRMATION" xml:space="preserve">
+    <value>You are about to delete this ticket type.</value>
+  </data>
+  <data name="ticketType.INDEX.YES_DELETE" xml:space="preserve">
+    <value>Yes, delete!</value>
+  </data>
+  <data name="ticketType.INDEX.CANCEL" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ticketType.INDEX.DELETED" xml:space="preserve">
+    <value>Deleted</value>
+  </data>
+  <data name="ticketType.INDEX.SUCCESS" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="ticketType.INDEX.ERROR" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ticketType.INDEX.SERVER_ERROR" xml:space="preserve">
+    <value>Could not reach server.</value>
+  </data>
+  <data name="ticketType.INDEX.DATA_ERROR" xml:space="preserve">
+    <value>Could not retrieve data.</value>
+  </data>
+</root>
+

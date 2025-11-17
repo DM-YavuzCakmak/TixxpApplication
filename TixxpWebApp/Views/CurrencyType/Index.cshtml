@@ -1,5 +1,6 @@
 ﻿@model List<Tixxp.Entities.CurrencyType.CurrencyTypeEntity>
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -10,10 +11,10 @@
     <div class="container-fluid">
 
         <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb text-fixed-white">
-            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">Para Birimi Listesi</h1>
+            <h1 class="page-title fw-medium fs-18 mb-0 text-fixed-white">@Localizer["currencyType.INDEX.TITLE"]</h1>
             @if (User.IsInRole("TIXXP_CURRENCY_TYPE_ADD"))
             {
-                <button class="btn btn-primary" onclick="openAddModal()">+ Ekle</button>
+                <button class="btn btn-primary" onclick="openAddModal()">+ @Localizer["currencyType.INDEX.ADD"]</button>
             }
         </div>
 
@@ -25,12 +26,12 @@
                             <table class="table table-bordered text-nowrap w-100">
                                 <thead>
                                     <tr>
-                                        <th>Adı</th>
-                                        <th>Sembol</th>
-                                        <th>Etiket</th>
+                                        <th>@Localizer["currencyType.INDEX.NAME"]</th>
+                                        <th>@Localizer["currencyType.INDEX.SYMBOL"]</th>
+                                        <th>@Localizer["currencyType.INDEX.TAG"]</th>
                                         @if (User.IsInRole("TIXXP_CURRENCY_TYPE_EDIT") || User.IsInRole("TIXXP_CURRENCY_TYPE_DELETE"))
                                         {
-                                            <th>İşlem</th>
+                                            <th>@Localizer["currencyType.INDEX.ACTIONS"]</th>
                                         }
                                     </tr>
                                 </thead>
@@ -46,20 +47,24 @@
                                                 @if (User.IsInRole("TIXXP_CURRENCY_TYPE_EDIT") || User.IsInRole("TIXXP_CURRENCY_TYPE_DELETE"))
                                                 {
                                                     <td>
-                                                        @if (User.IsInRole("TIXXP_CURRENCY_TYPE_EDIT"))
-                                                        {
-                                                            <button class="btn btn-sm btn-warning"
-                                                                    onclick="openEditModal(@currency.Id, '@currency.Name', '@currency.Symbol', '@currency.Tag')">
-                                                                Düzenle
-                                                            </button>
-                                                        }
-                                                        @if (User.IsInRole("TIXXP_CURRENCY_TYPE_DELETE"))
-                                                        {
-                                                            <button class="btn btn-sm btn-danger"
-                                                                    onclick="deleteCurrency(@currency.Id)">
-                                                                Sil
-                                                            </button>
-                                                        }
+                                                        <div class="hstack gap-2 fs-15">
+                                                            @if (User.IsInRole("TIXXP_CURRENCY_TYPE_EDIT"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="openEditModal(@currency.Id, '@currency.Name.Replace("'", "\\'")', '@currency.Symbol.Replace("'", "\\'")', '@currency.Tag.Replace("'", "\\'")')"
+                                                                   title="@Localizer["currencyType.INDEX.EDIT"]">
+                                                                    <i class="ri-edit-line"></i>
+                                                                </a>
+                                                            }
+                                                            @if (User.IsInRole("TIXXP_CURRENCY_TYPE_DELETE"))
+                                                            {
+                                                                <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
+                                                                   onclick="deleteCurrency(@currency.Id)"
+                                                                   title="@Localizer["currencyType.INDEX.DELETE"]">
+                                                                    <i class="ri-delete-bin-line"></i>
+                                                                </a>
+                                                            }
+                                                        </div>
                                                     </td>
                                                 }
                                             </tr>
@@ -68,7 +73,7 @@
                                     else
                                     {
                                         <tr>
-                                            <td colspan="4" class="text-center">Kayıt bulunamadı.</td>
+                                            <td colspan="4" class="text-center">@Localizer["currencyType.INDEX.NO_RECORDS_FOUND"]</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -87,7 +92,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Para Birimi</h5>
+                <h5 class="modal-title" id="modalTitle"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -95,18 +100,18 @@
                     <input type="hidden" id="currencyId" name="Id" />
 
                     <div class="mb-3">
-                        <label>Adı</label>
+                        <label>@Localizer["currencyType.INDEX.NAME"]</label>
                         <input type="text" class="form-control" id="currencyName" name="Name" required />
                     </div>
                     <div class="mb-3">
-                        <label>Sembol</label>
+                        <label>@Localizer["currencyType.INDEX.SYMBOL"]</label>
                         <input type="text" class="form-control" id="currencySymbol" name="Symbol" />
                     </div>
                     <div class="mb-3">
-                        <label>Etiket</label>
+                        <label>@Localizer["currencyType.INDEX.TAG"]</label>
                         <input type="text" class="form-control" id="currencyTag" name="Tag" />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                    <button type="submit" class="btn btn-primary w-100">@Localizer["currencyType.INDEX.SAVE"]</button>
                 </form>
             </div>
         </div>
@@ -116,10 +121,22 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        const localizer = {
+            title: '@Localizer["currencyType.INDEX.TITLE"].Value.Replace("'", "\\'")',
+            addTitle: '@Localizer["currencyType.INDEX.ADD_CURRENCY_TYPE"].Value.Replace("'", "\\'")',
+            updateTitle: '@Localizer["currencyType.INDEX.UPDATE_CURRENCY_TYPE"].Value.Replace("'", "\\'")',
+            success: '@Localizer["currencyType.INDEX.SUCCESS"].Value.Replace("'", "\\'")',
+            error: '@Localizer["currencyType.INDEX.ERROR"].Value.Replace("'", "\\'")',
+            areYouSure: '@Localizer["currencyType.INDEX.ARE_YOU_SURE"].Value.Replace("'", "\\'")',
+            deleteConfirmation: '@Localizer["currencyType.INDEX.DELETE_CONFIRMATION"].Value.Replace("'", "\\'")',
+            yesDelete: '@Localizer["currencyType.INDEX.YES_DELETE"].Value.Replace("'", "\\'")',
+            deleted: '@Localizer["currencyType.INDEX.DELETED"].Value.Replace("'", "\\'")'
+        };
+
         function openAddModal() {
             $('#currencyForm')[0].reset();
             $('#currencyId').val('');
-            $('#modalTitle').text('Para Birimi Ekle');
+            $('#modalTitle').text(localizer.addTitle);
             $('#currencyModal').modal('show');
         }
 
@@ -128,7 +145,7 @@
             $('#currencyName').val(name);
             $('#currencySymbol').val(symbol);
             $('#currencyTag').val(tag);
-            $('#modalTitle').text('Para Birimi Güncelle');
+            $('#modalTitle').text(localizer.updateTitle);
             $('#currencyModal').modal('show');
         }
 
@@ -137,29 +154,29 @@
             var formData = $(this).serialize();
             $.post('/CurrencyType/Save', formData, function (response) {
                 if (response.success) {
-                    Swal.fire('Başarılı!', response.message, 'success').then(() => location.reload());
+                    Swal.fire(localizer.success, response.message, 'success').then(() => location.reload());
                 } else {
-                    Swal.fire('Hata', response.message, 'error');
+                    Swal.fire(localizer.error, response.message, 'error');
                 }
             });
         });
 
         function deleteCurrency(id) {
             Swal.fire({
-                title: 'Emin misiniz?',
-                text: 'Bu para birimi silinecek!',
+                title: localizer.areYouSure,
+                text: localizer.deleteConfirmation,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Evet, sil!'
+                confirmButtonText: localizer.yesDelete
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('/CurrencyType/Delete', { id: id }, function (response) {
                         if (response.success) {
-                            Swal.fire('Silindi!', response.message, 'success').then(() => location.reload());
+                            Swal.fire(localizer.deleted, response.message, 'success').then(() => location.reload());
                         } else {
-                            Swal.fire('Hata', response.message, 'error');
+                            Swal.fire(localizer.error, response.message, 'error');
                         }
                     });
                 }

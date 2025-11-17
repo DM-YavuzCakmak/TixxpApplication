@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+<!DOCTYPE html>
 <html lang="en" dir="ltr" data-nav-layout="vertical" data-theme-mode="light" data-header-styles="gradient" data-menu-styles="light" data-toggled="close">
 
 <head>
@@ -49,6 +51,17 @@
     </div>
     <div id="responsive-overlay"></div>
     <!-- Scroll To Top -->
+    
+    <!-- Global Loading Overlay -->
+    <div id="globalLoadingOverlay" class="global-loading-overlay" style="display: none;">
+        <div class="global-loading-content">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">@Localizer["shared.LOADING"]</span>
+            </div>
+            <p class="mt-3 text-white" id="globalLoadingMessage">@Localizer["shared.LOADING_MESSAGE"]</p>
+        </div>
+    </div>
+    <!-- Global Loading Overlay -->
     <!-- Popper JS -->
     <script src="../assets/libs/popperjs/core/umd/popper.min.js"></script>
 
@@ -117,6 +130,96 @@
     <!-- Internal Datatables JS -->
     <script src="../assets/js/datatables.js"></script>
     <script src="../assets/js/redirect.js"></script>
+
+    <!-- Global Loading Overlay Styles -->
+    <style>
+        .global-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .global-loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .global-loading-content .spinner-border {
+            border-width: 0.3rem;
+        }
+    </style>
+
+    <!-- Global AJAX Loading Interceptor -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // Global loading overlay kontrolü
+            const loadingOverlay = document.getElementById('globalLoadingOverlay');
+            let activeRequests = 0;
+
+            function showLoading() {
+                if (loadingOverlay && activeRequests === 0) {
+                    loadingOverlay.style.display = 'flex';
+                }
+                activeRequests++;
+            }
+
+            function hideLoading() {
+                activeRequests--;
+                if (activeRequests <= 0) {
+                    activeRequests = 0;
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                    }
+                }
+            }
+
+            // jQuery AJAX interceptor
+            if (typeof jQuery !== 'undefined') {
+                $(document).ajaxStart(function() {
+                    showLoading();
+                }).ajaxStop(function() {
+                    hideLoading();
+                }).ajaxError(function() {
+                    hideLoading();
+                });
+            }
+
+            // Fetch API interceptor
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                showLoading();
+                return originalFetch.apply(this, args)
+                    .finally(function() {
+                        hideLoading();
+                    });
+            };
+
+            // Global utility fonksiyonlar
+            window.showGlobalLoading = function(customMessage) {
+                if (customMessage && loadingOverlay) {
+                    const messageEl = loadingOverlay.querySelector('#globalLoadingMessage');
+                    if (messageEl) {
+                        messageEl.textContent = customMessage;
+                    }
+                }
+                showLoading();
+            };
+            window.hideGlobalLoading = hideLoading;
+            
+            // Loading mesajını localStorage'dan veya default olarak ayarla
+            const defaultLoadingMessage = '@Localizer["shared.LOADING_MESSAGE"]';
+        })();
+    </script>
 
     @RenderSection("scripts", required: false)
 </body>
