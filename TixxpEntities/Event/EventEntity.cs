@@ -7,9 +7,6 @@ namespace Tixxp.Entities.Events
     [Table("Event")]
     public class EventEntity : BaseEntity
     {
-        [Column("Name")]
-        public string? Name { get; set; }
-
         [Column("ImagePath")]
         public string? ImagePath { get; set; }
 

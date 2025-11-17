@@ -5,6 +5,7 @@ using System.Linq;
 using Tixxp.Business.Services.Abstract.ChannelTranslation;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
+using Tixxp.Business.Services.Abstract.EventTranslation;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PaymentType;
@@ -19,6 +20,7 @@ using Tixxp.Business.Services.Abstract.TicketStatus;
 using Tixxp.Business.Services.Abstract.TicketStatusTranslation;
 using Tixxp.Core.Utilities.Results.Abstract;
 using Tixxp.Entities.Events;
+using Tixxp.Entities.EventTranslation;
 using Tixxp.Entities.PaymentTypeTranslation;
 using Tixxp.Entities.ProductTranslation;
 using Tixxp.Entities.Reservation;
@@ -35,6 +37,7 @@ namespace Tixxp.WebApp.Controllers
     {
         // === services ===
         private readonly IEventService _eventService;
+        private readonly IEventTranslationService _eventTranslationService;
         private readonly ICurrencyTypeService _currencyTypeService;
         private readonly IChannelTranslationService _channelTranslationService;
         private readonly IProductTranslationService _productTranslationService;
@@ -65,6 +68,7 @@ namespace Tixxp.WebApp.Controllers
             IProductTranslationService productTranslationService,
             ICurrencyTypeService currencyTypeService,
             IEventService eventService,
+            IEventTranslationService eventTranslationService,
             ITicketStatusService ticketStatusService,
             ITicketStatusTranslationService ticketStatusTranslationService,
             IChannelTranslationService channelTranslationService)
@@ -81,6 +85,7 @@ namespace Tixxp.WebApp.Controllers
             _productTranslationService = productTranslationService;
             _currencyTypeService = currencyTypeService;
             _eventService = eventService;
+            _eventTranslationService = eventTranslationService;
             _ticketStatusService = ticketStatusService;
             _ticketStatusTranslationService = ticketStatusTranslationService;
             _channelTranslationService = channelTranslationService;
@@ -90,8 +95,41 @@ namespace Tixxp.WebApp.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            var cultureCode = CultureInfo.CurrentUICulture.Name;
+            var fallbackCulture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var langRes = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+            long? languageId = langRes.Success ? langRes.Data?.Id : null;
+
+            // Event'leri ve çevirilerini getir
             var eventList = _eventService.GetList(x => !x.IsDeleted);
-            ViewBag.EventList = eventList.Success && eventList.Data != null ? eventList.Data : Enumerable.Empty<EventEntity>();
+            var events = (eventList.Success && eventList.Data != null) 
+                ? eventList.Data 
+                : Enumerable.Empty<EventEntity>();
+
+            var eventIds = events.Select(e => e.Id).ToList();
+            var translationsResult = eventIds.Any()
+                ? _eventTranslationService.GetListWithInclude(
+                    x => !x.IsDeleted && eventIds.Contains(x.EventId),
+                    x => x.Language)
+                : new Core.Utilities.Results.Concrete.SuccessDataResult<List<EventTranslationEntity>>(new List<EventTranslationEntity>());
+
+            var translations = (translationsResult.Success && translationsResult.Data != null)
+                ? translationsResult.Data.ToList()
+                : new List<EventTranslationEntity>();
+
+            // Event'leri IdNameVm'e dönüştür (çeviri ile)
+            var eventViewModels = events.Select(ev =>
+            {
+                var evTranslations = translations.Where(t => t.EventId == ev.Id).ToList();
+                var displayName = ResolveEventDisplayName(ev, evTranslations, cultureCode, fallbackCulture, languageId);
+                return new IdNameVm
+                {
+                    Id = ev.Id,
+                    Name = displayName
+                };
+            }).OrderBy(e => e.Name).ToList();
+
+            ViewBag.EventList = eventViewModels;
 
             var lookups = BuildFilterLookups();
             ViewBag.Channels = lookups.Channels;
@@ -518,6 +556,33 @@ namespace Tixxp.WebApp.Controllers
 
         private string ResolveStatusName(long statusId, Dictionary<long, string> dict)
             => (dict != null && dict.TryGetValue(statusId, out var name)) ? name : $"#{statusId}";
+
+        // Event display name'i çeviri ile çözümle
+        private string ResolveEventDisplayName(EventEntity ev, List<EventTranslationEntity> translations, string cultureCode, string fallbackCulture, long? languageId)
+        {
+            // Önce mevcut dildeki çeviriyi bul
+            var cultureMatch = translations.FirstOrDefault(t =>
+                languageId.HasValue && t.LanguageId == languageId.Value);
+
+            // Mevcut culture code ile eşleşen çeviriyi bul
+            if (cultureMatch == null)
+            {
+                cultureMatch = translations.FirstOrDefault(t =>
+                    string.Equals(t.Language?.Code, cultureCode, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Fallback culture ile eşleşen çeviriyi bul
+            var fallbackMatch = cultureMatch ?? translations.FirstOrDefault(t =>
+                string.Equals(t.Language?.Code, fallbackCulture, StringComparison.OrdinalIgnoreCase));
+
+            // Herhangi bir çeviri
+            var any = fallbackMatch ?? translations.FirstOrDefault();
+
+            return cultureMatch?.Name
+                ?? fallbackMatch?.Name
+                ?? any?.Name
+                ?? $"#{ev.Id}";
+        }
 
         private Dictionary<long, string> GetPaymentTypeNames()
         {

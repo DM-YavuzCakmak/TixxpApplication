@@ -213,4 +213,25 @@
   <data name="event.INDEX.SUCCESS" xml:space="preserve">
     <value>Başarılı</value>
   </data>
+  <data name="event.INDEX.EVENT_TRANSLATIONS" xml:space="preserve">
+    <value>Çeviriler</value>
+  </data>
+  <data name="event.INDEX.NO_TRANSLATION" xml:space="preserve">
+    <value>Çeviri yok</value>
+  </data>
+  <data name="event.INDEX.TRANSLATION_SECTION" xml:space="preserve">
+    <value>Etkinlik İsimleri</value>
+  </data>
+  <data name="event.INDEX.TRANSLATION_HINT" xml:space="preserve">
+    <value>Her dil için etkinlik adını girin. Boş bırakırsanız o dil gösterilmez.</value>
+  </data>
+  <data name="event.INDEX.LANGUAGE_TEMPLATE" xml:space="preserve">
+    <value>Ad ({0})</value>
+  </data>
+  <data name="event.INDEX.NAME_PLACEHOLDER" xml:space="preserve">
+    <value>İsim girin</value>
+  </data>
+  <data name="event.INDEX.NO_LANGUAGE_DEFINED" xml:space="preserve">
+    <value>Tanımlı dil bulunamadı.</value>
+  </data>
 </root>

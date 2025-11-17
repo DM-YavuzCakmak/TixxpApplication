@@ -12,6 +12,7 @@ using Tixxp.Business.Services.Abstract.CountyTranslation;
 using Tixxp.Business.Services.Abstract.CurrenctUser;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
+using Tixxp.Business.Services.Abstract.EventTranslation;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PaymentType;
@@ -34,6 +35,7 @@ using Tixxp.Entities.CityTranslation;
 using Tixxp.Entities.County;
 using Tixxp.Entities.CountyTranslation;
 using Tixxp.Entities.Events;
+using Tixxp.Entities.EventTranslation;
 using Tixxp.Entities.EventTicketPrice;
 using Tixxp.Entities.PaymentTypeTranslation;
 using Tixxp.Entities.ProductTranslation;
@@ -63,6 +65,7 @@ public class TicketSaleController : Controller
     private readonly ITicketService _ticketService;
 
     private readonly IEventService _eventService;
+    private readonly IEventTranslationService _eventTranslationService;
     private readonly ISessionService _sessionService;
     private readonly ILanguageService _languageService;
     private readonly ISessionTypeTranslationRepository _sessionTypeTranslationRepository;
@@ -95,6 +98,7 @@ public class TicketSaleController : Controller
 
     public TicketSaleController(
         IEventService eventService,
+        IEventTranslationService eventTranslationService,
         ISessionService sessionService,
         ILanguageService languageService,
         ISessionTypeTranslationRepository sessionTypeTranslationRepository,
@@ -122,6 +126,7 @@ public class TicketSaleController : Controller
         ICampaignActionService campaignActionService)
     {
         _eventService = eventService;
+        _eventTranslationService = eventTranslationService;
         _sessionService = sessionService;
         _languageService = languageService;
         _sessionTypeTranslationRepository = sessionTypeTranslationRepository;
@@ -161,11 +166,45 @@ public class TicketSaleController : Controller
     // ———————————————————————————
     public IActionResult Index()
     {
-        var eventsDr = _eventService.GetList(x => !x.IsDeleted);
-        if (eventsDr.Success && eventsDr.Data is { Count: > 0 })
-            return View(eventsDr.Data);
+        var cultureCode = CultureInfo.CurrentUICulture.Name;
+        var fallbackCulture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        var langDr = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+        long? languageId = langDr.Success ? langDr.Data?.Id : null;
 
-        return View(Enumerable.Empty<EventEntity>());
+        var eventsDr = _eventService.GetList(x => !x.IsDeleted);
+        var events = (eventsDr.Success && eventsDr.Data != null)
+            ? eventsDr.Data
+            : Enumerable.Empty<EventEntity>();
+
+        var eventIds = events.Select(e => e.Id).ToList();
+        var translationsResult = eventIds.Any()
+            ? _eventTranslationService.GetListWithInclude(
+                x => !x.IsDeleted && eventIds.Contains(x.EventId),
+                x => x.Language)
+            : new Core.Utilities.Results.Concrete.SuccessDataResult<List<EventTranslationEntity>>(new List<EventTranslationEntity>());
+
+        var translations = (translationsResult.Success && translationsResult.Data != null)
+            ? translationsResult.Data.ToList()
+            : new List<EventTranslationEntity>();
+
+        // Event'leri Translation ile birlikte ViewModel'e dönüştür
+        var eventViewModels = events.Select(ev =>
+        {
+            var evTranslations = translations.Where(t => t.EventId == ev.Id).ToList();
+            var displayName = ResolveEventDisplayName(ev, evTranslations, cultureCode, fallbackCulture, languageId);
+            return new EventWithTranslationViewModel
+            {
+                Id = ev.Id,
+                Name = displayName,
+                ImagePath = ev.ImagePath,
+                OpeningTime = ev.OpeningTime,
+                ClosingTime = ev.ClosingTime,
+                IsAvailableOnB2C = ev.IsAvailableOnB2C,
+                IsAvailableOnB2B = ev.IsAvailableOnB2B
+            };
+        }).OrderBy(e => e.Name).ToList();
+
+        return View(eventViewModels);
     }
 
     // ———————————————————————————
@@ -664,4 +703,43 @@ public class TicketSaleController : Controller
 
     private static string BuildQrText(long reservationId, long reservationDetailId, long eventTicketPriceId, int seq)
         => $"TXXP|R:{reservationId}|RD:{reservationDetailId}|ETP:{eventTicketPriceId}|S:{seq}|TS:{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}|{Guid.NewGuid():N}";
+
+    // Event display name'i çeviri ile çözümle
+    private string ResolveEventDisplayName(EventEntity ev, List<EventTranslationEntity> translations, string cultureCode, string fallbackCulture, long? languageId)
+    {
+        // Önce mevcut dildeki çeviriyi bul
+        var cultureMatch = translations.FirstOrDefault(t =>
+            languageId.HasValue && t.LanguageId == languageId.Value);
+
+        // Mevcut culture code ile eşleşen çeviriyi bul
+        if (cultureMatch == null)
+        {
+            cultureMatch = translations.FirstOrDefault(t =>
+                string.Equals(t.Language?.Code, cultureCode, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Fallback culture ile eşleşen çeviriyi bul
+        var fallbackMatch = cultureMatch ?? translations.FirstOrDefault(t =>
+            string.Equals(t.Language?.Code, fallbackCulture, StringComparison.OrdinalIgnoreCase));
+
+        // Herhangi bir çeviri
+        var any = fallbackMatch ?? translations.FirstOrDefault();
+
+        return cultureMatch?.Name
+            ?? fallbackMatch?.Name
+            ?? any?.Name
+            ?? $"#{ev.Id}";
+    }
+}
+
+// Event ViewModel (Translation ile birlikte)
+public class EventWithTranslationViewModel
+{
+    public long Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? ImagePath { get; set; }
+    public TimeSpan? OpeningTime { get; set; }
+    public TimeSpan? ClosingTime { get; set; }
+    public bool IsAvailableOnB2C { get; set; }
+    public bool IsAvailableOnB2B { get; set; }
 }

@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using System.Linq;
 using Tixxp.Business.Services.Abstract.CurrenctUser;
 using Tixxp.Business.Services.Abstract.CurrencyType;
 using Tixxp.Business.Services.Abstract.Event;
+using Tixxp.Business.Services.Abstract.EventTranslation;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
+using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PriceCategory;
 using Tixxp.Business.Services.Abstract.TicketType;
+using Tixxp.Entities.Events;
+using Tixxp.Entities.EventTranslation;
 using Tixxp.Entities.EventTicketPrice;
 
 namespace Tixxp.WebApp.Controllers
@@ -15,6 +21,8 @@ namespace Tixxp.WebApp.Controllers
 
 
         private readonly IEventService _eventService;
+        private readonly IEventTranslationService _eventTranslationService;
+        private readonly ILanguageService _languageService;
         private readonly ITicketTypeService _ticketTypeService;
         private readonly IPriceCategoryService _priceCategoryService;
         private readonly ICurrencyTypeService _currencyTypeService;
@@ -22,6 +30,8 @@ namespace Tixxp.WebApp.Controllers
 
         public EventTicketPriceController(
             IEventService eventService,
+            IEventTranslationService eventTranslationService,
+            ILanguageService languageService,
             ITicketTypeService ticketTypeService,
             IPriceCategoryService priceCategoryService,
             ICurrencyTypeService currencyTypeService,
@@ -29,6 +39,8 @@ namespace Tixxp.WebApp.Controllers
             ICurrentUser currentUser)
         {
             _eventService = eventService;
+            _eventTranslationService = eventTranslationService;
+            _languageService = languageService;
             _ticketTypeService = ticketTypeService;
             _priceCategoryService = priceCategoryService;
             _currencyTypeService = currencyTypeService;
@@ -48,7 +60,44 @@ namespace Tixxp.WebApp.Controllers
                 item.CurrencyType = _currencyTypeService.GetFirstOrDefault(x => x.Id == item.CurrencyTypeId && !x.IsDeleted).Data;
             }
 
-            ViewBag.Events = _eventService.GetList(x => !x.IsDeleted).Data;
+            // Event'leri Translation ile birlikte al
+            var cultureCode = CultureInfo.CurrentUICulture.Name;
+            var fallbackCulture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var langDr = _languageService.GetFirstOrDefault(x => x.Code == cultureCode);
+            long? languageId = langDr.Success ? langDr.Data?.Id : null;
+
+            var eventList = _eventService.GetList(x => !x.IsDeleted);
+            var events = (eventList.Success && eventList.Data != null)
+                ? eventList.Data
+                : Enumerable.Empty<EventEntity>();
+
+            var eventIds = events.Select(e => e.Id).ToList();
+            var translationsResult = eventIds.Any()
+                ? _eventTranslationService.GetListWithInclude(
+                    x => !x.IsDeleted && eventIds.Contains(x.EventId),
+                    x => x.Language)
+                : new Core.Utilities.Results.Concrete.SuccessDataResult<List<EventTranslationEntity>>(new List<EventTranslationEntity>());
+
+            var translations = (translationsResult.Success && translationsResult.Data != null)
+                ? translationsResult.Data.ToList()
+                : new List<EventTranslationEntity>();
+
+            // Event isimlerini çözümle ve Dictionary olarak ViewBag'e ekle
+            var eventNames = new Dictionary<long, string>();
+            foreach (var ev in events)
+            {
+                var evTranslations = translations.Where(t => t.EventId == ev.Id).ToList();
+                var displayName = ResolveEventDisplayName(ev, evTranslations, cultureCode, fallbackCulture, languageId);
+                eventNames[ev.Id] = displayName;
+            }
+
+            // ViewBag.Events'i Translation ile birlikte doldur
+            var eventViewModels = events.Select(ev => new { Id = ev.Id, Name = eventNames.GetValueOrDefault(ev.Id, $"#{ev.Id}") })
+                .OrderBy(e => e.Name)
+                .ToList();
+
+            ViewBag.Events = eventViewModels;
+            ViewBag.EventNames = eventNames; // Model'de event isimlerini kullanmak için
             ViewBag.TicketTypes = _ticketTypeService.GetList(x => !x.IsDeleted).Data;
             ViewBag.PriceCategories = _priceCategoryService.GetList(x => !x.IsDeleted).Data;
             ViewBag.CurrencyTypes = _currencyTypeService.GetList(x => !x.IsDeleted).Data;
@@ -113,6 +162,33 @@ namespace Tixxp.WebApp.Controllers
             result.Data.IsDeleted = true;
             var updateResult = _eventTicketPriceService.Update(result.Data);
             return Json(new { success = updateResult.Success, message = updateResult.Message });
+        }
+
+        // Event display name'i çeviri ile çözümle
+        private string ResolveEventDisplayName(EventEntity ev, List<EventTranslationEntity> translations, string cultureCode, string fallbackCulture, long? languageId)
+        {
+            // Önce mevcut dildeki çeviriyi bul
+            var cultureMatch = translations.FirstOrDefault(t =>
+                languageId.HasValue && t.LanguageId == languageId.Value);
+
+            // Mevcut culture code ile eşleşen çeviriyi bul
+            if (cultureMatch == null)
+            {
+                cultureMatch = translations.FirstOrDefault(t =>
+                    string.Equals(t.Language?.Code, cultureCode, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Fallback culture ile eşleşen çeviriyi bul
+            var fallbackMatch = cultureMatch ?? translations.FirstOrDefault(t =>
+                string.Equals(t.Language?.Code, fallbackCulture, StringComparison.OrdinalIgnoreCase));
+
+            // Herhangi bir çeviri
+            var any = fallbackMatch ?? translations.FirstOrDefault();
+
+            return cultureMatch?.Name
+                ?? fallbackMatch?.Name
+                ?? any?.Name
+                ?? $"#{ev.Id}";
         }
     }
 }

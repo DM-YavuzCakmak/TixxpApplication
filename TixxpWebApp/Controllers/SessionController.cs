@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Tixxp.Business.Services.Abstract.Event;
+using Tixxp.Business.Services.Abstract.EventTranslation;
 using Tixxp.Business.Services.Abstract.EventTicketPrice;
 using Tixxp.Business.Services.Abstract.Language;
 using Tixxp.Business.Services.Abstract.PriceCategory;
@@ -12,6 +13,8 @@ using Tixxp.Business.Services.Abstract.Session;
 using Tixxp.Business.Services.Abstract.SessionEventTicketPrice;
 using Tixxp.Business.Services.Abstract.SessionStatus;
 using Tixxp.Business.Services.Abstract.SessionType;
+using Tixxp.Entities.Events;
+using Tixxp.Entities.EventTranslation;
 using Tixxp.Entities.EventTicketPrice;
 using Tixxp.Entities.Session;
 using Tixxp.Entities.SessionEventTicketPrice;
@@ -24,6 +27,7 @@ namespace Tixxp.WebApp.Controllers
     {
         private readonly ISessionService _sessionService;
         private readonly IEventService _eventService;
+        private readonly IEventTranslationService _eventTranslationService;
         private readonly IPriceCategoryService _priceCategoryService;
         private readonly ISessionEventTicketPriceService _sessionEventTicketPriceService;
         private readonly IEventTicketPriceService _eventTicketPriceService;
@@ -39,6 +43,7 @@ namespace Tixxp.WebApp.Controllers
         public SessionController(
             ISessionService sessionService,
             IEventService eventService,
+            IEventTranslationService eventTranslationService,
             IPriceCategoryService priceCategoryService,
             ISessionEventTicketPriceService sessionEventTicketPriceService,
             IEventTicketPriceService eventTicketPriceService,
@@ -51,6 +56,7 @@ namespace Tixxp.WebApp.Controllers
         {
             _sessionService = sessionService;
             _eventService = eventService;
+            _eventTranslationService = eventTranslationService;
             _priceCategoryService = priceCategoryService;
             _sessionEventTicketPriceService = sessionEventTicketPriceService;
             _eventTicketPriceService = eventTicketPriceService;
@@ -150,7 +156,33 @@ namespace Tixxp.WebApp.Controllers
                 .GetListWithInclude(x => !x.IsDeleted, x => x.EventTicketPrice)
                 .Data;
 
-            ViewBag.Events = _eventService.GetList(x => !x.IsDeleted).Data;
+            // Event'leri Translation ile birlikte al
+            var fallbackCulture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var eventList = _eventService.GetList(x => !x.IsDeleted);
+            var events = (eventList.Success && eventList.Data != null)
+                ? eventList.Data
+                : Enumerable.Empty<EventEntity>();
+
+            var eventIds = events.Select(e => e.Id).ToList();
+            var translationsResult = eventIds.Any()
+                ? _eventTranslationService.GetListWithInclude(
+                    x => !x.IsDeleted && eventIds.Contains(x.EventId),
+                    x => x.Language)
+                : new Core.Utilities.Results.Concrete.SuccessDataResult<List<EventTranslationEntity>>(new List<EventTranslationEntity>());
+
+            var translations = (translationsResult.Success && translationsResult.Data != null)
+                ? translationsResult.Data.ToList()
+                : new List<EventTranslationEntity>();
+
+            // Event'leri IdNameVm'e dönüştür (çeviri ile)
+            var eventViewModels = events.Select(ev =>
+            {
+                var evTranslations = translations.Where(t => t.EventId == ev.Id).ToList();
+                var displayName = ResolveEventDisplayName(ev, evTranslations, cultureCode, fallbackCulture, languageId);
+                return new { Id = ev.Id, Name = displayName };
+            }).OrderBy(e => e.Name).ToList();
+
+            ViewBag.Events = eventViewModels;
             ViewBag.PriceCategories = _priceCategoryService.GetList(x => !x.IsDeleted).Data;
             ViewBag.EventTicketPrices = _eventTicketPriceService.GetList(x => !x.IsDeleted).Data;
             ViewBag.SessionTicketPrices = sessionTicketPrices;
@@ -201,6 +233,33 @@ namespace Tixxp.WebApp.Controllers
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
             return DateTime.TryParse(s, out var dt) ? dt.Date : (DateTime?)null;
+        }
+
+        // Event display name'i çeviri ile çözümle
+        private string ResolveEventDisplayName(EventEntity ev, List<EventTranslationEntity> translations, string cultureCode, string fallbackCulture, long? languageId)
+        {
+            // Önce mevcut dildeki çeviriyi bul
+            var cultureMatch = translations.FirstOrDefault(t =>
+                languageId.HasValue && t.LanguageId == languageId.Value);
+
+            // Mevcut culture code ile eşleşen çeviriyi bul
+            if (cultureMatch == null)
+            {
+                cultureMatch = translations.FirstOrDefault(t =>
+                    string.Equals(t.Language?.Code, cultureCode, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Fallback culture ile eşleşen çeviriyi bul
+            var fallbackMatch = cultureMatch ?? translations.FirstOrDefault(t =>
+                string.Equals(t.Language?.Code, fallbackCulture, StringComparison.OrdinalIgnoreCase));
+
+            // Herhangi bir çeviri
+            var any = fallbackMatch ?? translations.FirstOrDefault();
+
+            return cultureMatch?.Name
+                ?? fallbackMatch?.Name
+                ?? any?.Name
+                ?? $"#{ev.Id}";
         }
 
         [HttpPost]

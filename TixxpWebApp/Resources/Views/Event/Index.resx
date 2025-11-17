@@ -213,4 +213,25 @@
   <data name="event.INDEX.SUCCESS" xml:space="preserve">
     <value>Success</value>
   </data>
+  <data name="event.INDEX.EVENT_TRANSLATIONS" xml:space="preserve">
+    <value>Translations</value>
+  </data>
+  <data name="event.INDEX.NO_TRANSLATION" xml:space="preserve">
+    <value>No translation</value>
+  </data>
+  <data name="event.INDEX.TRANSLATION_SECTION" xml:space="preserve">
+    <value>Event Names</value>
+  </data>
+  <data name="event.INDEX.TRANSLATION_HINT" xml:space="preserve">
+    <value>Provide the event name for each language. Leave blank to hide a translation.</value>
+  </data>
+  <data name="event.INDEX.LANGUAGE_TEMPLATE" xml:space="preserve">
+    <value>Name ({0})</value>
+  </data>
+  <data name="event.INDEX.NAME_PLACEHOLDER" xml:space="preserve">
+    <value>Enter name</value>
+  </data>
+  <data name="event.INDEX.NO_LANGUAGE_DEFINED" xml:space="preserve">
+    <value>No languages are configured.</value>
+  </data>
 </root>

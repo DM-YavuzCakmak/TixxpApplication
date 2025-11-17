@@ -1,5 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
-@using Tixxp.Entities.Events
 @inject IViewLocalizer Localizer
 @{
     ViewData["Title"] = "Reservation Management";
@@ -9,8 +8,7 @@
     var paymentTypes = ViewBag.PaymentTypes as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
     var statuses = ViewBag.Statuses as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
     var currencyTypes = ViewBag.CurrencyTypes as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
-    var events = ViewBag.EventList as IEnumerable<EventEntity> ?? Enumerable.Empty<EventEntity>();
-    <!-- EKLENDİ -->
+    var events = ViewBag.EventList as IEnumerable<Tixxp.WebApp.Models.ReservationManagement.IdNameVm> ?? Enumerable.Empty<Tixxp.WebApp.Models.ReservationManagement.IdNameVm>();
 }
 
 

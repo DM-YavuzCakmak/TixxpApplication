@@ -1,4 +1,4 @@
-﻿@model List<Tixxp.Entities.Events.EventEntity>
+﻿@model Tixxp.WebApp.Models.Event.EventIndexViewModel
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer;
 @{
@@ -24,6 +24,7 @@
                                 <thead>
                                     <tr>
                                         <th>@Localizer["event.INDEX.EVENT_NAME"]</th>
+                                        <th>@Localizer["event.INDEX.EVENT_TRANSLATIONS"]</th>
                                         <th>@Localizer["event.INDEX.OPENING_TIME"]</th>
                                         <th>@Localizer["event.INDEX.CLOSING_TIME"]</th>
                                         <th>@Localizer["event.INDEX.B2C_OPEN"]</th>
@@ -32,33 +33,48 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (Model != null && Model.Any())
+                                    @if (Model?.Events != null && Model.Events.Any())
                                     {
-                                        foreach (var item in Model)
+                                        foreach (var item in Model.Events)
                                         {
                                             <tr>
-                                                <td>@item.Name</td>
-                                                <td>@item.OpeningTime?.ToString(@"hh\:mm")</td>
-                                                <td>@item.ClosingTime?.ToString(@"hh\:mm")</td>
+                                                <td>@item.DisplayName</td>
                                                 <td>
-                                                    <span class="badge @(item.IsAvailableOnB2C ? "bg-success-transparent" : "bg-danger-transparent")">
-                                                        @Localizer[item.IsAvailableOnB2C ? "event.INDEX.OPEN" : "event.INDEX.CLOSING"]
+                                                    @if (item.Translations != null && item.Translations.Any())
+                                                    {
+                                                        foreach (var translation in item.Translations)
+                                                        {
+                                                            <div>
+                                                                <strong>@translation.Language?.Code?.ToUpperInvariant():</strong> @translation.Name
+                                                            </div>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">@Localizer["event.INDEX.NO_TRANSLATION"]</span>
+                                                    }
+                                                </td>
+                                                <td>@item.Event.OpeningTime?.ToString(@"hh\:mm")</td>
+                                                <td>@item.Event.ClosingTime?.ToString(@"hh\:mm")</td>
+                                                <td>
+                                                    <span class="badge @(item.Event.IsAvailableOnB2C ? "bg-success-transparent" : "bg-danger-transparent")">
+                                                        @Localizer[item.Event.IsAvailableOnB2C ? "event.INDEX.OPEN" : "event.INDEX.CLOSING"]
                                                     </span>
                                                 </td>
 
                                                 <td>
-                                                    <span class="badge @(item.IsAvailableOnB2B ? "bg-success-transparent" : "bg-danger-transparent")">
-                                                        @Localizer[item.IsAvailableOnB2B ? "event.INDEX.OPEN" : "event.INDEX.CLOSING"]
+                                                    <span class="badge @(item.Event.IsAvailableOnB2B ? "bg-success-transparent" : "bg-danger-transparent")">
+                                                        @Localizer[item.Event.IsAvailableOnB2B ? "event.INDEX.OPEN" : "event.INDEX.CLOSING"]
                                                     </span>
                                                 </td>
                                                 <td>
                                                     <div class="hstack gap-2 fs-15">
                                                         <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="openEditEventModal(@item.Id)">
+                                                           onclick="openEditEventModal(@item.Event.Id)">
                                                             <i class="ri-edit-line"></i>
                                                         </a>
                                                         <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-light"
-                                                           onclick="confirmDeleteEvent(@item.Id)">
+                                                           onclick="confirmDeleteEvent(@item.Event.Id)">
                                                             <i class="ri-delete-bin-line"></i>
                                                         </a>
                                                     </div>
@@ -138,6 +154,43 @@
                         </div>
                     </div>
 
+                    <!-- Çeviri Alanları -->
+                    <div class="card custom-card mb-3">
+                        <div class="card-header">
+                            <div class="card-title mb-0">@Localizer["event.INDEX.TRANSLATION_SECTION"]</div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">@Localizer["event.INDEX.TRANSLATION_HINT"]</p>
+                            <div class="row g-3">
+                                @if (Model?.Languages != null && Model.Languages.Any())
+                                {
+                                    foreach (var lang in Model.Languages)
+                                    {
+                                        var langCode = lang.Code?.ToLowerInvariant() ?? $"lang-{lang.Id}";
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="translation-@langCode">
+                                                @Localizer["event.INDEX.LANGUAGE_TEMPLATE", lang.Code?.ToUpperInvariant()]
+                                            </label>
+                                            <input type="text"
+                                                   class="form-control translation-input"
+                                                   id="translation-@langCode"
+                                                   data-lang="@langCode"
+                                                   placeholder="@Localizer["event.INDEX.NAME_PLACEHOLDER"]" />
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-warning mb-0">
+                                            @Localizer["event.INDEX.NO_LANGUAGE_DEFINED"]
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100" id="btn-save">@Localizer["event.INDEX.SAVE"]</button>
                 </form>
             </div>
@@ -179,8 +232,31 @@
             });
         }
 
+        function resetTranslationInputs() {
+            $('.translation-input').each(function () {
+                $(this).val('');
+            });
+        }
+
+        function bindTranslations(translations) {
+            resetTranslationInputs();
+            if (!translations || !Array.isArray(translations)) {
+                return;
+            }
+
+            translations.forEach(function (item) {
+                if (!item.languageCode) return;
+                const code = item.languageCode.toString().toLowerCase();
+                const input = $('.translation-input[data-lang="' + code + '"]');
+                if (input.length) {
+                    input.val(item.name);
+                }
+            });
+        }
+
         function openEditEventModal(id) {
             const modalTitle = $('#editEventModal .modal-title');
+            resetTranslationInputs();
             if (id === 0) {
                 $('#editEventForm')[0].reset();
                 $('#editId').val(0);
@@ -193,9 +269,9 @@
                 $('#editId').val(data.id);
                 $('#editStartTime').val(data.openingTime);
                 $('#editEndTime').val(data.closingTime);
-                $('#editDuration').val(data.durationInMinutes);
                 $('#editB2C').val(data.isAvailableOnB2C.toString());
                 $('#editB2B').val(data.isAvailableOnB2B.toString());
+                bindTranslations(data.translations);
 
                 modalTitle.text("@Localizer["event.INDEX.EDIT_EVENT"]");
                 $('#editEventModal').modal('show');
@@ -207,14 +283,22 @@
         $('#editEventForm').submit(function (e) {
             e.preventDefault();
             const id = Number($('#editId').val());
+            const translations = [];
+
+            $('.translation-input').each(function () {
+                translations.push({
+                    LanguageCode: $(this).data('lang'),
+                    Name: $(this).val()
+                });
+            });
+
             const data = {
                 Id: id,
-                Name: $('#editName').val(),
                 StartTime: $('#editStartTime').val(),
                 EndTime: $('#editEndTime').val(),
-                DurationInMinutes: $('#editDuration').val(),
                 IsAvailableOnB2C: $('#editB2C').val() === "true",
-                IsAvailableOnB2B: $('#editB2B').val() === "true"
+                IsAvailableOnB2B: $('#editB2B').val() === "true",
+                Translations: translations
             };
 
             const url = id === 0 ? '/Event/Create' : '/Event/Update';
@@ -232,7 +316,7 @@
                     }
                 },
                 error: function () {
-                    Swal.fire("@Localizer["event.INDEX.ERROR"]", "@Localizer["event.INDEX.SERVER_ERROR"].", "error");
+                    Swal.fire("@Localizer["event.INDEX.ERROR"]", "@Localizer["event.INDEX.SERVER_ERROR"]", "error");
                 }
             });
         });

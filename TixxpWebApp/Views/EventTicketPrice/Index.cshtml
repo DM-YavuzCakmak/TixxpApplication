@@ -1,5 +1,4 @@
 ﻿@using Tixxp.Entities.EventTicketPrice
-@using Tixxp.Entities.Events
 @using Tixxp.Entities.TicketType
 @using Tixxp.Entities.PriceCategory
 @using Tixxp.Entities.CurrencyType
@@ -9,7 +8,8 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Etkinlik Bilet Fiyatları";
-    var events = ViewBag.Events as List<EventEntity>;
+    var events = ViewBag.Events as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+    var eventNames = ViewBag.EventNames as Dictionary<long, string> ?? new Dictionary<long, string>();
     var ticketTypes = ViewBag.TicketTypes as List<TicketTypeEntity>;
     var priceCategories = ViewBag.PriceCategories as List<PriceCategoryEntity>;
     var currencyTypes = ViewBag.CurrencyTypes as List<CurrencyTypeEntity>;
@@ -41,8 +41,9 @@
                             {
                                 foreach (var item in Model)
                                 {
+                                    var eventName = eventNames.TryGetValue(item.EventId, out var en);
                                     <tr>
-                                        <td>@item.Event?.Name</td>
+                                        <td>@eventName</td>
                                         <td>@item.TicketType?.Name</td>
                                         <td>@item.PriceCategory?.Name</td>
                                         <td>@item.Price.ToString("N2")</td>

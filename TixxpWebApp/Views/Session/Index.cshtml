@@ -1,7 +1,6 @@
 ﻿@using Tixxp.Core.Utilities.Helper
 @using Tixxp.Entities.PriceCategory
 @using Tixxp.Entities.Session
-@using Tixxp.Entities.Events
 @using Tixxp.Entities.EventTicketPrice
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
@@ -11,7 +10,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Seans Listesi";
 
-    var events = ViewBag.Events as List<EventEntity> ?? new();
+    var events = ViewBag.Events as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
     var priceCategories = ViewBag.PriceCategories as List<PriceCategoryEntity> ?? new();
     var eventTicketPrices = ViewBag.EventTicketPrices as List<EventTicketPriceEntity> ?? new();
     var sessionTicketPrices = ViewBag.SessionTicketPrices as List<Tixxp.Entities.SessionEventTicketPrice.SessionEventTicketPriceEntity> ?? new();
@@ -108,7 +107,8 @@
                                     .Distinct()
                                     .ToList();
 
-                                    var eventName = events.FirstOrDefault(ev => ev.Id == item.EventId)?.Name ?? "-";
+                                    var eventObj = events.FirstOrDefault(ev => ((dynamic)ev).Id == item.EventId);
+                                    var eventName = eventObj != null ? ((dynamic)eventObj).Name : "-";
                                     var typeText = (item.TypeId.HasValue && typeNames.TryGetValue(item.TypeId.Value, out var tn)) ? tn : "-";
                                     var statusText = (item.StatusId.HasValue && statusNames.TryGetValue(item.StatusId.Value, out var sn)) ? sn : "-";
 

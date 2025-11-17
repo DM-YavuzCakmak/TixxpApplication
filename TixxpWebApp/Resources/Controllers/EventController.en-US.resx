@@ -132,4 +132,7 @@
   <data name="eventController.GET_BY_ID.EVENT_NOT_FOUND" xml:space="preserve">
     <value>Event Not Found</value>
   </data>
+  <data name="eventController.VALIDATION.TRANSLATION_REQUIRED" xml:space="preserve">
+    <value>Please provide at least one translated name.</value>
+  </data>
 </root>

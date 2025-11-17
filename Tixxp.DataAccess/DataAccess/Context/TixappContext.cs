@@ -13,6 +13,7 @@ using Tixxp.Entities.Currency;
 using Tixxp.Entities.CurrencyType;
 using Tixxp.Entities.Events;
 using Tixxp.Entities.EventTicketPrice;
+using Tixxp.Entities.EventTranslation;
 using Tixxp.Entities.Guide;
 using Tixxp.Entities.InvoiceType;
 using Tixxp.Entities.Language;
@@ -226,6 +227,10 @@ namespace Tixxp.Infrastructure.DataAccess.Context
             {
                 entity.ToTable("Event", _schema);
             });
+            modelBuilder.Entity<EventTranslationEntity>(entity =>
+            {
+                entity.ToTable("EventTranslation", _schema);
+            });
             modelBuilder.Entity<AgencyContractEntity>(entity =>
             {
                 entity.ToTable("AgencyContract", _schema);
@@ -284,6 +289,7 @@ namespace Tixxp.Infrastructure.DataAccess.Context
         public DbSet<BankEntity> Banks { get; set; }
         public DbSet<GuideEntity> Guides { get; set; }
         public DbSet<EventEntity> Events { get; set; }
+        public DbSet<EventTranslationEntity> EventTranslations { get; set; }
         public DbSet<ProductSaleEntity> ProductSales { get; set; }
         public DbSet<ProductPriceEntity> ProductPrices { get; set; }
         public DbSet<ProductSaleDetailEntity> ProductSaleDetails { get; set; }

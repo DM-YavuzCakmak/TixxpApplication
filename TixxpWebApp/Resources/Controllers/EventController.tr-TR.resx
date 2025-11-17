@@ -132,4 +132,7 @@
   <data name="eventController.GET_BY_ID.EVENT_NOT_FOUND" xml:space="preserve">
     <value>Etkinlik Bulunamadı</value>
   </data>
+  <data name="eventController.VALIDATION.TRANSLATION_REQUIRED" xml:space="preserve">
+    <value>Lütfen en az bir dilde etkinlik adı girin.</value>
+  </data>
 </root>
