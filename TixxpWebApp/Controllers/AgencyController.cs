@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 using Tixxp.Business.Services.Abstract.Agency;
 using Tixxp.Entities.Agency;
@@ -8,10 +9,14 @@ namespace Tixxp.WebApp.Controllers
     public class AgencyController : Controller
     {
         private readonly IAgencyService _agencyService;
+        private readonly IStringLocalizer<AgencyController> _stringLocalizer;
 
-        public AgencyController(IAgencyService agencyService)
+        public AgencyController(
+            IAgencyService agencyService,
+            IStringLocalizer<AgencyController> stringLocalizer)
         {
             _agencyService = agencyService;
+            _stringLocalizer = stringLocalizer;
         }
 
         public IActionResult Index()
@@ -34,7 +39,7 @@ namespace Tixxp.WebApp.Controllers
                 });
             }
 
-            return Json(new { success = false, message = "Acente bulunamadı." });
+            return Json(new { success = false, message = _stringLocalizer["agency.INDEX.AGENCY_NOT_FOUND"].Value });
         }
 
         [HttpPost]
@@ -51,7 +56,7 @@ namespace Tixxp.WebApp.Controllers
             var result = _agencyService.Add(model);
             if (result.Success)
             {
-                return Json(new { success = true, message = "Acente başarıyla eklendi." });
+                return Json(new { success = true, message = _stringLocalizer["agency.INDEX.AGENCY_ADDED_SUCCESS"].Value });
             }
 
             return Json(new { success = false, message = result.Message });
@@ -62,7 +67,7 @@ namespace Tixxp.WebApp.Controllers
         {
             var existing = _agencyService.GetById(model.Id);
             if (!existing.Success || existing.Data == null)
-                return Json(new { success = false, message = "Acente bulunamadı." });
+                return Json(new { success = false, message = _stringLocalizer["agency.INDEX.AGENCY_NOT_FOUND"].Value });
 
             var entity = existing.Data;
             entity.Name = model.Name;
@@ -70,7 +75,7 @@ namespace Tixxp.WebApp.Controllers
             var result = _agencyService.Update(entity);
             if (result.Success)
             {
-                return Json(new { success = true, message = "Acente başarıyla güncellendi." });
+                return Json(new { success = true, message = _stringLocalizer["agency.INDEX.AGENCY_UPDATED_SUCCESS"].Value });
             }
 
             return Json(new { success = false, message = result.Message });
@@ -81,7 +86,7 @@ namespace Tixxp.WebApp.Controllers
         {
             var existing = _agencyService.GetById(id);
             if (!existing.Success || existing.Data == null)
-                return Json(new { success = false, message = "Acente bulunamadı." });
+                return Json(new { success = false, message = _stringLocalizer["agency.INDEX.AGENCY_NOT_FOUND"].Value });
 
             var entity = existing.Data;
             entity.IsDeleted = true; // Soft delete
@@ -89,7 +94,7 @@ namespace Tixxp.WebApp.Controllers
             var result = _agencyService.Update(entity);
             if (result.Success)
             {
-                return Json(new { success = true, message = "Acente başarıyla silindi." });
+                return Json(new { success = true, message = _stringLocalizer["agency.INDEX.AGENCY_DELETED_SUCCESS"].Value });
             }
 
             return Json(new { success = false, message = result.Message });

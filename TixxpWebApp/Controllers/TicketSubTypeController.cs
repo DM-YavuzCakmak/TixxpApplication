@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Tixxp.Business.Services.Abstract.TicketSubType;
 using Tixxp.Business.Services.Abstract.TicketType;
 using Tixxp.Entities.TicketSubType;
@@ -9,11 +10,16 @@ namespace Tixxp.WebApp.Controllers
     {
         private readonly ITicketSubTypeService _ticketSubTypeService;
         private readonly ITicketTypeService _ticketTypeService;
+        private readonly IStringLocalizer<TicketSubTypeController> _stringLocalizer;
 
-        public TicketSubTypeController(ITicketSubTypeService ticketSubTypeService, ITicketTypeService ticketTypeService)
+        public TicketSubTypeController(
+            ITicketSubTypeService ticketSubTypeService, 
+            ITicketTypeService ticketTypeService,
+            IStringLocalizer<TicketSubTypeController> stringLocalizer)
         {
             _ticketSubTypeService = ticketSubTypeService;
             _ticketTypeService = ticketTypeService;
+            _stringLocalizer = stringLocalizer;
         }
 
         public IActionResult Index()
@@ -56,7 +62,7 @@ namespace Tixxp.WebApp.Controllers
         {
             var existing = _ticketSubTypeService.GetFirstOrDefault(x => x.Id == model.Id);
             if (!existing.Success)
-                return Json(new { success = false, message = "Kayıt bulunamadı." });
+                return Json(new { success = false, message = _stringLocalizer["ticketSubType.INDEX.RECORD_NOT_FOUND"].Value });
 
             existing.Data.Name = model.Name;
             existing.Data.Description = model.Description;
@@ -72,7 +78,7 @@ namespace Tixxp.WebApp.Controllers
         {
             var existing = _ticketSubTypeService.GetFirstOrDefault(x => x.Id == id);
             if (!existing.Success)
-                return Json(new { success = false, message = "Kayıt bulunamadı." });
+                return Json(new { success = false, message = _stringLocalizer["ticketSubType.INDEX.RECORD_NOT_FOUND"].Value });
 
             existing.Data.IsDeleted = true;
             var result = _ticketSubTypeService.Update(existing.Data);

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ticketSubType.INDEX.TITLE" xml:space="preserve">
+    <value>Bilet Alt Tip Listesi</value>
+  </data>
+  <data name="ticketSubType.INDEX.ADD_NEW" xml:space="preserve">
+    <value>Yeni Alt Tip</value>
+  </data>
+  <data name="ticketSubType.INDEX.SUB_TYPES" xml:space="preserve">
+    <value>Alt Tipler</value>
+  </data>
+  <data name="ticketSubType.INDEX.NAME" xml:space="preserve">
+    <value>Adı</value>
+  </data>
+  <data name="ticketSubType.INDEX.DESCRIPTION" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="ticketSubType.INDEX.TICKET_TYPE" xml:space="preserve">
+    <value>Bilet Tipi</value>
+  </data>
+  <data name="ticketSubType.INDEX.ACTIONS" xml:space="preserve">
+    <value>İşlem</value>
+  </data>
+  <data name="ticketSubType.INDEX.EDIT" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="ticketSubType.INDEX.DELETE" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="ticketSubType.INDEX.NO_RECORDS_FOUND" xml:space="preserve">
+    <value>Kayıt bulunamadı.</value>
+  </data>
+  <data name="ticketSubType.INDEX.EDIT_SUB_TYPE" xml:space="preserve">
+    <value>Alt Tip Düzenle</value>
+  </data>
+  <data name="ticketSubType.INDEX.ADD_SUB_TYPE" xml:space="preserve">
+    <value>Alt Tip Ekle</value>
+  </data>
+  <data name="ticketSubType.INDEX.SUB_TYPE_NAME" xml:space="preserve">
+    <value>Alt Tip Adı</value>
+  </data>
+  <data name="ticketSubType.INDEX.SELECT" xml:space="preserve">
+    <value>Seçiniz</value>
+  </data>
+  <data name="ticketSubType.INDEX.SAVE" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="ticketSubType.INDEX.ARE_YOU_SURE" xml:space="preserve">
+    <value>Emin misiniz?</value>
+  </data>
+  <data name="ticketSubType.INDEX.DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Bu alt tipi silmek üzeresiniz.</value>
+  </data>
+  <data name="ticketSubType.INDEX.YES_DELETE" xml:space="preserve">
+    <value>Evet, sil!</value>
+  </data>
+  <data name="ticketSubType.INDEX.CANCEL" xml:space="preserve">
+    <value>Vazgeç</value>
+  </data>
+  <data name="ticketSubType.INDEX.DELETED" xml:space="preserve">
+    <value>Silindi</value>
+  </data>
+  <data name="ticketSubType.INDEX.SUCCESS" xml:space="preserve">
+    <value>Başarılı</value>
+  </data>
+  <data name="ticketSubType.INDEX.ERROR" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="ticketSubType.INDEX.SERVER_ERROR" xml:space="preserve">
+    <value>Sunucuya ulaşılamadı.</value>
+  </data>
+  <data name="ticketSubType.INDEX.DATA_ERROR" xml:space="preserve">
+    <value>Veri alınamadı.</value>
+  </data>
+</root>
+
